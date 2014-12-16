@@ -4,6 +4,39 @@ import pylab as pl
 import matplotlib as mpl
 import wills_functions as wf
 
+
+'''
+fills a figure object with data contained in vertically stacked columns (see np.vstack). I.e. first column is the x-axis datat and all other columns contain y-axis data.
+
+Example(s): python/plot_gb_concentration_profiles.py
+'''
+def plot_multiple_1d( data, color='', style='' ):
+    columns = data.shape[1]
+    x = data[ :, 0 ]
+    
+    if style
+    for i in range( 1, columns ):
+        pl.plot( x, data[ :, i ], color = color )
+    pl.show()
+    
+def color_list( ind ):
+    colors = [ 'black', 'red', 'blue', 'green', 'magenta', 'cyan' ]
+    colors = colors + colors + colors + colors + colors
+    return colors[ ind ]
+    
+'''
+pluck a counter pattern (e.g. an incrementing number in filenames) from a string. For a string 'files_gb_03', sub_pattern is '_gb_', counter length is 2 ('03' has two characters). Returns '03'.
+
+Example(s): python/plot_gb_concentration_profiles.py
+'''
+def pluck_sub_string_counter( string, sub_pattern, counter_length ):
+    #     if isinstance( string, str ) and string.__contain__( sub_string ) # check that both are str and one contains other
+    if isinstance( string, str ) and string.__contains__( sub_pattern ):
+        pattern_index = np.core.defchararray.find( string, sub_pattern )
+        counter_index = pattern_index + len( sub_pattern )
+        counter = string[ counter_index : counter_index + counter_length ]
+        return counter
+
 # add a text annotation to a plot. centered at x, y (in data coordinates), 
 # string is the text, color is the text color. REQUIRES PYLAB
 def centered_annotation( x, y, string, color ):
