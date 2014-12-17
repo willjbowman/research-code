@@ -10,14 +10,23 @@ fills a figure object with data contained in vertically stacked columns (see np.
 
 Example(s): python/plot_gb_concentration_profiles.py
 '''
-def plot_multiple_1d( data, color='', style='' ):
+def plot_multiple_1d( data, color='', style='', shift='' ):
     columns = data.shape[1]
     x = data[ :, 0 ]
     
-    if style
+    if len( shift ) == 2 :
+        shift_value = shift[ 0 ]
+        shift_center = shift[ 1 ]
+        x = x + ( shift_center - shift_value )
+    
     for i in range( 1, columns ):
-        pl.plot( x, data[ :, i ], color = color )
+        pl.plot( x, data[ :, i ], color = color, marker = style )
     pl.show()
+    
+def marker_list( ind ):
+    markers = [ 'o', 'v', '^', 's', 'D', 'x', '+', '*' ]
+    markers = markers + markers + markers + markers + markers
+    return markers[ ind ]
     
 def color_list( ind ):
     colors = [ 'black', 'red', 'blue', 'green', 'magenta', 'cyan' ]

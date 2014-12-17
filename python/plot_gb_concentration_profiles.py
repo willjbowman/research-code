@@ -11,7 +11,7 @@ from os import path
 # filename: 'map_xx_gb_y' where xx and yy are counters
 
 # specify path to directory of elemental map files
-maps_dir = "c:/Dropbox/SOFC Electrolyte Project/Microscopy/141118_10Ca_ARM200kV/gb_maps/calculated_concentrations/"
+maps_dir = "c:/Dropbox/SOFC Electrolyte Project/Microscopy/141007_2Ca_ARM200kV/gb_maps/calculated_concentrations/"
 map_files = listdir( maps_dir ) # get map file names
 
 pl.close( 'all' )
@@ -21,15 +21,33 @@ for file in map_files:
     gb_num_i = wf.pluck_sub_string_counter( file, '_gb_', 2 )
     d = np.loadtxt( maps_dir + file )
     
+#     wf.shift_curve( d, x, 0 )
+    x = d[ :, 0 ]
+    y = d[ :, 1 ]
+    min_y = np.min( y )
+    max_y = np.max( y )
+    mean_y = np.mean( y )
+    if ( max_y - mean_y ) > ( mean_y - min_y ) :
+        yy = y.tolist()
+        shift_index = yy.index( max_y )
+        shift_value = x[ shift_index ]
+    else:
+        yy = y.tolist()
+        shift_index = yy.index( min_y )
+        shift_value = x[ shift_index ]
+    
     col_num = map_files.index( file )
     col = wf.color_list( col_num )
+    mark = wf.marker_list( col_num )
     
     if gb_num_i == gb_num:
-        wf.plot_multiple_1d( d, color = col )
+        wf.plot_multiple_1d( d, color = col, shift = ( shift_value, 0 ), style = mark )
             
     else:
         pl.figure()
-        wf.plot_multiple_1d( d, color = col )
+        wf.plot_multiple_1d( d, color = col, shift = ( shift_value, 0 ), style = mark )
+    
+    ax = pl.gca()
         
     gb_num = gb_num_i
     
