@@ -45,11 +45,12 @@ def calculate_concentration( i_CeM, i_CaL, i_OK ) :
     return c_Ca_i, c_Ce_i, c_O_i
 
         
-def save_concentration_map( x, c_Ce_i, c_Ca_i, c_O_i, maps_dir, id, gb_id, k_CaCe, k_OCe ) :         
-    output_data = np.vstack( ( x, c_Ce_i, c_Ca_i, c_O_i ) )
+def save_concentration_map( x, i_Ca_Ce, i_O_Ce, c_Ce_i, c_Ca_i, c_O_i, maps_dir, id, gb_id, k_CaCe, k_OCe ) :         
+    output_data = np.vstack( ( x, i_Ca_Ce, i_O_Ce, c_Ce_i, c_Ca_i, c_O_i ) )
     output_dir = maps_dir + 'calculated_concentrations/'
     output_file = 'map_' + id + '_gb_' + gb_id + '.txt'
     head = 'gb_id: ' + gb_id + '\nmap_id: ' + id + '\nk_CaCe: ' + str( k_CaCe ) + '\nk_OCe ' + str( k_OCe )
+    head = head + '\ndist (nm)\tI_Ca/I_Ce\tI_OK/I_Ce\t[Ce]\t[Ca]\t[O]'
         
     np.savetxt( output_dir + output_file, output_data.T, delimiter='\t', header=head, fmt='%10.3e', newline='\n')
 
@@ -80,6 +81,9 @@ for id in map_ids:
                 i_CaL = CaL[ :, i ]
                 i_OK = OK[ :, i ]
                 
+                i_Ca_Ce = i_CaL / i_CeM
+                i_O_Ce = i_OK / i_CeM
+                
                 c_Ca_i, c_Ce_i, c_O_i = calculate_concentration( i_CeM, i_CaL, i_OK )
                 
                 id_counter = 0.1 # create subcounter string for file name
@@ -89,7 +93,7 @@ for id in map_ids:
 #                 print( id_float, id_int, id )
                 
                 # save
-                save_concentration_map( x, c_Ce_i, c_Ca_i, c_O_i, maps_dir, id, gb_id, k_CaCe, k_OCe )
+                save_concentration_map( x, i_Ca_Ce, i_O_Ce, c_Ce_i, c_Ca_i, c_O_i, maps_dir, id, gb_id, k_CaCe, k_OCe )
         else :
             # 1d map
             x = CeM[ :, 0 ] # distance exported from DM as 1st column
