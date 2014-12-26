@@ -11,7 +11,8 @@ from os import path
 # filename: 'map_xx_gb_y' where xx and yy are counters
 
 # specify path to directory of elemental map files
-maps_dir = "c:/Dropbox/SOFC Electrolyte Project/Microscopy/141118_10Ca_ARM200kV/gb_maps/calculated_concentrations/"
+maps_dir = "c:/Dropbox/SOFC Electrolyte Project/Microscopy/141007_2Ca_ARM200kV/gb_maps/calculated_concentrations/"
+maps_label = '2Ca_'
 map_files = listdir( maps_dir ) # get map file names
 
 pl.close( 'all' )
@@ -19,7 +20,7 @@ pl.close( 'all' )
 def label_and_save_current():
     ax = pl.gca()
     title = 'GB_' + str( gb_num )
-    ax.set_title( title )
+    ax.set_title( maps_label + title )
     ax.set_xlabel( 'distance (nm)' )
     ax.set_ylabel( 'Concentration' )
     
@@ -27,7 +28,7 @@ def label_and_save_current():
         output_dir = path.join( maps_dir, 'plots/' )
         if not path.exists( output_dir ) :
             mkdir( output_dir )
-        pl.savefig( output_dir + title + '.png', format = 'png', dpi = 500 )
+        pl.savefig( output_dir + maps_label + title + '.png', format = 'png', dpi = 500 )
 
 gb_num = None
 for file in map_files:

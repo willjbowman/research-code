@@ -10,7 +10,7 @@ from os import path
 k_CaCe, k_OCe = 1.89, 5.81 # calculated from 10Ca 2d scans (x spectra)
 
 # specify path to directory of elemental map files
-maps_dir = "c:/Dropbox/SOFC Electrolyte Project/Microscopy/140821_5CaDC_ARM200kV/gb_maps/"
+maps_dir = "c:/Dropbox/SOFC Electrolyte Project/Microscopy/140821_5CaDC_ARM200kV/gb_maps_141226/"
 map_file_names = listdir( maps_dir ) # get map file names
 common_sub_str = 'EELS'
 sub_str_pattern = 'EELS_XX_'
