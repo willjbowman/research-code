@@ -11,8 +11,12 @@ from os import path
 # filename: 'map_xx_gb_y' where xx and yy are counters
 
 # specify path to directory of elemental map files
-maps_dir = "c:/Dropbox/SOFC Electrolyte Project/Microscopy/140821_5CaDC_ARM200kV/gb_maps_141230/calculated_concentrations/"
-maps_label = '5CaDC_'
+maps_dir = "c:/Dropbox/SOFC Electrolyte Project/Microscopy/141118_10Ca_ARM200kV/gb_maps_141229/calculated_concentrations/"
+maps_label = '10Ca_'
+# maps_dir = "c:/Dropbox/SOFC Electrolyte Project/Microscopy/140821_5CaDC_ARM200kV/gb_maps_141230/calculated_concentrations/"
+# maps_label = '5CaDC_'
+# maps_dir = "c:/Dropbox/SOFC Electrolyte Project/Microscopy/141007_2Ca_ARM200kV/gb_maps_141230/calculated_concentrations/"
+# maps_label = '2Ca_'
 map_files = listdir( maps_dir ) # get map file names
 
 pl.close( 'all' )
