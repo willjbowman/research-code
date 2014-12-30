@@ -7,10 +7,10 @@ from os import listdir # listdir(dir_path) returns array of file names in dir_pa
 from os import mkdir
 from os import path
 ##
-k_CaCe, k_OCe = 1.89, 5.81 # calculated from 10Ca 2d scans (x spectra)
+k_CaCe, k_OCe = 0.593, 2.999 # calculated from 10Ca 2d scans (x spectra)
 
 # specify path to directory of elemental map files
-maps_dir = "c:/Dropbox/SOFC Electrolyte Project/Microscopy/140821_5CaDC_ARM200kV/gb_maps_141226/"
+maps_dir = "c:/Dropbox/SOFC Electrolyte Project/Microscopy/140821_5CaDC_ARM200kV/gb_maps_141230/"
 map_file_names = listdir( maps_dir ) # get map file names
 common_sub_str = 'EELS'
 sub_str_pattern = 'EELS_XX_'
@@ -64,7 +64,7 @@ for id in map_ids:
                 
         # get gb id from file name
         # gb_id = get_gb_id( file_group[0], '_gb' )
-        gb_id = wf.pluck_sub_string_counter( file_group[ 0 ], '_gb', 2 )
+        gb_id = wf.pluck_sub_string_counter( file_group[ 0 ], '_gb', 1 )
         
         screening_map = np.loadtxt( file_group[1], skiprows = 3 )
         # check map dimensions for 1d or 2d spectrum images
@@ -96,15 +96,18 @@ for id in map_ids:
                 save_concentration_map( x, i_Ca_Ce, i_O_Ce, c_Ce_i, c_Ca_i, c_O_i, maps_dir, id, gb_id, k_CaCe, k_OCe )
         else :
             # 1d map
-            x = CeM[ :, 0 ] # distance exported from DM as 1st column
             CeM = np.loadtxt( file_group[1] ) # load concentration maps data
             CaL = np.loadtxt( file_group[0] )
             OK = np.loadtxt( file_group[2] )
+            x = CeM[ :, 0 ] # distance exported from DM as 1st column
             i_CeM = CeM[ :, 1 ]
             i_CaL = CaL[ :, 1 ]
             i_OK = OK[ :, 1 ]
+                
+            i_Ca_Ce = i_CaL / i_CeM
+            i_O_Ce = i_OK / i_CeM
             
             c_Ca_i, c_Ce_i, c_O_i = calculate_concentration( i_CeM, i_CaL, i_OK )
             
             # save
-            save_concentration_map( x, c_Ce_i, c_Ca_i, c_O_i, maps_dir, id, gb_id, k_CaCe, k_OCe )
+            save_concentration_map( x, i_Ca_Ce, i_O_Ce, c_Ce_i, c_Ca_i, c_O_i, maps_dir, id, gb_id, k_CaCe, k_OCe )

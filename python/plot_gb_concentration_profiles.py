@@ -11,8 +11,8 @@ from os import path
 # filename: 'map_xx_gb_y' where xx and yy are counters
 
 # specify path to directory of elemental map files
-maps_dir = "c:/Dropbox/SOFC Electrolyte Project/Microscopy/141007_2Ca_ARM200kV/gb_maps/calculated_concentrations/"
-maps_label = '2Ca_'
+maps_dir = "c:/Dropbox/SOFC Electrolyte Project/Microscopy/140821_5CaDC_ARM200kV/gb_maps_141230/calculated_concentrations/"
+maps_label = '5CaDC_'
 map_files = listdir( maps_dir ) # get map file names
 
 pl.close( 'all' )
@@ -33,12 +33,12 @@ def label_and_save_current():
 gb_num = None
 for file in map_files:
     if file.endswith( '.txt' ) :
-        gb_num_i = wf.pluck_sub_string_counter( file, '_gb_', 2 )
+        gb_num_i = wf.pluck_sub_string_counter( file, '_gb_', 1 )
         d = np.loadtxt( maps_dir + file )
     
 #     wf.shift_curve( d, x, 0 )
         x = d[ :, 0 ]
-        y = d[ :, 1 ]
+        y = d[ :, 3 ]
         min_y = np.min( y )
         max_y = np.max( y )
         mean_y = np.mean( y )
@@ -56,14 +56,14 @@ for file in map_files:
         mark = wf.marker_list( col_num )
     
         if gb_num_i == gb_num:
-            wf.plot_multiple_1d( d, color = col, shift = ( shift_value, 0 ), style = mark )
+            wf.plot_multiple_1d( d, 3, 6, color = col, shift = ( shift_value, 0 ), style = mark )
             
         else:
             # label previous figure if it exists
             label_and_save_current()
             # or create one if it doesn't
             pl.figure() # create new figure
-            wf.plot_multiple_1d( d, color = col, shift = ( shift_value, 0 ), style = mark )
+            wf.plot_multiple_1d( d, 3, 6, color = col, shift = ( shift_value, 0 ), style = mark )
         
         gb_num = gb_num_i
 

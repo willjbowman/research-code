@@ -10,7 +10,7 @@ fills a figure object with data contained in vertically stacked columns (see np.
 
 Example(s): python/plot_gb_concentration_profiles.py
 '''
-def plot_multiple_1d( data, color='', style='', shift='' ):
+def plot_multiple_1d( data, col_0, col_n, color='', style='', shift='' ):
     columns = data.shape[1]
     x = data[ :, 0 ]
     
@@ -19,7 +19,7 @@ def plot_multiple_1d( data, color='', style='', shift='' ):
         shift_center = shift[ 1 ]
         x = x + ( shift_center - shift_value )
     
-    for i in range( 1, columns ):
+    for i in range( col_0, col_n ):
         pl.plot( x, data[ :, i ], color = color, marker = style )
     pl.show()
     
