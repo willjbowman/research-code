@@ -10,37 +10,39 @@ from os import path
 k_CaCe, k_OCe = 0.593, 2.999 # calculated from 10Ca 2d scans (x spectra)
 
 # specify path to directory of elemental map files
-maps_dir = "c:/Dropbox/SOFC Electrolyte Project/Microscopy/140821_5CaDC_ARM200kV/gb_maps_141230/"
+maps_dir = "c:/Dropbox/SOFC Electrolyte Project/Microscopy/141118_10Ca_ARM200kV/gb_maps_141229/"
+# maps_dir = "c:/Dropbox/SOFC Electrolyte Project/Microscopy/140821_5CaDC_ARM200kV/gb_maps_141230/"
+# maps_dir = "c:/Dropbox/SOFC Electrolyte Project/Microscopy/141007_2Ca_ARM200kV/gb_maps_141230/"
 map_file_names = listdir( maps_dir ) # get map file names
-common_sub_str = 'EELS'
-sub_str_pattern = 'EELS_XX_'
 
+common_sub_str = 'EELS' # define common patterns to locate unique file IDs
+sub_str_pattern = 'EELS_XX_'
 # pluck 2-digit map ids (e.g. '00') from file names
 map_ids = [] # list of map ids
 for file_name in map_file_names:
-    if np.core.defchararray.find( file_name, common_sub_str ):
-        uniq_sub_index = np.core.defchararray.find( file_name, common_sub_str )
-        uniq_id_index = uniq_sub_index + len( sub_str_pattern )
+    if np.core.defchararray.find( file_name, common_sub_str ): #if find sub string
+        uniq_sub_index = np.core.defchararray.find( file_name, common_sub_str ) #get substr index
+        uniq_id_index = uniq_sub_index + len( sub_str_pattern ) #get uniq ID index
         map_ids.append( file_name[ uniq_id_index : uniq_id_index + 2 ] ) # pluck 2-digit map id from file name
 
 # list(set()) removes duplicates, sorted() performs ascending sort
 map_ids = sorted( list( set( map_ids ) ) )
 
-def get_gb_id( file_name, sub_str ):
+def get_gb_id( file_name, sub_str ): #this is outdated, use wf.pluck_sub_string_counter()
     gb_str_index = np.core.defchararray.find( file_name, sub_str )
     gb_id = file_name[ gb_str_index + len( sub_str ) ]
     return gb_id
     
-if not path.isdir( maps_dir + 'calculated_concentrations' ):
+if not path.isdir( maps_dir + 'calculated_concentrations' ): #create dir if not exists
     mkdir ( maps_dir + 'calculated_concentrations' )
 
-def calculate_concentration( i_CeM, i_CaL, i_OK ) :
+def calculate_concentration( i_CeM, i_CaL, i_OK ): #calculate concentrations from eels intensity ratios and k-factors (from calculate_k_factors.py)
     kr_CaCe = i_CaL / i_CeM * k_CaCe
     kr_OCe = i_OK / i_CeM * k_OCe
         
-    c_Ca_i = kr_CaCe / ( 1 + kr_CaCe )
-    c_Ce_i = 1 - c_Ca_i
-    c_O_i = 2 - c_Ca_i
+    c_Ca_i = kr_CaCe / ( 1 + kr_CaCe ) #Ca concentration (assume [Ca] = 1 - [Ce])
+    c_O_i = - kr_OCe / ( 1 - kr_OCe ) #O concentration (assume [Ce] = [O] - 1)
+    c_Ce_i = 1 - c_Ca_i #Ce concentration ([Ce] = 1 - [Ca]).
     
     return c_Ca_i, c_Ce_i, c_O_i
 
