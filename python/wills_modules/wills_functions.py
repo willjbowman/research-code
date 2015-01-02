@@ -1,4 +1,4 @@
-# these are functions that I use repeatedly
+''' ########################### IMPORT MODULES ########################### '''
 import numpy as np
 import pylab as pl
 import matplotlib as mpl
@@ -6,7 +6,7 @@ import wills_functions as wf
 
 
 '''
-fills a figure object with data contained in vertically stacked columns (see np.vstack). I.e. first column is the x-axis datat and all other columns contain y-axis data.
+fills a figure object with data contained in vertical columns (see np.vstack().T) ranging between columns labelled col_0 to col_n. I.e. first column is the x-axis data and all other columns contain y-axis data.
 
 Example(s): python/plot_gb_concentration_profiles.py
 '''
