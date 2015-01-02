@@ -111,5 +111,5 @@ for id in map_ids:
             
             c_Ca_i, c_Ce_i, c_O_i = calculate_concentration( i_CeM, i_CaL, i_OK )
             
-            # save
+            # save - should output intensity ratio (after scaling/splicing), concentration ratio at minimnum)
             save_concentration_map( x, i_Ca_Ce, i_O_Ce, c_Ce_i, c_Ca_i, c_O_i, maps_dir, id, gb_id, k_CaCe, k_OCe )
