@@ -22,7 +22,7 @@ maps_dir = "c:/Dropbox/SOFC Electrolyte Project/Microscopy/141118_10Ca_ARM200kV/
 # maps_dir = "c:/Dropbox/SOFC Electrolyte Project/Microscopy/141007_2Ca_ARM200kV/gb_maps_141230/"
 
 # specify load order,z, of each element in the map (see np.loadtxt( filegroup[ z ] )
-z_Ca, z_O, z_Ce = 0, 2, 1
+z_Ca, z_O, z_Ce = 1, 2, 0
 
 common_sub_str = 'EELS' # define common patterns to locate unique file IDs
 sub_str_pattern = 'EELS_XX_'
@@ -88,7 +88,7 @@ for id in map_ids: # iterate through unique map ids
             for i in range( 1, map_cols ) : # create 1d linescan from each row of 2d spectrum image
             
                 # process_integrated_intensity( CeM, CaL, OK, i ) :
-                    
+    
                 x = CeM[ :, 0 ] # distance exported from DM as 1st column
                 i_CeM = CeM[ :, i ] # integrated eels intensity from ith row of 2d SI
                 i_CaL = CaL[ :, i ]

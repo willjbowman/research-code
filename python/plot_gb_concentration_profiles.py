@@ -17,24 +17,25 @@ from os import path
 
 # specify path to directory of eels intensity map files and label for output files
 
-maps_dir = "c:/Dropbox/SOFC Electrolyte Project/Microscopy/141118_10Ca_ARM200kV/gb_maps_141229/calculated_concentrations/"
+maps_dir = "c:/Dropbox/SOFC Electrolyte Project/Microscopy/141118_10Ca_ARM200kV/gb_maps_141229/quantification_results/"
 maps_label = '10Ca_' 
 
-# maps_dir = "c:/Dropbox/SOFC Electrolyte Project/Microscopy/140821_5CaDC_ARM200kV/gb_maps_141230/calculated_concentrations/"
+# maps_dir = "c:/Dropbox/SOFC Electrolyte Project/Microscopy/140821_5CaDC_ARM200kV/gb_maps_141230/quantification_results/"
 # maps_label = '5CaDC_'
 
-# maps_dir = "c:/Dropbox/SOFC Electrolyte Project/Microscopy/141007_2Ca_ARM200kV/gb_maps_141230/calculated_concentrations/"
+# maps_dir = "c:/Dropbox/SOFC Electrolyte Project/Microscopy/141007_2Ca_ARM200kV/gb_maps_141230/quantification_results/"
 # maps_label = '2Ca_'
 
 
 ''' ########################### FUNCTIONS ########################### '''
 
-def label_and_save_current():
+def label_current_axis( title, x_label, y_label ) :
     ax = pl.gca()
-    title = 'GB_' + str( gb_num )
-    ax.set_title( maps_label + title )
-    ax.set_xlabel( 'distance (nm)' )
-    ax.set_ylabel( 'Concentration' )
+    ax.set_title( title )
+    ax.set_xlabel( x_label )
+    ax.set_ylabel( y_label )
+    
+def save_current_figure(  ):
     
     if title != 'GB_None' :
         output_dir = path.join( maps_dir, 'plots/' )
@@ -71,28 +72,44 @@ for file in map_files: # iterate through items in map data directory
             shift_index = yy.index( min_y )
             shift_value = x[ shift_index ]
     
-        col_num = map_files.index( file )
-        col = wf.color_list( col_num )
-        mark = wf.marker_list( col_num )
+        col_num = map_files.index( file ) # get number of file in directory
+        mark_color = wf.color_list( col_num ) # pick a color from list
+        mark = wf.marker_list( col_num ) # pick a marker from list
+        
+        ax_title = 'GB_' + str( gb_num )
+        x_label = 'distance (nm)'
     
         if gb_num_i == gb_num: # if data is from current gb plot along side on current figure
-            wf.plot_multiple_1d( d, 3, 6, color = col, shift = ( shift_value, 0 ), style = mark )
+            pl.subplot( 2, 1, 1 ) # subplot for integrated intensity ratio
+            wf.plot_multiple_1d( d, 1, 3, color = mark_color, shift = ( shift_value, 0 ), style = mark )
+            label_current_axis( ax_title, x_label, 'EELS intensity ratio' )
+            
+            pl.subplot( 2, 1, 2 ) # subplot for concentration ratio
+            wf.plot_multiple_1d( d, 3, 5, color = mark_color, shift = ( shift_value, 0 ), style = mark )
+            label_current_axis( ax_title, x_label, 'EELS concentration ratio' )
             
         else: # if data is from new gb save current and create new figure
             # label previous figure if it exists
             label_and_save_current()
-            # or create one if it doesn't
-            pl.figure() # create new figure
-            wf.plot_multiple_1d( d, 3, 6, color = col, shift = ( shift_value, 0 ), style = mark )
+            # create one if it doesn't
+            pl.figure( figsize = ( wf.mm2in( 90 ), wf.mm2in( 190 ) ) ) # create new figure
+            
+            pl.subplot( 2, 1, 1 ) # subplot for integrated intensity ratio
+            wf.plot_multiple_1d( d, 1, 3, color = mark_color, shift = ( shift_value, 0 ), style = mark )
+            label_current_axis( ax_title, x_label, 'EELS intensity ratio' )
+            
+            pl.subplot( 2, 1, 2 ) # subplot for concentration ratio
+            wf.plot_multiple_1d( d, 3, 5, color = mark_color, shift = ( shift_value, 0 ), style = mark )
+            label_current_axis( ax_title, x_label, 'EELS concentration ratio' )
         
         gb_num = gb_num_i # reset gb id counter
 
 # the last iteration will result in a figure that needs to be saved
-label_and_save_current()
+save_current_figure()
     
     
 ''' ########################### REFERENCES ########################### '''
-    
+
 '''
 equations for solving k-factor [2]
 ca/cb = ia/ib * k
