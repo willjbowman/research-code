@@ -17,7 +17,7 @@ from os import path
 
 # specify path to directory of eels intensity map files and label for output files
 
-maps_dir = "c:/Dropbox/SOFC Electrolyte Project/Microscopy/141118_10Ca_ARM200kV/gb_maps_141229/quantification_results/"
+maps_dir = "c:/Dropbox/SOFC Electrolyte Project/Microscopy/141118_10Ca_ARM200kV/gb_maps_141229/quantification_results_scaled/"
 maps_label = '10Ca_' 
 
 # maps_dir = "c:/Dropbox/SOFC Electrolyte Project/Microscopy/140821_5CaDC_ARM200kV/gb_maps_141230/quantification_results/"
@@ -35,13 +35,12 @@ def label_current_axis( title, x_label, y_label ) :
     ax.set_xlabel( x_label )
     ax.set_ylabel( y_label )
     
-def save_current_figure(  ):
-    
-    if title != 'GB_None' :
+def save_current_figure( ax_title='GB_None' ):
+    if ax_title != 'GB_None' :
         output_dir = path.join( maps_dir, 'plots/' )
         if not path.exists( output_dir ) :
             mkdir( output_dir )
-        pl.savefig( output_dir + maps_label + title + '.png', format = 'png', dpi = 500 )
+        pl.savefig( output_dir + maps_label + ax_title + '.png', format = 'png', dpi = 500 )
     
     
 ''' ########################### MAIN SCRIPT ########################### '''
@@ -90,7 +89,7 @@ for file in map_files: # iterate through items in map data directory
             
         else: # if data is from new gb save current and create new figure
             # label previous figure if it exists
-            label_and_save_current()
+            save_current_figure( ax_title )
             # create one if it doesn't
             pl.figure( figsize = ( wf.mm2in( 90 ), wf.mm2in( 190 ) ) ) # create new figure
             
@@ -105,7 +104,7 @@ for file in map_files: # iterate through items in map data directory
         gb_num = gb_num_i # reset gb id counter
 
 # the last iteration will result in a figure that needs to be saved
-save_current_figure()
+save_current_figure( ax_title )
     
     
 ''' ########################### REFERENCES ########################### '''
