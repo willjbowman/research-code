@@ -18,16 +18,16 @@ output_dir_name = 'quantification_results_scaled' # name of output directory for
 
 # specify path to directory of elemental map files
 # specify load order,z, of each element in the map (see np.loadtxt( filegroup[ z ] )
-maps_dir = "c:/Dropbox/SOFC Electrolyte Project/Microscopy/141118_10Ca_ARM200kV/gb_maps_141229/"
-z_Ca, z_O, z_Ce = 1, 2, 0
-# dictionary callable using map id as key (12eV integration window used)
-# scalar is low/high; need to multiply high by scalar to make sections equal
-Ce_scalar = { '00' : 0.972, '01' : 0.972, '03' : 0.994, '04' : 0.971, '06' : 0.976,
- '07' : 0.976, '08' : 0.975, '10' : 0.976, '11' : 0.974, '12' : 0.982 }
+# maps_dir = "c:/Dropbox/SOFC Electrolyte Project/Microscopy/141118_10Ca_ARM200kV/gb_maps_141229/"
+# z_Ca, z_O, z_Ce = 1, 2, 0
+# # dictionary callable using map id as key (12eV integration window used)
+# # scalar is low/high; need to multiply high by scalar to make sections equal
+# Ce_scalar = { '00' : 0.972, '01' : 0.972, '03' : 0.994, '04' : 0.971, '06' : 0.976,
+#  '07' : 0.976, '08' : 0.975, '10' : 0.976, '11' : 0.974, '12' : 0.982 }
 
-# maps_dir = "c:/Dropbox/SOFC Electrolyte Project/Microscopy/140821_5CaDC_ARM200kV/gb_maps_141230/"
-# z_Ca, z_O, z_Ce = 0, 2, 1
-# Ce_scalar = { '00' : 0.781, '01' : 0.781 }
+maps_dir = "c:/Dropbox/SOFC Electrolyte Project/Microscopy/140821_5CaDC_ARM200kV/gb_maps_141230/"
+z_Ca, z_O, z_Ce = 0, 2, 1
+Ce_scalar = { '01' : 0.781, '02' : 0.781 }
 
 # maps_dir = "c:/Dropbox/SOFC Electrolyte Project/Microscopy/141007_2Ca_ARM200kV/gb_maps_141230/"
 # z_Ca, z_O, z_Ce = 0, 2, 1
@@ -94,6 +94,8 @@ for id in map_ids: # iterate through unique map ids
             CaL = np.loadtxt( file_group[ z_Ca ], skiprows = 3 )
             OK = np.loadtxt( file_group[ z_O ], skiprows = 3 )
             
+            Ce_scale_factor = Ce_scalar[ id ] # get dictionary key with value of id before loop starts
+            
             for i in range( 1, map_cols ) : # create 1d linescan from each row of 2d spectrum image
             
                 # process_integrated_intensity( CeM, CaL, OK, i ) :
@@ -105,7 +107,7 @@ for id in map_ids: # iterate through unique map ids
                 
                 # scaling factors need to be integrated here
                 if len( Ce_scalar ) > 0 :
-                    i_CeM = i_CeM * Ce_scalar[ id ] # get dictionary key with value of id
+                    i_CeM = i_CeM * Ce_scale_factor # 'id' is manipulated in this loop, get Ce_scalar val outside of loop
                 
                 i_Ca_Ce = i_CaL / i_CeM # calculate integrated intensity ratios
                 i_O_Ce = i_OK / i_CeM
