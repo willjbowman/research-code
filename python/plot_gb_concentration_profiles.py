@@ -17,11 +17,11 @@ from os import path
 
 # specify path to directory of eels intensity map files and label for output files
 
-maps_dir = "c:/Dropbox/SOFC Electrolyte Project/Microscopy/141118_10Ca_ARM200kV/gb_maps_141229/quantification_results_scaled/"
-maps_label = '10Ca_' 
+# maps_dir = "c:/Dropbox/SOFC Electrolyte Project/Microscopy/141118_10Ca_ARM200kV/gb_maps_141229/quantification_results_scaled/"
+# maps_label = '10Ca_' 
 
-# maps_dir = "c:/Dropbox/SOFC Electrolyte Project/Microscopy/140821_5CaDC_ARM200kV/gb_maps_141230/quantification_results/"
-# maps_label = '5CaDC_'
+maps_dir = "c:/Dropbox/SOFC Electrolyte Project/Microscopy/140821_5CaDC_ARM200kV/gb_maps_141230/quantification_results_scaled/"
+maps_label = '5CaDC_'
 
 # maps_dir = "c:/Dropbox/SOFC Electrolyte Project/Microscopy/141007_2Ca_ARM200kV/gb_maps_141230/quantification_results/"
 # maps_label = '2Ca_'
@@ -75,7 +75,7 @@ for file in map_files: # iterate through items in map data directory
         mark_color = wf.color_list( col_num ) # pick a color from list
         mark = wf.marker_list( col_num ) # pick a marker from list
         
-        ax_title = 'GB_' + str( gb_num )
+        ax_title = maps_label + 'GB_' + str( gb_num )
         x_label = 'distance (nm)'
     
         if gb_num_i == gb_num: # if data is from current gb plot along side on current figure
