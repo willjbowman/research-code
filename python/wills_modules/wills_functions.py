@@ -4,6 +4,12 @@ import pylab as pl
 import matplotlib as mpl
 import wills_functions as wf
 
+'''
+to reload a module:
+
+import imp
+imp.reload( module_name )
+'''
 
 '''
 fills a figure object with data contained in vertical columns (see np.vstack().T) ranging between columns labelled col_0 to col_n. I.e. first column is the x-axis data and all other columns contain y-axis data.
@@ -21,6 +27,7 @@ def plot_multiple_1d( data, col_0, col_n, color='', style='', shift='' ):
     
     for i in range( col_0, col_n ):
         pl.plot( x, data[ :, i ], color = color, marker = style )
+        pl.minorticks_on()
     pl.show()
     
 def marker_list( ind ):
