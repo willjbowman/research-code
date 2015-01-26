@@ -2,7 +2,43 @@
 import numpy as np
 import pylab as pl
 import matplotlib as mpl
+import csv
 import wills_functions as wf
+
+''' ############################### NOTES ################################ '''
+'''
+to reload a module:
+
+import imp
+imp.reload( module_name )
+'''
+
+''' ########################## read_csv_2col() ########################## '''
+
+''' imports 2 column (i.e. [ x_i, y_i ]) .csv file and returns columns. Requires
+csv module.
+
+Usage: x1, x2 = read_csv_2col( file_path )
+file_path is path to .csv file with '.csv' included in text string.
+**IMPORTANT** header rows are ignored via <code>if len(row) != 2:</code>, so 
+make sure that the header rows do not have entries in the first two columns. 
+header rows may have 1 or >2 entries.
+
+REFS:
+[1] https://thenewcircle.com/s/post/1572/python_for_beginners_reading_and_manipulating_csv_files#opening-a-csv-file
+[2] https://docs.python.org/2/library/csv.html
+'''
+def read_csv_2col( file_path ):
+    f = open( file_path ) # create a TextIOWrapper object
+    d = csv.reader( f ) # create csv reader object
+    x, y = [], [] # create blank lists to store datas
+    for row in d: # iterate through rows of input .csv file
+        if len( row ) == 2: # ignore row if it doesn't have (*only) 2 entries
+#         need to convert to float!!!
+            x.append( float( row[ 0 ] ) ) # append row entries to lists
+            y.append( float( row[ 1 ] ) )
+    
+    return x, y # return lists containing .csv columns
 
 
 '''
@@ -21,6 +57,7 @@ def plot_multiple_1d( data, col_0, col_n, color='', style='', shift='' ):
     
     for i in range( col_0, col_n ):
         pl.plot( x, data[ :, i ], color = color, marker = style )
+        pl.minorticks_on()
     pl.show()
     
 def marker_list( ind ):
@@ -48,8 +85,8 @@ def pluck_sub_string_counter( string, sub_pattern, counter_length ):
 
 # add a text annotation to a plot. centered at x, y (in data coordinates), 
 # string is the text, color is the text color. REQUIRES PYLAB
-def centered_annotation( x, y, string, color ):
-    pl.text( x, y, string, color = color, ha = 'center', va = 'center' )
+def centered_annotation( x, y, string, color, fontsize='' ):
+    pl.text( x, y, string, color = color, ha = 'center', va = 'center', fontsize = fontsize )
     
 # plot column 1 vs. column 2
 def plot_2col_txt( file_name, close_all ):
@@ -90,9 +127,12 @@ def slide_art_styles( ):
 #     mpl.rcParams[ 'mathtext.default' ] = 'regular'
     
 def elsvier_art_styles( ):
+#     mpl.rcParams[ 'font.family' ] = 'Times New Roman'
+#     mpl.rcParams[ 'font.weight' ] = 'medium' # modify matplotlib defaults
+#     mpl.rcParams[ 'font.size' ] = 7
     mpl.rcParams[ 'font.family' ] = 'Times New Roman'
     mpl.rcParams[ 'font.weight' ] = 'medium' # modify matplotlib defaults
-    mpl.rcParams[ 'font.size' ] = 7
+    mpl.rcParams.update( { 'font.size' : 8 } )
 #     mpl.rcParams[ 'mathtext.default' ] = 'regular'
     
 # normalize two spectra, shrink the one with more counts to have same max val as smaller one

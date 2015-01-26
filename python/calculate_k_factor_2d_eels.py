@@ -13,6 +13,9 @@ C_Ce, C_Ca, C_O = 0.9, 0.1, 1.90 # sample molar concentrations
 
 k_CaCe = [] # containers for calculated k factors
 k_OCe = []
+k_CaO = []
+k_OCa = []
+
 for id in map_ids: # iterate through map ids
     file_group = [] # container for filenames of all elements of given map
     for file_name in map_file_names: # iterate through map filenames in dir
@@ -29,18 +32,24 @@ for id in map_ids: # iterate through map ids
     
     k_CaCe_i = C_Ca / C_Ce * np.sum( i_CeM ) / np.sum( i_CaL ) # calculate k-factor
     k_OCe_i = C_O / C_Ce * np.sum( i_CeM ) / np.sum( i_OK )
+    k_CaO_i = C_Ca / C_O * np.sum( i_OK ) / np.sum( i_CaL )
+    k_OCa_i = C_O / C_Ca * np.sum( i_CaL ) / np.sum( i_OK )
     
     k_CaCe.append( k_CaCe_i ) # add k-factor to conatiner
     k_OCe.append( k_OCe_i )
+    k_CaO.append( k_CaO_i )
+    k_OCa.append( k_OCa_i )
     
-k_CaCe.append( np.mean( k_CaCe ) ) # append mean k-factor to array
+k_CaCe.append( np.mean( k_CaCe ) ) # append mean k-factor column to array
 k_OCe.append( np.mean( k_OCe ) )
+k_CaO.append( np.mean( k_CaO ) )
+k_OCa.append( np.mean( k_OCa ) )
     
 # save k-factors as .txt
-output_data = np.vstack( ( k_CaCe, k_OCe ) )
+output_data = np.vstack( ( k_CaCe, k_OCe, k_CaO, k_OCa ) )
 output_dir = maps_dir
 output_file = 'kfactors.txt'
-head = 'rows: k_CaCe, k_OCe; last col: mean k-factor'
+head = 'rows: k_CaCe, k_OCe, k_CaO, k_OCa; last col: mean k-factor'
 np.savetxt( output_dir + output_file, output_data, delimiter='\t', header=head, fmt='%10.3e', newline='\n')
 '''
 equations for solving k-factor [2]
