@@ -85,8 +85,8 @@ def pluck_sub_string_counter( string, sub_pattern, counter_length ):
 
 # add a text annotation to a plot. centered at x, y (in data coordinates), 
 # string is the text, color is the text color. REQUIRES PYLAB
-def centered_annotation( x, y, string, color ):
-    pl.text( x, y, string, color = color, ha = 'center', va = 'center' )
+def centered_annotation( x, y, string, color, fontsize='' ):
+    pl.text( x, y, string, color = color, ha = 'center', va = 'center', fontsize = fontsize )
     
 # plot column 1 vs. column 2
 def plot_2col_txt( file_name, close_all ):
