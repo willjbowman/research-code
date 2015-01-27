@@ -8,10 +8,40 @@ import wills_functions as wf
 ''' ############################### NOTES ################################ '''
 '''
 to reload a module:
-
-import imp
-imp.reload( module_name )
+>>>import imp
+>>>imp.reload( module_name )
 '''
+    
+
+''' ########################## list manipulation ########################## '''
+''''returns list after manipulation of each element via math operations
+Usage:
+>>>list_after = wf.multiply_list( list, scalar )
+returns list where each element is multiplied by scalar
+'''
+
+def multiply_list( list, scalar ):
+    return [ i * scalar for i in list ]
+
+def add_to_list( list, scalar ):
+    return [ i + scalar for i in list ]
+    
+
+''' ########################## current_script_info() ########################## '''
+''''returns the filename and storage directory of the script in which this 
+function is called
+Usage:
+script_filename, script_direcetory_path = wf.current_script_info()
+
+Requires: 
+import os, inspect
+'''
+def current_script_info():
+    import os, inspect
+    script_filename = inspect.getfile( inspect.currentframe() )
+    script_dirname = os.path.dirname( os.path.abspath ( script_filename ) )
+    return script_filename, script_dirname
+
 
 ''' ########################## read_csv_2col() ########################## '''
 
