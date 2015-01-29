@@ -35,7 +35,7 @@ plasmon_off_filename = '141007_2Ca_ARM200kV_06_EELS_LL_gb4_6C_2.5mm_OffGb.s'
 # off_2Ca_filename = 
 
 # FIGURE PARAMETERS
-fig_size = ( wf.mm2in( 90 ), wf.mm2in( 160 ) ) # check journal fig size requirement
+fig_size = ( wf.mm2in( 90 ), wf.mm2in( 130 ) ) # check journal fig size requirement
 manu_fontsize, slide_fontsize = 8, 10 # 8pt for print, 10pt for presentation
 output_file_name = 'EELS_spectra_2_5_10_mol'
 # absolute path to manuscript sub directory (same as data store dir)
@@ -44,9 +44,9 @@ output_file_path = path_data_dir
 # PLOT PARAMETERS
 anno_color = 'black'
 # subplot (a) - EELS and background removal
-ax_a_limsx, ax_a_limsy = ( 300, 1e3 ), ( -600, 125e3 ) # axis ( min, max )
+ax_a_limsx, ax_a_limsy = ( 250, 1e3 ), ( 200, 3e5 ) # axis ( min, max )
 ax_a_labels = [ 'Energy loss (eV)', 'Counts (Arbitrary units)' ] # axis labels
-ax_a_legend = [ 'Unprocessed', 'Processed' ] # legend entries
+ax_a_legend = [ 'On G.B.', 'Off G.B.' ] # legend entries
 ax_a_inset_coords = [ .52, .76, .37, .2 ] # [ L, bot, W, H ]
 
 # subplot (a) inset - plasmons on/off gb
@@ -57,15 +57,14 @@ curve_colors = [ 'maroon', 'grey', 'black' ]
 ax_b_limsx, ax_b_limsy = ax_a_limsx, ( -600, 9e4 ) # axis limits
 ax_b_labels = ax_a_labels
 
-vshift_sm, vshift_lg = 10e3, 0 # vertical shift to separate spectra and compositions
+vshift_sm, vshift_lg = 2e4, 0 # vertical shift to separate spectra and compositions
 dash = [ 4, 2 ] # define dashes ( [ pix_on, pix_off ] )
 legend_std, legend_10Ca = 'Ca:Ce standard', '10 mol%' # legend text
 legend_location = 'upper left' # legend locator
 curve_color = 'maroon'
 
 # INTEGRATION WINDOWS PARAMETERS
-# CaL_bg_min, CaL_bg_max, 
-CaL_I_min, CaL_I_max = 340, 420
+CaL_BG_min, CaL_BG_max, CaL_I_min, CaL_I_max = 240, 330, 340, 420
 OK_BG_min, OK_BG_max, OK_I_min, OK_I_max = 430, 530, 533, 613
 CeM_BG_min, CeM_BG_max, CeM_I_min, CeM_I_max = 780, 880, 883, 963
 fill_color_BG = ( 192/255, 192/255, 192/255 ) # rgb are values < 1
@@ -128,7 +127,7 @@ pl_off_x, pl_off_y = plasmon_off.T
 # cl2_off_x, cl2_off_y = coreloss_2_off.T
 
 # INTEGRATION WINDOW
-# winx_BG_CaL, winy_BG_CaL = sub_arrays( cl_x, cl_y, CaL_BG_min, CaL_BG_max )
+winx_BG_CaL, winy_BG_CaL = sub_arrays( cl_x, cl_y, CaL_BG_min, CaL_BG_max )
 winx_I_CaL, winy_I_CaL = sub_arrays( cl_x, cl_y, CaL_I_min, CaL_I_max )
 winx_BG_OK, winy_BG_OK = sub_arrays( cl_x, cl_y, OK_BG_min, OK_BG_max )
 winx_I_OK, winy_I_OK = sub_arrays( cl_x, cl_y, OK_I_min, OK_I_max )
@@ -142,21 +141,26 @@ pl.figure( figsize = fig_size ) # create new figure
 # generate_plot( slide_fontsize )
 
 # create subplot (a)
-pl.subplot( 2, 1, 1 )
+# pl.subplot( 2, 1, 1 )
 ax_a = pl.gca()
-pl.plot( cl_x, cl_y, color = curve_color )
-pl.plot( cl_strip_x, cl_strip_y, color = curve_color )
+pl.plot( cl_x, cl_y + 7*vshift_sm, color = 'black' )
+pl.plot( cl_x, cl_y + 6*vshift_sm, color = 'black', dashes = (4,1) )
+pl.plot( cl_x, cl_y + 4*vshift_sm, color = 'grey' )
+pl.plot( cl_x, cl_y + 3*vshift_sm, color = 'grey', dashes = (4,1) )
+pl.plot( cl_x, cl_y + 1*vshift_sm, color = curve_color )
+pl.plot( cl_x, cl_y, color = curve_color, dashes = (4,1) )
 
 # integration_windows()
-pl.fill_between( winx_I_CaL, winy_I_CaL, color = fill_color_I )
-pl.fill_between( winx_BG_OK, winy_BG_OK, color = fill_color_BG )
-pl.fill_between( winx_I_OK, winy_I_OK, color = fill_color_I )
-pl.fill_between( winx_BG_CeM, winy_BG_CeM, color = fill_color_BG )
-pl.fill_between( winx_I_CeM, winy_I_CeM, color = fill_color_I )
+pl.fill_between( winx_BG_CaL, winy_BG_CaL+ 7*vshift_sm, color = fill_color_BG )
+pl.fill_between( winx_I_CaL, winy_I_CaL+ 7*vshift_sm, color = fill_color_I )
+pl.fill_between( winx_BG_OK, winy_BG_OK+ 7*vshift_sm, color = fill_color_BG )
+pl.fill_between( winx_I_OK, winy_I_OK+ 7*vshift_sm, color = fill_color_I )
+pl.fill_between( winx_BG_CeM, winy_BG_CeM+ 7*vshift_sm, color = fill_color_BG )
+pl.fill_between( winx_I_CeM, winy_I_CeM+ 7*vshift_sm, color = fill_color_I )
 pl.xlim( ax_a_limsx ), pl.ylim( ax_a_limsy ) # apply plot limits
 pl.minorticks_on() # minor ticks on
 ax_a.yaxis.set_ticklabels([]) # y tick labels off
-pl.legend( ax_a_legend, frameon = False, fontsize = slide_fontsize, labelspacing = .01, handletextpad = 0.2, loc = 'upper left' )
+pl.legend( ax_a_legend, frameon = False, fontsize = slide_fontsize, labelspacing = .01, handletextpad = 0.2, loc = 'lower left' )
 apply_xy_labels( ax_a_labels )
 
 # create subplot (a) inset axes
@@ -164,12 +168,14 @@ ax_a_in = pl.axes( ax_a_inset_coords )
 pl.xlim( ax_a_in_limsx ), pl.ylim( ax_a_in_limsy )
 pl.plot( pl_on_x, pl_on_y, color = curve_color )
 pl.plot( pl_off_x, pl_off_y, color = curve_color, dashes = dash )
+
 pl.minorticks_on() # minor ticks on
 ax_a_in.set_xticks( np.linspace( 0, 70, 8 ) ) # xticks position
 ax_a_in.set_yticks([]) # yticks off
 
 annotate_plot( ax_a_in_annox, ax_a_in_annoy, ax_a_in_anno_labels, slide_fontsize )
 
+'''
 # create subplot (b)
 pl.subplot( 2, 1, 2 )
 ax_b = pl.gca()
@@ -198,6 +204,7 @@ pl.xlim( ax_b_limsx ), pl.ylim( ax_b_limsy ) # apply plot limits
 pl.minorticks_on() # minor ticks on
 ax_b.yaxis.set_ticklabels([]) # y tick labels off
 apply_xy_labels( ax_b_labels )
+'''
 
 # change font size of axis objects
 for item in ( [ ax_a.xaxis.label, ax_a.yaxis.label, ax_a_in.xaxis.label, ax_a_in.yaxis.label, ax_b.xaxis.label, ax_b.yaxis.label ] + ax_a.get_xticklabels() + ax_a.get_yticklabels() + ax_a_in.get_xticklabels() + ax_a_in.get_yticklabels() + ax_b.get_xticklabels() + ax_b.get_yticklabels() ):
