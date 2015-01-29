@@ -42,12 +42,11 @@ output_file_name = 'EELS_spectra_2_5_10_mol'
 output_file_path = path_data_dir
 
 # PLOT PARAMETERS
-anno_color = 'black'
 # subplot (a) - EELS and background removal
 ax_a_limsx, ax_a_limsy = ( 250, 1e3 ), ( 200, 3e5 ) # axis ( min, max )
 ax_a_labels = [ 'Energy loss (eV)', 'Counts (Arbitrary units)' ] # axis labels
 ax_a_legend = [ 'On G.B.', 'Off G.B.' ] # legend entries
-ax_a_inset_coords = [ .52, .76, .37, .2 ] # [ L, bot, W, H ]
+ax_a_inset_coords = [ .54, .745, .35, .2 ] # [ L, bot, W, H ]
 
 # subplot (a) inset - plasmons on/off gb
 ax_a_in_limsx, ax_a_in_limsy = ( -10, 80 ), ( 0, 3e5 ) # axis limits
@@ -71,10 +70,16 @@ fill_color_BG = ( 192/255, 192/255, 192/255 ) # rgb are values < 1
 fill_color_I = ( 255/255, 210/255, 210/255 ) # rgb are values < 1
 
 # ANNOTATIONS PARAMETERS
+anno_color = 'black'
 
+# subplot (a) inset
+ax_a_annox = [ 390, 553, 900 ] # label x position
+ax_a_annoy = [ 24e4, 19e4, 185e3 ] # label y position
+ax_a_anno_labels = [ 'Ca $L_{3,2}$', 'O K', 'Ce $M_{5,4}$' ] # label text strings
+    
 # subplot (a) inset - plasmons on/off gb
-ax_a_in_annox = [ 15, 33 ] # label x position
-ax_a_in_annoy = [ 2.7e5, 0.7e5 ] # label y position
+ax_a_in_annox = [ 16, 33 ] # label x position
+ax_a_in_annoy = [ 26e4, 7e4 ] # label y position
 ax_a_in_anno_labels = [ 'Z.L.P.', 'Plasmon' ] # label text strings
 
 ''' ########################### FUNCTIONS ########################### '''
@@ -151,17 +156,19 @@ pl.plot( cl_x, cl_y + 1*vshift_sm, color = curve_color )
 pl.plot( cl_x, cl_y, color = curve_color, dashes = (4,1) )
 
 # integration_windows()
-pl.fill_between( winx_BG_CaL, winy_BG_CaL+ 7*vshift_sm, color = fill_color_BG )
-pl.fill_between( winx_I_CaL, winy_I_CaL+ 7*vshift_sm, color = fill_color_I )
-pl.fill_between( winx_BG_OK, winy_BG_OK+ 7*vshift_sm, color = fill_color_BG )
-pl.fill_between( winx_I_OK, winy_I_OK+ 7*vshift_sm, color = fill_color_I )
-pl.fill_between( winx_BG_CeM, winy_BG_CeM+ 7*vshift_sm, color = fill_color_BG )
-pl.fill_between( winx_I_CeM, winy_I_CeM+ 7*vshift_sm, color = fill_color_I )
+pl.fill_between( winx_BG_CaL, winy_BG_CaL+ 0*vshift_sm, color = fill_color_BG )
+pl.fill_between( winx_I_CaL, winy_I_CaL+ 0*vshift_sm, color = fill_color_I )
+pl.fill_between( winx_BG_OK, winy_BG_OK+ 0*vshift_sm, color = fill_color_BG )
+pl.fill_between( winx_I_OK, winy_I_OK+ 0*vshift_sm, color = fill_color_I )
+pl.fill_between( winx_BG_CeM, winy_BG_CeM+ 0*vshift_sm, color = fill_color_BG )
+pl.fill_between( winx_I_CeM, winy_I_CeM+ 0*vshift_sm, color = fill_color_I )
 pl.xlim( ax_a_limsx ), pl.ylim( ax_a_limsy ) # apply plot limits
 pl.minorticks_on() # minor ticks on
 ax_a.yaxis.set_ticklabels([]) # y tick labels off
-pl.legend( ax_a_legend, frameon = False, fontsize = slide_fontsize, labelspacing = .01, handletextpad = 0.2, loc = 'lower left' )
+pl.legend( ax_a_legend, frameon = False, fontsize = slide_fontsize, labelspacing = .01, handletextpad = 0.2, loc = 'upper left' )
 apply_xy_labels( ax_a_labels )
+
+annotate_plot( ax_a_annox, ax_a_annoy, ax_a_anno_labels, slide_fontsize )
 
 # create subplot (a) inset axes
 ax_a_in = pl.axes( ax_a_inset_coords )
@@ -207,7 +214,7 @@ apply_xy_labels( ax_b_labels )
 '''
 
 # change font size of axis objects
-for item in ( [ ax_a.xaxis.label, ax_a.yaxis.label, ax_a_in.xaxis.label, ax_a_in.yaxis.label, ax_b.xaxis.label, ax_b.yaxis.label ] + ax_a.get_xticklabels() + ax_a.get_yticklabels() + ax_a_in.get_xticklabels() + ax_a_in.get_yticklabels() + ax_b.get_xticklabels() + ax_b.get_yticklabels() ):
+for item in ( [ ax_a.xaxis.label, ax_a.yaxis.label, ax_a_in.xaxis.label, ax_a_in.yaxis.label ] + ax_a.get_xticklabels() + ax_a.get_yticklabels() + ax_a_in.get_xticklabels() + ax_a_in.get_yticklabels() ):
     item.set_fontsize( slide_fontsize )
 
 pl.tight_layout()
