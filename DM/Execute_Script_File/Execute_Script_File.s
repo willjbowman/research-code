@@ -10,7 +10,8 @@
 
 
 //+++++++++++ USER-DEFINED +++++++++++//
-String file_name = "C:/path/to/your/script/file.s"
+// String file_name = "C:/path/to/my/script/file.s"
+String file_name = "C:/Dropbox/Crozier Group Users - Will Bowman/active_research/codecode/DM/Export_Line_Profile_As_Tabbed_Text/Export_Line_Profile_As_Tabbed_Text.s"
 
 
 //+++++++++++ FUNCTIONS +++++++++++//
