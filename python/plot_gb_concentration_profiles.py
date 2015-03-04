@@ -17,15 +17,18 @@ from os import path
 
 # specify path to directory of eels intensity map files and label for output files
 
-# maps_dir = "c:/Dropbox/SOFC Electrolyte Project/Microscopy/141118_10Ca_ARM200kV/gb_maps_141229/quantification_results_scaled/"
+# maps_dir = "c:/Dropbox/SOFC Electrolyte Project/Microscopy/141118_10Ca_ARM200kV/gb_maps_141229/150218_scaled_StdK-edx_50acqK-eels/"
 # maps_label = '10Ca_' 
 
-# maps_dir = "c:/Dropbox/SOFC Electrolyte Project/Microscopy/140821_5CaDC_ARM200kV/gb_maps_141230/quantification_results_scaled/"
+# maps_dir = "c:/Dropbox/SOFC Electrolyte Project/Microscopy/140821_5CaDC_ARM200kV/gb_maps_141230/150218_scaled_StdK-edx_50acqK-eels/"
 # maps_label = '5CaDC_'
 
-maps_dir = "c:/Dropbox/SOFC Electrolyte Project/Microscopy/141007_2Ca_ARM200kV/gb_maps_141230/quantification_results_scaled/"
+maps_dir = "c:/Dropbox/SOFC Electrolyte Project/Microscopy/141007_2Ca_ARM200kV/gb_maps_141230/150218_scaled_StdK-edx_50acqK-eels/"
 maps_label = '2Ca_'
 
+I_ratio, C_ratio, C_ion = 'EELS intensity ratio', 'EELS concentration ratio', 'EELS concentration'
+I_ratio_col_0, I_ratio_col_1, C_ratio_col_0, C_ratio_col_1  = 4, 6, 6, 8
+C_col_0, C_col_1 = 8, 11
 
 ''' ########################### FUNCTIONS ########################### '''
 
@@ -80,21 +83,20 @@ for file in map_files: # iterate through items in map data directory
         x_label = 'distance (nm)' # define axis x label
         
         '''create a plot for each gb'''
-        
     
         '''this logic plots linescans together with others from same grain boundary'''
         if gb_num_i == gb_num: # if data is from current gb plot along side on current figure
             pl.subplot( 1, 3, 1 ) # subplot for integrated intensity ratio
-            wf.plot_multiple_1d( d, 1, 3, color = mark_color, shift = ( shift_value, 0 ), style = mark )
-            label_current_axis( ax_title, x_label, 'EELS intensity ratio' )
+            wf.plot_multiple_1d( d, I_ratio_col_0, I_ratio_col_1, color = mark_color, shift = ( shift_value, 0 ), style = mark )
+            label_current_axis( ax_title, x_label, I_ratio )
             
             pl.subplot( 1, 3, 2 ) # subplot for concentration ratio
-            wf.plot_multiple_1d( d, 4, 6, color = mark_color, shift = ( shift_value, 0 ), style = mark )
-            label_current_axis( ax_title, x_label, 'EELS concentration ratio' )
+            wf.plot_multiple_1d( d, C_ratio_col_0, C_ratio_col_1, color = mark_color, shift = ( shift_value, 0 ), style = mark )
+            label_current_axis( ax_title, x_label, C_ratio )
             
             pl.subplot( 1, 3, 3 ) # subplot for concentration
-            wf.plot_multiple_1d( d, 7, 10, color = mark_color, shift = ( shift_value, 0 ), style = mark )
-            label_current_axis( ax_title, x_label, 'EELS concentration' )
+            wf.plot_multiple_1d( d, C_col_0, C_col_1, color = mark_color, shift = ( shift_value, 0 ), style = mark )
+            label_current_axis( ax_title, x_label, C_ion )
             
         else: # if data is from new gb save current and create new figure
             # label previous figure if it exists
@@ -103,15 +105,15 @@ for file in map_files: # iterate through items in map data directory
             pl.figure( figsize = ( wf.mm2in( 300 ), wf.mm2in( 100 ) ) ) # create new figure
             
             pl.subplot( 1, 3, 1 ) # subplot for integrated intensity ratio
-            wf.plot_multiple_1d( d, 1, 3, color = mark_color, shift = ( shift_value, 0 ), style = mark )
+            wf.plot_multiple_1d( d, I_ratio_col_0, I_ratio_col_1, color = mark_color, shift = ( shift_value, 0 ), style = mark )
             label_current_axis( ax_title, x_label, 'EELS intensity ratio' )
             
             pl.subplot( 1, 3, 2 ) # subplot for concentration ratio
-            wf.plot_multiple_1d( d, 4, 6, color = mark_color, shift = ( shift_value, 0 ), style = mark )
+            wf.plot_multiple_1d( d, C_ratio_col_0, C_ratio_col_1, color = mark_color, shift = ( shift_value, 0 ), style = mark )
             label_current_axis( ax_title, x_label, 'EELS concentration ratio' )
             
             pl.subplot( 1, 3, 3 ) # subplot for concentration
-            wf.plot_multiple_1d( d, 7, 10, color = mark_color, shift = ( shift_value, 0 ), style = mark )
+            wf.plot_multiple_1d( d, C_col_0, C_col_1, color = mark_color, shift = ( shift_value, 0 ), style = mark )
             label_current_axis( ax_title, x_label, 'EELS concentration' )
         
         gb_num = gb_num_i # reset gb id counter
