@@ -82,7 +82,7 @@ void showallhiddenimages()
 		// count the number of image documents - this includes both shown and hidden ones
 		// and delete any temporary tag information which may have been left over from last time.
 		
-		 =Countdocumentwindowsoftype(5) // images currently shown
+		shown = Countdocumentwindowsoftype(5) // images currently shown
 		nodocs=countimagedocuments() // all image documents, including hidden ones
 		hidden=nodocs-shown // the number of hidden images
 		
