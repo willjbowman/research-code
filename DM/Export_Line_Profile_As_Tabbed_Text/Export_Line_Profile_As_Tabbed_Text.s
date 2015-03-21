@@ -3,7 +3,7 @@
 // VERSION: 0.1
 // DATE CREATED: 2015-02-23
 // This script takes an image with multiple profiles and stores the data from 
-// each as a tab delimited text file. The first row of values are calibrated 
+// each in a tab delimited text file. The first row of values are calibrated 
 // x-axis values and each subsequent row is a profile's values. The first entry 
 // in each row is the legend label of that profile. The label of the first row
 // of profile values is the image's file name (this is not ideal, but also not
@@ -12,6 +12,13 @@
 // USAGE: Have 1D line profile open as front-most image. Make sure to specify
 // '.txt' extension during save dialog!
 
+// KNOWN ISSUES:
+// 1. profile data are not labeled properly because they take the
+//    image display's name rather than the slice's name in the legend.
+// 2. the initial profiles should be saved before conversion to .txt
+// 3. the script ends with an error - press ok.
+// 4. the editor window doesn't show up in the free version, so there's code here
+//    to accommodate that - which is clunky and useless.
 
 //+++++++++++ USER-DEFINED +++++++++++//
 String export_start_text = "\nExporting profile data to "
@@ -37,11 +44,12 @@ GetSize( profiles, x_size, y_size ) //get image size data
 
 //tell user that output file is being written
 Result( export_start_text + file_name + "\n" )
+
 // create new script window with progress messages for user (comment this out if
 // you have Result window)
-DocumentWindow result_window
-result_window = NewScriptWindow( "Result Window", 84, 202, 726, 740 )
-EditorWindowAddText( result_window, export_start_text + file_name + "\n" )
+// DocumentWindow result_window
+// result_window = NewScriptWindow( "Result Window", 84, 202, 726, 740 )
+// EditorWindowAddText( result_window, export_start_text + file_name + "\n" )
 
 // write first row as calibrated x-axis
 WriteFile( output_file_ID, units + "\t" ) //write units text string in first column
@@ -81,7 +89,7 @@ for( i = 0; i < slice_count; i++ ) {
 
 CloseFile( output_file_ID ) //close output file (end cpu process)
 Result( export_end_text ) //report the end of the script execution to user
-EditorWindowAddText( result_window, export_end_text )
+// EditorWindowAddText( result_window, export_end_text ) //comment out if you have results window
 
 
 //+++++++++++ REFERENCES +++++++++++//
