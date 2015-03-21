@@ -219,3 +219,15 @@ def rotate_func( x, y, ang_rads ) :
     x_rotated = x * np.cos( ang_rads ) - y * np.sin( ang_rads )
     y_rotated = x * np.sin( ang_rads ) + y * np.cos( ang_rads )
     return x_rotated, y_rotated
+
+# closes all open figures
+def close_all():
+    pl.close( 'all' )
+    
+# get key index of value(s) from np array. pass single value or tuple, returns list
+def array_index( array, values ):
+    key_indicies = []
+    for value in values:
+        key_index = np.where( array == value )[0][0]
+        key_indicies.append( key_index )
+    return key_indicies
