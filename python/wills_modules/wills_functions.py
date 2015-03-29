@@ -222,7 +222,6 @@ def rotate_func( x, y, ang_rads ) :
 
 # closes all open figures
 def close_all():
-<<<<<<< HEAD
     pl.close( 'all' )
     
 # get key index of value(s) from np array. pass single value or tuple, returns list
@@ -232,6 +231,4 @@ def array_index( array, values ):
         key_index = np.where( array == value )[0][0]
         key_indicies.append( key_index )
     return key_indicies
-=======
     pl.close( 'all' )
->>>>>>> 2618d2657592965aa3b76e86b03056b1f49b4c7d

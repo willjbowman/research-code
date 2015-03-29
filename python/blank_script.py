@@ -15,12 +15,14 @@ import csv, imp, os
 
 
 ''' ########################### USER-DEFINED ########################### '''
+_data_path = '' # path to data file
 
 
 ''' ########################### FUNCTIONS ########################### '''
     
     
 ''' ########################### MAIN SCRIPT ########################### '''
+_data = np.loadtxt( _data_path, skiprows = 3 ) # read data, ignore first three rows
 
     
 ''' ########################### REFERENCES ########################### '''
