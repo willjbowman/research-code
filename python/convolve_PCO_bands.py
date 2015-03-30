@@ -76,6 +76,7 @@ Ce5d_DOS = Ce5d_step
 O2p_Pr4f_convolve_DOS = np.convolve( O2p_DOS, Pr4f_DOS, mode = 'same' )
 O2p_Ce4f_convolve_DOS = np.convolve( O2p_DOS, Ce4f_DOS, mode = 'same' )
 O2p_Ce5d_convolve_DOS = np.convolve( O2p_DOS, Ce5d_DOS, mode = 'same' )
+summed_convolve_DOS = O2p_Pr4f_convolve_DOS + O2p_Ce4f_convolve_DOS + O2p_Ce5d_convolve_DOS
 energy_axis_convolve = np.linspace( energy_min, energy_max, np.size( O2p_Ce4f_convolve_DOS ) )
 
 
@@ -105,6 +106,7 @@ pl.subplot( 1, 2, 2 ) # subplot for convolved density of states functions
 pl.plot( energy_axis_convolve, O2p_Pr4f_convolve_DOS )
 pl.plot( energy_axis_convolve, O2p_Ce4f_convolve_DOS )
 pl.plot( energy_axis_convolve, O2p_Ce5d_convolve_DOS )
+pl.plot( energy_axis_convolve, summed_convolve_DOS )
 
     
 ''' ########################### REFERENCES ########################### 
