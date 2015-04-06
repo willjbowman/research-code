@@ -63,20 +63,42 @@ pl.bar( ex, e, width = 1 )
 pl.bar( cx, c, width = 1 )
 pl.plot( ce, color = 'red' )
 
-# convolve step functions of (f) 4x1, (g) 4x2 offset by 3 channels
+# convolve step functions of (f) 4x1, (g) 4x2 offset 
 fx = np.linspace( 0, 19, 20 )
 f = np.zeros( 20 )
 g = np.zeros( 20 )
 gx = fx
-f[ 12:16 ] = 1
-g[ 8:12 ] = 2
+f[ 8:12 ] = 2
+g[ 8:12 ] = 1
 fg = np.convolve( g, f, 'same' )
+gf = np.convolve( f, g, 'same' )
 pl.figure()
 pl.title( '4x1 * 4x2' )
-pl.bar( fx, f, width = 1 )
-pl.bar( fx, g, width = 1 )
-pl.plot( fg, color = 'red' )
+pl.bar( fx, f, width = 1, align = 'center', color = 'g' )
+pl.bar( fx, g, width = 1, align = 'center', color = 'b' )
+pl.plot( fg, color = 'r', marker = 'o' )
+pl.plot( fg, color = 'k', marker = '^' )
 
+# convolve step functions of (h) 1x1, (i) 1x1 offset 
+convolution_type, alignment = 'full', 'center'
+hx = np.linspace( 0, 19, 20 )
+h = np.zeros( 20 )
+i = np.zeros( 20 )
+ix = hx
+h[ 15 ] = 1
+# h[ 17 ] = 1
+i[ 7 ] = 2
+i[ 10 ] = 1
+hi = np.convolve( h, i, convolution_type )
+ih = np.convolve( i, h, convolution_type )
+pl.figure()
+pl.title( '1x1 * 1x1 | conv. type: ' + convolution_type + ', align: ' + alignment )
+pl.bar( hx, h, width = 1, align = alignment, color = 'g' )
+pl.bar( ix, i, width = 1, align = alignment, color = 'b' )
+pl.plot( hi, color = 'r', marker = 'o' )
+pl.plot( ih, color = 'k', marker = '^' )
+pl.minorticks_on()
+pl.legend( ( 'h*i', 'i*h', 'h()', 'i()' ) )
 
 ''' ########################### FUNCTIONS ########################### '''
     
