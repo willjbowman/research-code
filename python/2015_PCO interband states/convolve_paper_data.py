@@ -17,11 +17,13 @@ import imp, os
 
 ''' ########################### USER-DEFINED ########################### '''
 
-data_path = "C:/Crozier_Lab/Writing/2015_PCO10 interband states/Dholobhai et al ceria PDOS_addPr_lowloss-states.txt" # path to data file
+data_path = "C:/Crozier_Lab/Writing/2015_PCO10 interband states/Dholobhai et al ceria PDOS_addPr_NoLowOcP_Eg35.txt" # path to data file
+# data_path = "C:/Crozier_Lab/Writing/2015_PCO10 interband states/Dholobhai et al ceria PDOS_addPr.txt" # path to data file
 curve_names = [ 'oc-s', 'oc-p',	'oc-d',	'oc-f',	'un-s',	'un-p',	'un-d',	'un-f',	'pr-f-0', 'pr-f-1' ]
 
 # convolution_type = 'same'
 convolution_type = 'full' 
+broadening_fwhm = 0.03 # eV
 
 DOS_colors = [ 'orange', 'blue', 'green', 'red', 'orange', 'blue', 'green', 'red', 'black' ]
 convolution_colors = [ 'orange', 'blue', 'green', 'red', 'black', 'grey' ]
@@ -44,6 +46,15 @@ def convolve( y0, y1 ):
     # return reverse( convolution )
     return convolution
 
+def broaden( signal_in, normalize = True ):
+    br_x = np.linspace( -5, 5, num = np.size( signal_in, axis = 0 ) )
+    br = wf.lorentzianate( br_x, broadening_fwhm )
+    br = br[ 0 : np.size( signal_in, axis = 0 ) ]
+    if normalize:
+        br = br / np.max( br )
+    broadened = np.convolve( signal_in, br, mode = 'same' )
+    return broadened
+
 def plot_figure( x, y1, y2, y1y2_conv ):
     pl.figure()
     pl.subplot( 2, 1, 1 )
@@ -56,9 +67,16 @@ def plot_DOSs( x, curves ):
     for index, curve_n in enumerate( curves ):
         pl.plot( x, curve_n, color = DOS_colors[ index ] )
     
-def plot_convolutions( curves ):
+# def plot_convolutions( curves ):
+#     for index, curve_n in enumerate( curves ):
+#         pl.plot( curve_n, color = convolution_colors[ index ] )
+    
+def plot_convolutions( curves, x = None ):
     for index, curve_n in enumerate( curves ):
-        pl.plot( curve_n, color = convolution_colors[ index ] )
+        if x == None:
+            pl.plot( curve_n, color = convolution_colors[ index ] )
+        else:
+            pl.plot( x, curve_n, color = convolution_colors[ index ] )
     
 ''' ########################### MAIN SCRIPT ########################### '''
 
@@ -73,8 +91,8 @@ un_s = interpolate( data[ :, 5 ] )
 un_p = interpolate( data[ :, 6 ] )
 un_d = interpolate( data[ :, 7 ] )
 un_f = interpolate( data[ :, 8 ] )
-# un_f_pr = interpolate( data[ :, 10 ] )
-un_f_pr = interpolate( data[ :, 10 ] ) * 2
+un_f_pr = interpolate( data[ :, 10 ] )
+# un_f_pr = interpolate( data[ :, 10 ] ) * 2
 
 # the occupied DOSs are passed to reverse() so that when the unoccupied DOSs
 # are convolved with the (reversed) occupied DOSs, the lowest channels of the 
@@ -103,35 +121,61 @@ pl.figure()
 DOSs = ( oc_s, oc_p, oc_d, oc_f, un_s, un_p, un_d, un_f )
 DOSs_convolved = ( con_s_p, con_p_d, con_p_f, con_d_f )
 con_sum = con_s_p + con_p_d + con_p_f + con_d_f
+con_sum_broadened = broaden( con_sum )
+energy_convolved = np.linspace( energy[ 0 ], energy[ -1 ], num = np.size( con_sum, axis = 0 ) )
 
-pl.subplot( 3, 1, 1 )
+# pl.subplot( 3, 1, 1 )
+# plot_DOSs( energy, DOSs )
+# pl.legend( ( 's', 'p', 'd', 'f' ) )
+# pl.xlabel( 'eV' )
+# pl.ylabel( 'DOS/eV' )
+# pl.subplot( 3, 1, 2 )
+# plot_convolutions( DOSs_convolved, x = energy_convolved )
+# pl.legend( ( 's*p', 'p*d', 'p*f', 'd*f' ) )
+# pl.subplot( 3, 1, 3 )
+# pl.plot( energy_convolved, con_sum, color = 'red' )
+# pl.legend( ( 'CeO2' ) )
+
+pl.figure()
+pl.subplot( 2, 2, 1 )
 plot_DOSs( energy, DOSs )
 pl.legend( ( 's', 'p', 'd', 'f' ) )
 pl.xlabel( 'eV' )
 pl.ylabel( 'DOS/eV' )
-pl.subplot( 3, 1, 2 )
-plot_convolutions( DOSs_convolved )
+pl.subplot( 2, 2, 2 )
+plot_convolutions( DOSs_convolved, x = energy_convolved )
 pl.legend( ( 's*p', 'p*d', 'p*f', 'd*f' ) )
-pl.subplot( 3, 1, 3 )
-pl.plot( con_sum, color = 'red' )
+pl.subplot( 2, 2, 3 )
+pl.plot( energy_convolved, con_sum, color = 'red' )
 pl.legend( ('CeO2', 'PCO') )
+pl.subplot( 2, 2, 4 )
+pl.plot( energy_convolved, con_sum_broadened, color = 'red' )
+pl.legend( ( 'CeO2 broad' ) )
+
+
 
 pl.figure()
 DOSs_pr = ( oc_s, oc_p, oc_d, oc_f, un_s, un_p, un_d, un_f, un_f_pr )
 DOSs_pr_convolved = ( con_s_p, con_p_d, con_p_f, con_d_f, con_p_f_pr, con_d_f_pr )
 con_sum_pr = con_s_p + con_p_d + con_p_f + con_d_f + con_p_f_pr + con_d_f_pr
+con_sum_pr_broadened = broaden( con_sum_pr )
 
-pl.subplot( 3, 1, 1 )
+
+pl.subplot( 2, 2, 1 )
 plot_DOSs( energy, DOSs_pr )
 pl.legend( ( 's', 'p', 'd', 'f' ) )
 pl.xlabel( 'eV' )
 pl.ylabel( 'DOS/eV' )
-pl.subplot( 3, 1, 2 )
-plot_convolutions( DOSs_pr_convolved )
+pl.subplot( 2, 2, 2 )
+plot_convolutions( DOSs_pr_convolved, x = energy_convolved )
 pl.legend( ( 's*p', 'p*d', 'p*f', 'd*f', 'p*f_Pr', 'd*f_Pr' ) )
-pl.subplot( 3, 1, 3 )
-pl.plot( con_sum, color = 'red' )
-pl.plot( con_sum_pr, color = 'blue' )
+pl.subplot( 2, 2, 3 )
+pl.plot( energy_convolved, con_sum, color = 'red' )
+pl.plot( energy_convolved, con_sum_pr, color = 'blue' )
+pl.legend( ( 'CeO2', 'PCO' ) )
+pl.subplot( 2, 2, 4 )
+pl.plot( energy_convolved, con_sum_broadened, color = 'red' )
+pl.plot( energy_convolved, con_sum_pr_broadened, color = 'blue' )
 pl.legend( ( 'CeO2', 'PCO' ) )
 
 ''' ########################### REFERENCES ###########################
