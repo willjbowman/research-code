@@ -11,6 +11,7 @@ import pylab as pl
 import matplotlib as mpl
 import wills_functions as wf
 import imp, os
+from scipy import signal
 
 ##
 
@@ -22,8 +23,12 @@ data_path = "C:/Crozier_Lab/Writing/2015_PCO10 interband states/Dholobhai et al 
 curve_names = [ 'oc-s', 'oc-p',	'oc-d',	'oc-f',	'un-s',	'un-p',	'un-d',	'un-f',	'pr-f-0', 'pr-f-1' ]
 
 # convolution_type = 'same'
-convolution_type = 'full' 
-broadening_fwhm = 0.03 # eV
+convolution_type = 'same'
+broadening_fwhm = 5 # eV
+
+x_str = 'Relative energy (eV)'
+y_str = 'DOS/eV'
+x_min, x_max = -5, 15 # eV
 
 DOS_colors = [ 'orange', 'blue', 'green', 'red', 'orange', 'blue', 'green', 'red', 'black' ]
 convolution_colors = [ 'orange', 'blue', 'green', 'red', 'black', 'grey' ]
@@ -47,9 +52,10 @@ def convolve( y0, y1 ):
     return convolution
 
 def broaden( signal_in, normalize = True ):
-    br_x = np.linspace( -5, 5, num = np.size( signal_in, axis = 0 ) )
-    br = wf.lorentzianate( br_x, broadening_fwhm )
-    br = br[ 0 : np.size( signal_in, axis = 0 ) ]
+    # br_x = np.linspace( -5, 5, num = np.size( signal_in, axis = 0 ) )
+    # br = wf.lorentzianate( br_x, broadening_fwhm )
+    # br = br[ 0 : np.size( signal_in, axis = 0 ) ]
+    br = signal.gaussian( np.size( signal_in, axis = 0 ), std = broadening_fwhm )
     if normalize:
         br = br / np.max( br )
     broadened = np.convolve( signal_in, br, mode = 'same' )
@@ -77,6 +83,12 @@ def plot_convolutions( curves, x = None ):
             pl.plot( curve_n, color = convolution_colors[ index ] )
         else:
             pl.plot( x, curve_n, color = convolution_colors[ index ] )
+
+def style_plot():
+    pl.xlim( x_min, x_max )
+    pl.xlabel( x_str )
+    pl.ylabel( y_str )
+    pl.minorticks_on()
     
 ''' ########################### MAIN SCRIPT ########################### '''
 
@@ -109,13 +121,6 @@ con_d_f_pr = convolve( reverse( oc_d ), un_f_pr )
 
 # wf.close_all()
 
-# plot_figure( energy, oc_s, un_p, con_s_p )
-# plot_figure( energy, oc_p, un_d, con_p_d )
-# plot_figure( energy, oc_p, un_f, con_p_f )
-# plot_figure( energy, oc_d, un_f, con_d_f )
-# plot_figure( energy, oc_p, un_f_pr, con_p_f_pr )
-# plot_figure( energy, oc_d, un_f_pr, con_d_f_pr )
-
 
 pl.figure()
 DOSs = ( oc_s, oc_p, oc_d, oc_f, un_s, un_p, un_d, un_f )
@@ -124,33 +129,22 @@ con_sum = con_s_p + con_p_d + con_p_f + con_d_f
 con_sum_broadened = broaden( con_sum )
 energy_convolved = np.linspace( energy[ 0 ], energy[ -1 ], num = np.size( con_sum, axis = 0 ) )
 
-# pl.subplot( 3, 1, 1 )
-# plot_DOSs( energy, DOSs )
-# pl.legend( ( 's', 'p', 'd', 'f' ) )
-# pl.xlabel( 'eV' )
-# pl.ylabel( 'DOS/eV' )
-# pl.subplot( 3, 1, 2 )
-# plot_convolutions( DOSs_convolved, x = energy_convolved )
-# pl.legend( ( 's*p', 'p*d', 'p*f', 'd*f' ) )
-# pl.subplot( 3, 1, 3 )
-# pl.plot( energy_convolved, con_sum, color = 'red' )
-# pl.legend( ( 'CeO2' ) )
-
-pl.figure()
 pl.subplot( 2, 2, 1 )
 plot_DOSs( energy, DOSs )
 pl.legend( ( 's', 'p', 'd', 'f' ) )
-pl.xlabel( 'eV' )
-pl.ylabel( 'DOS/eV' )
+style_plot()
 pl.subplot( 2, 2, 2 )
+pl.plot( energy_convolved, con_sum, color = 'red' )
+pl.plot( energy_convolved, wf.normalize_to_max( con_sum_broadened, con_sum )[0], color = 'blue' )
+pl.legend( ('CeO2', 'broadened') )
+style_plot()
+pl.subplot( 2, 2, 3 )
 plot_convolutions( DOSs_convolved, x = energy_convolved )
 pl.legend( ( 's*p', 'p*d', 'p*f', 'd*f' ) )
-pl.subplot( 2, 2, 3 )
-pl.plot( energy_convolved, con_sum, color = 'red' )
-pl.legend( ('CeO2', 'PCO') )
-pl.subplot( 2, 2, 4 )
-pl.plot( energy_convolved, con_sum_broadened, color = 'red' )
-pl.legend( ( 'CeO2 broad' ) )
+style_plot()
+# pl.subplot( 2, 2, 4 )
+# pl.legend( ( 'CeO2 broad' ) )
+# style_plot()
 
 
 
@@ -160,23 +154,24 @@ DOSs_pr_convolved = ( con_s_p, con_p_d, con_p_f, con_d_f, con_p_f_pr, con_d_f_pr
 con_sum_pr = con_s_p + con_p_d + con_p_f + con_d_f + con_p_f_pr + con_d_f_pr
 con_sum_pr_broadened = broaden( con_sum_pr )
 
-
 pl.subplot( 2, 2, 1 )
 plot_DOSs( energy, DOSs_pr )
 pl.legend( ( 's', 'p', 'd', 'f' ) )
-pl.xlabel( 'eV' )
-pl.ylabel( 'DOS/eV' )
+style_plot()
 pl.subplot( 2, 2, 2 )
-plot_convolutions( DOSs_pr_convolved, x = energy_convolved )
-pl.legend( ( 's*p', 'p*d', 'p*f', 'd*f', 'p*f_Pr', 'd*f_Pr' ) )
-pl.subplot( 2, 2, 3 )
-pl.plot( energy_convolved, con_sum, color = 'red' )
-pl.plot( energy_convolved, con_sum_pr, color = 'blue' )
-pl.legend( ( 'CeO2', 'PCO' ) )
-pl.subplot( 2, 2, 4 )
 pl.plot( energy_convolved, con_sum_broadened, color = 'red' )
 pl.plot( energy_convolved, con_sum_pr_broadened, color = 'blue' )
 pl.legend( ( 'CeO2', 'PCO' ) )
+style_plot()
+pl.subplot( 2, 2, 3 )
+plot_convolutions( DOSs_pr_convolved, x = energy_convolved )
+pl.legend( ( 's*p', 'p*d', 'p*f', 'd*f', 'p*f_Pr', 'd*f_Pr' ) )
+style_plot()
+pl.subplot( 2, 2, 4 )
+pl.plot( energy_convolved, con_sum, color = 'red' )
+pl.plot( energy_convolved, con_sum_pr, color = 'blue' )
+pl.legend( ( 'CeO2', 'PCO' ) )
+style_plot()
 
 ''' ########################### REFERENCES ###########################
 1. http://stackoverflow.com/questions/6518811/interpolate-nan-values-in-a-numpy-array
