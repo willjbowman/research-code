@@ -35,12 +35,12 @@ x_str = 'Relative energy (eV)'
 y_str = 'DOS/eV'
 x_tick_shift = 4 # eV
 x_min, x_max = -5, 15 # eV
-x_min_conv, x_max_conv = 0, 5 # eV
+x_min_conv, x_max_conv = 0, 15 # eV
 
 wf.slide_art_styles()
 
 DOS_colors = [ 'orange', 'blue', 'green', 'red', 'orange', 'blue', 'green', 'red', 'black' ]
-convolution_colors = [ 'orange', 'blue', 'green', 'red', 'black', 'grey' ]
+convolution_colors = [ 'orange', 'blue', 'green', 'red', 'black', 'grey', 'orange', 'blue', 'green', 'red', 'black', 'grey' ]
 
 ''' ########################### FUNCTIONS ########################### '''
 
@@ -108,7 +108,8 @@ data = np.loadtxt( data_path, skiprows = 1 ) # read data, ignore first three row
 energy = data[ :, 0 ]
 oc_s = interpolate( data[ :, 1 ] )
 oc_p = interpolate( data[ :, 2 ] )  
-oc_d = interpolate( data[ :, 3 ] ) / 2
+oc_d = interpolate( data[ :, 3 ] )
+# oc_d = interpolate( data[ :, 3 ] ) / 2 # used for presentation
 oc_f = interpolate( data[ :, 4 ] )
 un_s = interpolate( data[ :, 5 ] )
 un_p = interpolate( data[ :, 6 ] )
@@ -124,68 +125,76 @@ un_f_pr = interpolate( data[ :, 10 ] )
 # EELS: transitions from the VB max to the CB min is the lowest energy 
 # ioniziation.
 con_s_p = convolve( reverse( oc_s ), un_p )
+
+con_p_s = convolve( reverse( oc_p ), un_s )
 con_p_d = convolve( reverse( oc_p ), un_d )
 con_p_f = convolve( reverse( oc_p ), un_f ) # hybridization
-con_d_f = convolve( reverse( oc_d ), un_f )
 con_p_f_pr = convolve( reverse( oc_p ), un_f_pr ) # hybridization
+
+con_d_p = convolve( reverse( oc_d ), un_p )
+con_d_f = convolve( reverse( oc_d ), un_f )
 con_d_f_pr = convolve( reverse( oc_d ), un_f_pr )
 
-# wf.close_all()
+con_f_d = convolve( reverse( oc_f ), un_d )
+
+wf.close_all()
 
 
 pl.figure()
 DOSs = ( oc_s, oc_p, oc_d, oc_f, un_s, un_p, un_d, un_f )
-DOSs_convolved = ( con_s_p, con_p_d, con_p_f, con_d_f )
-con_sum = con_s_p + con_p_d + con_p_f + con_d_f
-# DOSs_convolved = ( con_s_p, con_p_d, con_d_f )
-# con_sum = con_s_p + con_p_d + con_d_f
+# DOSs_convolved = ( con_s_p, con_p_d, con_p_f, con_d_f )
+# con_sum = con_s_p + con_p_d + con_p_f + con_d_f
+DOSs_convolved = ( con_s_p, con_p_s, con_p_d, con_p_f, con_d_p, con_d_f, con_f_d )
+con_sum = con_s_p + con_p_s + con_p_d + con_p_f + con_d_p + con_d_f + con_f_d
 con_sum_broadened = broaden( con_sum )
 energy_convolved = np.linspace( energy[ 0 ], energy[ -1 ], num = np.size( con_sum, axis = 0 ) )
 energy_convolved = energy_convolved + x_tick_shift
 
 pl.subplot( 2, 2, 1 )
 plot_DOSs( energy, DOSs )
-pl.legend( ( 's', 'p', 'd', 'f' ) )
+pl.legend( ( 's', 'p', 'd', 'f' ), loc = 'best' )
 style_plot( convolved = False )
 pl.subplot( 2, 2, 2 )
 plot_convolutions( DOSs_convolved, x = energy_convolved )
-pl.legend( ( 's*p', 'p*d', 'p*f', 'd*f' ) )
-# pl.legend( ( 's*p', 'p*d', 'd*f' ) )
+# pl.legend( ( 's*p', 'p*d', 'p*f', 'd*f' ) )
+pl.legend( ( 's*p', 'p*s', 'p*d', 'p*f', 'd*p', 'd*f', 'f*d' ), loc = 'best' )
 style_plot()
 pl.subplot( 2, 2, 3 )
 pl.plot( energy_convolved, con_sum, color = 'blue' )
 pl.plot( energy_convolved, wf.normalize_to_max( con_sum_broadened, con_sum )[0], color = 'maroon' )
-pl.legend( ('CeO2', 'broadened') )
+pl.legend( ('CeO2', 'broadened'), loc = 'best' )
 style_plot()
 pl.subplot( 2, 2, 4 )
-pl.legend( ( 'CeO2 broad' ) )
+pl.legend( ( 'CeO2 broad' ), loc = 'best' )
 style_plot()
 
 
 
 pl.figure()
-DOSs_pr = ( oc_s, oc_p, oc_d, oc_f, un_s, un_p, un_d, un_f, un_f_pr )
-DOSs_pr_convolved = ( con_s_p, con_p_d, con_p_f, con_d_f, con_p_f_pr, con_d_f_pr )
-con_sum_pr = con_s_p + con_p_d + con_p_f + con_d_f + con_p_f_pr + con_d_f_pr
+# DOSs_pr = ( oc_s, oc_p, oc_d, oc_f, un_s, un_p, un_d, un_f, un_f_pr )
+# DOSs_pr_convolved = ( con_s_p, con_p_d, con_p_f, con_d_f, con_p_f_pr, con_d_f_pr )
+DOSs_pr = ( oc_s, oc_p, oc_d, oc_f, un_s, un_p, un_d, un_f )
+DOSs_pr_convolved = ( con_s_p, con_p_s, con_p_d, con_p_f, con_p_f_pr, con_d_p, con_d_f, con_d_f_pr, con_f_d )
+con_sum_pr = con_s_p + con_p_s + con_p_d + con_p_f + con_p_f_pr + con_d_p + con_d_f + con_d_f_pr + con_f_d
 con_sum_pr_broadened = broaden( con_sum_pr )
 
 pl.subplot( 2, 2, 1 )
 plot_DOSs( energy, DOSs_pr )
-pl.legend( ( 's', 'p', 'd', 'f' ) )
+pl.legend( ( 's', 'p', 'd', 'f' ), loc = 'best' )
 style_plot( convolved = False )
 pl.subplot( 2, 2, 2 )
 plot_convolutions( DOSs_pr_convolved, x = energy_convolved )
-pl.legend( ( 's*p', 'p*d', 'p*f', 'd*f', 'p*f_Pr', 'd*f_Pr' ), loc = 'best' )
+pl.legend( ( 's*p', 'p*s', 'p*d', 'p*f', 'p*f_Pr', 'd*p', 'd*f_Pr', 'd*f', 'f*d' ), loc = 'best' )
 style_plot()
 pl.subplot( 2, 2, 3 )
 pl.plot( energy_convolved, con_sum_broadened, color = 'blue' )
 pl.plot( energy_convolved, con_sum_pr_broadened, color = 'maroon' )
-pl.legend( ( 'CeO2', 'PCO' ) )
+pl.legend( ( 'CeO2', 'PCO' ), loc = 'best' )
 style_plot()
 pl.subplot( 2, 2, 4 )
 pl.plot( energy_convolved, con_sum, color = 'blue' )
 pl.plot( energy_convolved, con_sum_pr, color = 'maroon' )
-pl.legend( ( 'CeO2', 'PCO' ) )
+pl.legend( ( 'CeO2', 'PCO' ), loc = 'best' )
 style_plot()
 
 ''' ########################### REFERENCES ###########################
