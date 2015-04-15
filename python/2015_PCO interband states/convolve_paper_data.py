@@ -2,6 +2,11 @@
 '''
  Created 2015-04-01by Will Bowman. This script convoles the data from Pratik's
  PCO DFT paper to predict the low loss spectrum for comparison with Katia EELS.
+ This script convolves the unoccupied DOSs above the Fermi level with those 
+ below which are occupied. I've also added a Pr f interband state which is also
+ convolved in order to compute the joint DOSs for undoped and doped cerias. The
+ joint DOSs are convolved with a broadening gaussian function whose standard 
+ deviation is called 'broadening_fwhm'.
 '''
 
 ''' ########################### IMPORT MODULES ########################### '''
@@ -28,7 +33,11 @@ broadening_fwhm = 5 # eV
 
 x_str = 'Relative energy (eV)'
 y_str = 'DOS/eV'
+x_tick_shift = 4 # eV
 x_min, x_max = -5, 15 # eV
+x_min_conv, x_max_conv = 0, 5 # eV
+
+wf.slide_art_styles()
 
 DOS_colors = [ 'orange', 'blue', 'green', 'red', 'orange', 'blue', 'green', 'red', 'black' ]
 convolution_colors = [ 'orange', 'blue', 'green', 'red', 'black', 'grey' ]
@@ -84,11 +93,13 @@ def plot_convolutions( curves, x = None ):
         else:
             pl.plot( x, curve_n, color = convolution_colors[ index ] )
 
-def style_plot():
+def style_plot( convolved = True ):
     pl.xlim( x_min, x_max )
     pl.xlabel( x_str )
     pl.ylabel( y_str )
     pl.minorticks_on()
+    if convolved:
+        pl.xlim( x_min_conv, x_max_conv )
     
 ''' ########################### MAIN SCRIPT ########################### '''
 
@@ -96,8 +107,8 @@ data = np.loadtxt( data_path, skiprows = 1 ) # read data, ignore first three row
 
 energy = data[ :, 0 ]
 oc_s = interpolate( data[ :, 1 ] )
-oc_p = interpolate( data[ :, 2 ] )
-oc_d = interpolate( data[ :, 3 ] )
+oc_p = interpolate( data[ :, 2 ] )  
+oc_d = interpolate( data[ :, 3 ] ) / 2
 oc_f = interpolate( data[ :, 4 ] )
 un_s = interpolate( data[ :, 5 ] )
 un_p = interpolate( data[ :, 6 ] )
@@ -126,25 +137,29 @@ pl.figure()
 DOSs = ( oc_s, oc_p, oc_d, oc_f, un_s, un_p, un_d, un_f )
 DOSs_convolved = ( con_s_p, con_p_d, con_p_f, con_d_f )
 con_sum = con_s_p + con_p_d + con_p_f + con_d_f
+# DOSs_convolved = ( con_s_p, con_p_d, con_d_f )
+# con_sum = con_s_p + con_p_d + con_d_f
 con_sum_broadened = broaden( con_sum )
 energy_convolved = np.linspace( energy[ 0 ], energy[ -1 ], num = np.size( con_sum, axis = 0 ) )
+energy_convolved = energy_convolved + x_tick_shift
 
 pl.subplot( 2, 2, 1 )
 plot_DOSs( energy, DOSs )
 pl.legend( ( 's', 'p', 'd', 'f' ) )
-style_plot()
+style_plot( convolved = False )
 pl.subplot( 2, 2, 2 )
-pl.plot( energy_convolved, con_sum, color = 'red' )
-pl.plot( energy_convolved, wf.normalize_to_max( con_sum_broadened, con_sum )[0], color = 'blue' )
-pl.legend( ('CeO2', 'broadened') )
-style_plot()
-pl.subplot( 2, 2, 3 )
 plot_convolutions( DOSs_convolved, x = energy_convolved )
 pl.legend( ( 's*p', 'p*d', 'p*f', 'd*f' ) )
+# pl.legend( ( 's*p', 'p*d', 'd*f' ) )
 style_plot()
-# pl.subplot( 2, 2, 4 )
-# pl.legend( ( 'CeO2 broad' ) )
-# style_plot()
+pl.subplot( 2, 2, 3 )
+pl.plot( energy_convolved, con_sum, color = 'blue' )
+pl.plot( energy_convolved, wf.normalize_to_max( con_sum_broadened, con_sum )[0], color = 'maroon' )
+pl.legend( ('CeO2', 'broadened') )
+style_plot()
+pl.subplot( 2, 2, 4 )
+pl.legend( ( 'CeO2 broad' ) )
+style_plot()
 
 
 
@@ -157,19 +172,19 @@ con_sum_pr_broadened = broaden( con_sum_pr )
 pl.subplot( 2, 2, 1 )
 plot_DOSs( energy, DOSs_pr )
 pl.legend( ( 's', 'p', 'd', 'f' ) )
-style_plot()
+style_plot( convolved = False )
 pl.subplot( 2, 2, 2 )
-pl.plot( energy_convolved, con_sum_broadened, color = 'red' )
-pl.plot( energy_convolved, con_sum_pr_broadened, color = 'blue' )
-pl.legend( ( 'CeO2', 'PCO' ) )
+plot_convolutions( DOSs_pr_convolved, x = energy_convolved )
+pl.legend( ( 's*p', 'p*d', 'p*f', 'd*f', 'p*f_Pr', 'd*f_Pr' ), loc = 'best' )
 style_plot()
 pl.subplot( 2, 2, 3 )
-plot_convolutions( DOSs_pr_convolved, x = energy_convolved )
-pl.legend( ( 's*p', 'p*d', 'p*f', 'd*f', 'p*f_Pr', 'd*f_Pr' ) )
+pl.plot( energy_convolved, con_sum_broadened, color = 'blue' )
+pl.plot( energy_convolved, con_sum_pr_broadened, color = 'maroon' )
+pl.legend( ( 'CeO2', 'PCO' ) )
 style_plot()
 pl.subplot( 2, 2, 4 )
-pl.plot( energy_convolved, con_sum, color = 'red' )
-pl.plot( energy_convolved, con_sum_pr, color = 'blue' )
+pl.plot( energy_convolved, con_sum, color = 'blue' )
+pl.plot( energy_convolved, con_sum_pr, color = 'maroon' )
 pl.legend( ( 'CeO2', 'PCO' ) )
 style_plot()
 

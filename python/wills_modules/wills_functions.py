@@ -154,6 +154,7 @@ def slide_art_styles( ):
     mpl.rcParams[ 'font.family' ] = 'Times New Roman'
     mpl.rcParams[ 'font.weight' ] = 'normal' # modify matplotlib defaults
     mpl.rcParams[ 'font.size' ] = 10
+    mpl.rcParams[ 'lines.linewidth' ] = 1.5
 #     mpl.rcParams[ 'mathtext.default' ] = 'regular'
     
 def elsvier_art_styles( ):
