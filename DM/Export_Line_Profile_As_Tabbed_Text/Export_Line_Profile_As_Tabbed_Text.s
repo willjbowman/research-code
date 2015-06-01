@@ -14,7 +14,7 @@
 
 // KNOWN ISSUES:
 // 1. profile data are not labeled properly because they take the
-//    image display's name rather than the slice's name in the legend.
+//    image display's name rather than the slice's name in the legend. ( Should use String ImageDisplayGetSliceLabelById( ImageDisplay img_disp, ScriptObject slice_id ) .)
 // 2. the initial profiles should be saved before conversion to .txt
 // 3. the script ends with an error - press ok.
 // 4. the editor window doesn't show up in the free version, so there's code here

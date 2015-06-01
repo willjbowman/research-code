@@ -173,7 +173,7 @@ style_plot()
 pl.figure()
 # DOSs_pr = ( oc_s, oc_p, oc_d, oc_f, un_s, un_p, un_d, un_f, un_f_pr )
 # DOSs_pr_convolved = ( con_s_p, con_p_d, con_p_f, con_d_f, con_p_f_pr, con_d_f_pr )
-DOSs_pr = ( oc_s, oc_p, oc_d, oc_f, un_s, un_p, un_d, un_f )
+DOSs_pr = ( oc_s, oc_p, oc_d, oc_f, un_s, un_p, un_d, un_f, un_f_pr )
 DOSs_pr_convolved = ( con_s_p, con_p_s, con_p_d, con_p_f, con_p_f_pr, con_d_p, con_d_f, con_d_f_pr, con_f_d )
 con_sum_pr = con_s_p + con_p_s + con_p_d + con_p_f + con_p_f_pr + con_d_p + con_d_f + con_d_f_pr + con_f_d
 con_sum_pr_broadened = broaden( con_sum_pr )
