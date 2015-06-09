@@ -13,6 +13,31 @@ to reload a module:
 '''
     
 
+''' ########################## electronic charge ########################## '''
+''''returns Boltzmann constant in specified units.
+Usage:
+>>>k_b = wf.boltzmann( boolean_0, boolean_1 )
+returns k_b in J/K if boolean_0 = true, or eV/K if boolean_1 = true.
+'''
+
+def electron_charge():
+    return 1.60217657e-19 # coulombs
+
+
+''' ########################## Boltzmann constant ########################## '''
+''''returns Boltzmann constant in specified units.
+Usage:
+>>>k_b = wf.boltzmann( boolean_0, boolean_1 )
+returns k_b in J/K if boolean_0 = true, or eV/K if boolean_1 = true.
+'''
+
+def boltzmann_constant( JperK, eVperK ):
+    if JperK:
+        return 1.3806488e-23
+    elif eVperK:
+        return 8.6173324e-5
+
+
 ''' ########################## list manipulation ########################## '''
 ''''returns list after manipulation of each element via math operations
 Usage:
@@ -25,7 +50,7 @@ def multiply_list( list, scalar ):
 
 def add_to_list( list, scalar ):
     return [ i + scalar for i in list ]
-    
+
 
 ''' ########################## current_script_info() ########################## '''
 ''''returns the filename and storage directory of the script in which this 

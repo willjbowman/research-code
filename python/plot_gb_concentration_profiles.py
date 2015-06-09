@@ -17,14 +17,14 @@ from os import path
 
 # specify path to directory of eels intensity map files and label for output files
 
-# maps_dir = "c:/Dropbox/SOFC Electrolyte Project/Microscopy/141118_10Ca_ARM200kV/gb_maps_141229/150218_scaled_StdK-edx_50acqK-eels/"
-# maps_label = '10Ca_' 
+maps_dir = "c:/Dropbox/Crozier Group Users - Will Bowman/active_research/microscopy/141118_10Ca_ARM200kV/gb_maps_141229/150527_kCa-0-540_kO-3-038/"
+maps_label = '10Ca_' 
 
-# maps_dir = "c:/Dropbox/SOFC Electrolyte Project/Microscopy/140821_5CaDC_ARM200kV/gb_maps_141230/150218_scaled_StdK-edx_50acqK-eels/"
+# maps_dir = "c:/Dropbox/Crozier Group Users - Will Bowman/active_research/microscopy/140821_5CaDC_ARM200kV/gb_maps_141230/150527_kCa-0-540_kO-3-038/"
 # maps_label = '5CaDC_'
 
-maps_dir = "c:/Dropbox/SOFC Electrolyte Project/Microscopy/141007_2Ca_ARM200kV/gb_maps_141230/150218_scaled_StdK-edx_50acqK-eels/"
-maps_label = '2Ca_'
+# maps_dir = "c:/Dropbox/Crozier Group Users - Will Bowman/active_research/microscopy/141007_2Ca_ARM200kV/gb_maps_141230/150527_kCa-0-540_kO-3-038/"
+# maps_label = '2Ca_'
 
 I_ratio, C_ratio, C_ion = 'EELS intensity ratio', 'EELS concentration ratio', 'EELS concentration'
 I_ratio_col_0, I_ratio_col_1, C_ratio_col_0, C_ratio_col_1  = 4, 6, 6, 8

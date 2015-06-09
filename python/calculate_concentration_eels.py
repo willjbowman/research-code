@@ -14,32 +14,33 @@ from os import path
 ''' ########################### USER-DEFINED ########################### '''
 # k_CaCe, k_OCe, k_CaO, k_OCa = 5.935e-1, 2.999, 1.982e-1, 5.202 # k-factors calculated from 10Ca 2d scans (x spectra)
 # k_CaCe, k_OCe, k_CaO, k_OCa = 0.4298, 3.0382, 1.982e-1, 5.202 # k-factors calculated from '150122 ethanol + sonicate + dip holey C'
-k_CaCe, k_OCe = 0.510, 3.038 # k-factors calculated from '150217_10Ca_XRDCrushed' and CeO2_crushed
+# k_CaCe, k_OCe = 0.510, 3.038 # k-factors calculated from '150217_10Ca_XRDCrushed' and CeO2_crushed
+k_CaCe, k_OCe = 0.540, 3.038 # k-factors calculated from '150527_CaCeMeOH-1M-STD-on-NiC_ARM200kV' and 'CeO2_crushed'
 # Ca/Ce EELS k-factor was calculated using the C_Ca/Ce from EDX of '150130_10Ca_EDS'
 # which was determined via EDX k-factor acquired using standard 5050
 
-output_dir_name = '150218_scaled_StdK-edx_50acqK-eels' # name of output directory for results 
+output_dir_name = '150527_kCa-0-540_kO-3-038' # name of output directory for results
 
 # specify path to directory of elemental map files
 # specify load order,z, of each element in the map (see np.loadtxt( filegroup[ z ] )
 
-# maps_dir = "c:/Dropbox/SOFC Electrolyte Project/Microscopy/141118_10Ca_ARM200kV/gb_maps_141229/"
-# z_Ca, z_O, z_Ce = 1, 2, 0
-# # dictionary callable using map id as key (12eV integration window used)
-# # scalar is low/high; need to multiply high by scalar to make sections equal
-# Ce_scalar = { '00' : 0.972, '01' : 0.972, '03' : 0.994, '04' : 0.971, '06' : 0.976,
-#  '07' : 0.976, '08' : 0.975, '10' : 0.976, '11' : 0.974, '12' : 0.982 }
-# common_string_HL, common_string_LL = 'EELS_HL_', 'EELS_LL_'
+maps_dir = "c:/Dropbox/Crozier Group Users - Will Bowman/active_research/microscopy/141118_10Ca_ARM200kV/gb_maps_141229/"
+z_Ca, z_O, z_Ce = 1, 2, 0
+# dictionary callable using map id as key (12eV integration window used)
+# scalar is low/high; need to multiply high by scalar to make sections equal
+Ce_scalar = { '00' : 0.972, '01' : 0.972, '03' : 0.994, '04' : 0.971, '06' : 0.976,
+ '07' : 0.976, '08' : 0.975, '10' : 0.976, '11' : 0.974, '12' : 0.982 }
+common_string_HL, common_string_LL = 'EELS_HL_', 'EELS_LL_'
 
-# maps_dir = "c:/Dropbox/SOFC Electrolyte Project/Microscopy/140821_5CaDC_ARM200kV/gb_maps_141230/"
+# maps_dir = "c:/Dropbox/Crozier Group Users - Will Bowman/active_research/microscopy/140821_5CaDC_ARM200kV/gb_maps_141230/"
 # z_Ca, z_O, z_Ce = 0, 2, 1
 # Ce_scalar = { '01' : 0.781, '02' : 0.781 }
 # common_string_HL, common_string_LL = 'EELS_HL_', 'EELS_LL_'
 
-maps_dir = "c:/Dropbox/SOFC Electrolyte Project/Microscopy/141007_2Ca_ARM200kV/gb_maps_141230/"
-z_Ca, z_O, z_Ce = 0, 2, 1
-Ce_scalar = {}
-common_string_HL, common_string_LL = 'EELS_CL_', 'EELS_LL_'
+# maps_dir = "c:/Dropbox/Crozier Group Users - Will Bowman/active_research/microscopy/141007_2Ca_ARM200kV/gb_maps_141230/"
+# z_Ca, z_O, z_Ce = 0, 2, 1
+# Ce_scalar = {}
+# common_string_HL, common_string_LL = 'EELS_CL_', 'EELS_LL_'
 
 common_sub_str = 'EELS' # define common patterns to locate unique file IDs
 sub_str_pattern = 'EELS_XX_'
