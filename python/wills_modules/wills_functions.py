@@ -11,7 +11,23 @@ to reload a module:
 >>>import imp
 >>>imp.reload( module_name )
 '''
-    
+
+
+''' ########################## ticks off ########################## 
+
+turns off the ticks on the current plot's axis specified by argument. 
+Usage:
+>>> wf.ticks_off( axis )
+axis = 'y' or 'x'
+'''
+
+def ticks_off( axis ):
+    ax = pl.gca()
+    if axis == 'y':
+        ax.set_yticks([])
+    elif axis == 'x':
+        ax.set_xticks([])
+
 
 ''' ########################## electronic charge ########################## '''
 ''''returns Boltzmann constant in specified units.

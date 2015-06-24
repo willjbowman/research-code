@@ -24,6 +24,7 @@ from scipy import signal
 ''' ########################### USER-DEFINED ########################### '''
 
 data_path = "C:/Crozier_Lab/Writing/2015_PCO10 interband states/figures/Dholobhai et al ceria PDOS_addPr_NoLowOcP_Eg35.txt" # path to data file
+experiment_data_path = 'C:/Crozier_Lab/Writing/2015_PCO10 interband states/data/pco-valence-loss.txt'
 # data_path = "C:/Crozier_Lab/Writing/2015_PCO10 interband states/Dholobhai et al ceria PDOS_addPr.txt" # path to data file
 curve_names = [ 'oc-s', 'oc-p',	'oc-d',	'oc-f',	'un-s',	'un-p',	'un-d',	'un-f',	'pr-f-0', 'pr-f-1' ]
 
@@ -31,16 +32,23 @@ curve_names = [ 'oc-s', 'oc-p',	'oc-d',	'oc-f',	'un-s',	'un-p',	'un-d',	'un-f',	
 convolution_type = 'same'
 broadening_fwhm = 5 # eV
 
-x_str = 'Relative energy (eV)'
+x_str = 'Energy (eV)'
 y_str = 'DOS/eV'
 x_tick_shift = 4 # eV
 x_min, x_max = -5, 15 # eV
 x_min_conv, x_max_conv = 0, 15 # eV
 
+x_min_eels, x_max_eels = 0, 5 # eV
+y_min_eels, y_max_eels = -2, 65 # eV
+
 wf.slide_art_styles()
 
-DOS_colors = [ 'orange', 'blue', 'green', 'red', 'orange', 'blue', 'green', 'red', 'black' ]
-convolution_colors = [ 'orange', 'blue', 'green', 'red', 'black', 'grey', 'orange', 'blue', 'green', 'red', 'black', 'grey' ]
+DOS_colors = [ 'red', 'orange', 'grey', 'maroon', 'black', 'red', 'orange', 'grey', 'maroon' ]
+convolution_colors = [ 'orange', 'white', 'green', 'maroon', 'black', 'blue', 'orange', 'grey', 'green', 'maroon', 'black', 'blue' ]
+# convolution_colors = [ 'red', 'orange', 'grey', 'maroon', 'black', 'blue', 'blue', 'blue', 'blue', 'blue', 'blue', 'blue' ]
+
+output_file_path = 'C:/Crozier_Lab/Writing/2015_PCO10 interband states/figures/single-scattering-model/'
+output_file_name = 'single-scattering-model'
 
 ''' ########################### FUNCTIONS ########################### '''
 
@@ -137,10 +145,14 @@ con_d_f_pr = convolve( reverse( oc_d ), un_f_pr )
 
 con_f_d = convolve( reverse( oc_f ), un_d )
 
-wf.close_all()
+# read experimental data (background subtracted valence loss)
+experiment_data = np.loadtxt( experiment_data_path )
+experiment_ev, experiment_raw, experiment_processed = experiment_data.T
+
+# wf.close_all()
 
 
-pl.figure()
+# pl.figure()
 DOSs = ( oc_s, oc_p, oc_d, oc_f, un_s, un_p, un_d, un_f )
 # DOSs_convolved = ( con_s_p, con_p_d, con_p_f, con_d_f )
 # con_sum = con_s_p + con_p_d + con_p_f + con_d_f
@@ -149,32 +161,33 @@ con_sum = con_s_p + con_p_s + con_p_d + con_p_f + con_d_p + con_d_f + con_f_d
 con_sum_broadened = broaden( con_sum )
 energy_convolved = np.linspace( energy[ 0 ], energy[ -1 ], num = np.size( con_sum, axis = 0 ) )
 energy_convolved = energy_convolved + x_tick_shift
-
-pl.subplot( 2, 2, 1 )
-plot_DOSs( energy, DOSs )
-pl.legend( ( 's', 'p', 'd', 'f' ), loc = 'best' )
-style_plot( convolved = False )
-pl.subplot( 2, 2, 2 )
-plot_convolutions( DOSs_convolved, x = energy_convolved )
+# 
+# pl.subplot( 2, 2, 1 )
+# plot_DOSs( energy, DOSs )
+# pl.legend( ( 's', 'p', 'd', 'f' ), loc = 'best' )
+# style_plot( convolved = False )
+# pl.subplot( 2, 2, 2 )
+# plot_convolutions( DOSs_convolved, x = energy_convolved )
 # pl.legend( ( 's*p', 'p*d', 'p*f', 'd*f' ) )
-pl.legend( ( 's*p', 'p*s', 'p*d', 'p*f', 'd*p', 'd*f', 'f*d' ), loc = 'best' )
-style_plot()
-pl.subplot( 2, 2, 3 )
-pl.plot( energy_convolved, con_sum, color = 'blue' )
-pl.plot( energy_convolved, wf.normalize_to_max( con_sum_broadened, con_sum )[0], color = 'maroon' )
-pl.legend( ('CeO2', 'broadened'), loc = 'best' )
-style_plot()
-pl.subplot( 2, 2, 4 )
-pl.legend( ( 'CeO2 broad' ), loc = 'best' )
-style_plot()
+# pl.legend( ( 's*p', 'p*s', 'p*d', 'p*f', 'd*p', 'd*f', 'f*d' ), loc = 'best' )
+# style_plot()
+# pl.subplot( 2, 2, 3 )
+# pl.plot( energy_convolved, con_sum, color = 'blue' )
+# pl.plot( energy_convolved, wf.normalize_to_max( con_sum_broadened, con_sum )[0], color = 'maroon' )
+# pl.legend( ('CeO2', 'broadened'), loc = 'best' )
+# style_plot()
+# pl.subplot( 2, 2, 4 )
+# pl.legend( ( 'CeO2 broad' ), loc = 'best' )
+# style_plot()
 
 
 
 pl.figure()
 # DOSs_pr = ( oc_s, oc_p, oc_d, oc_f, un_s, un_p, un_d, un_f, un_f_pr )
 # DOSs_pr_convolved = ( con_s_p, con_p_d, con_p_f, con_d_f, con_p_f_pr, con_d_f_pr )
-DOSs_pr = ( oc_s, oc_p, oc_d, oc_f, un_s, un_p, un_d, un_f, un_f_pr )
-DOSs_pr_convolved = ( con_s_p, con_p_s, con_p_d, con_p_f, con_p_f_pr, con_d_p, con_d_f, con_d_f_pr, con_f_d )
+DOSs_pr = ( oc_s, oc_p, oc_d, oc_f, un_f_pr, un_s, un_p, un_d, un_f )
+DOSs_pr_convolved = ( con_s_p, con_p_s, con_p_d, con_p_f, con_p_f_pr, con_d_p, con_d_f, con_d_f_pr, con_f_d ) # rearranged for paper
+# DOSs_pr_convolved = ( con_p_f, con_p_f_pr, con_d_f, con_d_f_pr, con_f_d, con_s_p, con_p_s, con_p_d, con_d_p )
 con_sum_pr = con_s_p + con_p_s + con_p_d + con_p_f + con_p_f_pr + con_d_p + con_d_f + con_d_f_pr + con_f_d
 con_sum_pr_broadened = broaden( con_sum_pr )
 
@@ -184,18 +197,68 @@ pl.legend( ( 's', 'p', 'd', 'f' ), loc = 'best' )
 style_plot( convolved = False )
 pl.subplot( 2, 2, 2 )
 plot_convolutions( DOSs_pr_convolved, x = energy_convolved )
-pl.legend( ( 's*p', 'p*s', 'p*d', 'p*f', 'p*f_Pr', 'd*p', 'd*f_Pr', 'd*f', 'f*d' ), loc = 'best' )
+pl.legend( ( 's*p', '', 'p*d', 'p*f', 'p*f_Pr', 'd*p', 'd*f_Pr', 'd*f', 'f*d' ), loc = 'best' )
 style_plot()
 pl.subplot( 2, 2, 3 )
-pl.plot( energy_convolved, con_sum_broadened, color = 'blue' )
+pl.plot( energy_convolved, con_sum_broadened, color = 'maroon', lw = 0.8, dashes = [ 2, 2 ] )
 pl.plot( energy_convolved, con_sum_pr_broadened, color = 'maroon' )
-pl.legend( ( 'CeO2', 'PCO' ), loc = 'best' )
-style_plot()
+pl.plot( experiment_ev, experiment_processed / 10, ls = 'None', marker = '.', ms = 1, color = 'grey' )
+pl.legend( ( 'CeO2', 'PCO', 'Exp.' ), loc = 'best' )
+# style_plot()
+# pl.xlim( x_min_eels, x_max_eels )
+pl.xlim( x_min_eels, 4.9 )
+pl.ylim( y_min_eels, y_max_eels )
+pl.xlabel( x_str )
+pl.ylabel( y_str )
+pl.minorticks_on()
+
 pl.subplot( 2, 2, 4 )
 pl.plot( energy_convolved, con_sum, color = 'blue' )
 pl.plot( energy_convolved, con_sum_pr, color = 'maroon' )
 pl.legend( ( 'CeO2', 'PCO' ), loc = 'best' )
 style_plot()
+
+
+# for paper
+pl.figure( figsize = ( 3.4, 9 ) )
+wf.slide_art_styles() # presentation styling
+fontsize = mpl.rcParams[ 'font.size' ]
+
+# pl.subplot( 2, 1, 1 )
+pl.subplot( 3, 1, 1 )
+plot_DOSs( energy, DOSs_pr )
+pl.legend( ( '$s_{CeO_{2}}$', '$p_{CeO_{2}}$', '$d_{CeO_{2}}$', '$f_{CeO_{2}}$', '$f_{Pr^{4+}}$' ), loc = 'upper left', fontsize = fontsize, labelspacing = .01, handletextpad = 0.2 )
+
+pl.xlim( x_min, x_max )
+pl.minorticks_on()
+wf.ticks_off( 'y' )
+
+pl.subplot( 3, 1, 2 )
+plot_convolutions( DOSs_pr_convolved, x = energy_convolved )
+# pl.legend( ( 's*p', 'p*s', 'p*d', 'p*f', 'p*f_Pr', 'd*p', 'd*f_Pr', 'd*f', 'f*d' ), loc = 'best' )
+
+pl.xlim( x_min_eels, 4.9 )
+pl.ylim( 0.02, 2.5 )
+pl.ylabel( y_str )
+pl.minorticks_on()
+wf.ticks_off( 'y' )
+
+# pl.subplot( 2, 1, 2 )
+pl.subplot( 3, 1, 3 )
+pl.plot( energy_convolved, con_sum_broadened, color = 'maroon', dashes = [ 2, 2 ] )
+pl.plot( energy_convolved, con_sum_pr_broadened, color = 'maroon' )
+pl.plot( experiment_ev, experiment_processed / 10, ls = 'None', marker = '.', ms = 0.8, color = 'grey' )
+pl.legend( ( r'$ \mathrm{ CeO_{2} }$ model', 'PCO model', 'PCO experiment' ), loc = 'best', fontsize = fontsize, labelspacing = .01, handletextpad = 0.2 )
+
+pl.xlim( x_min_eels, x_max_eels )
+pl.xlim( x_min_eels, 4.9 )
+pl.ylim( 0, y_max_eels )
+pl.xlabel( x_str )
+pl.ylabel( '' )
+pl.minorticks_on()
+wf.ticks_off( 'y' )
+
+# pl.savefig( output_file_path + output_file_name + '.png', format = 'png', dpi = 1000 )
 
 ''' ########################### REFERENCES ###########################
 1. http://stackoverflow.com/questions/6518811/interpolate-nan-values-in-a-numpy-array
