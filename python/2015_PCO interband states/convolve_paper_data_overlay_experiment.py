@@ -23,14 +23,15 @@ from scipy import signal
 
 ''' ########################### USER-DEFINED ########################### '''
 
-data_path = "C:/Crozier_Lab/Writing/2015_PCO10 interband states/figures/Dholobhai et al ceria PDOS_addPr_NoLowOcP_Eg35.txt" # path to data file
+data_path = "C:/Crozier_Lab/Writing/2015_PCO10 interband states/figures/Dholobhai et al ceria PDOS_addPr_NoLowOcP_Eg35_25meV.txt" # path to data file
 experiment_data_path = 'C:/Crozier_Lab/Writing/2015_PCO10 interband states/data/pco-valence-loss.txt'
 # data_path = "C:/Crozier_Lab/Writing/2015_PCO10 interband states/Dholobhai et al ceria PDOS_addPr.txt" # path to data file
 curve_names = [ 'oc-s', 'oc-p',	'oc-d',	'oc-f',	'un-s',	'un-p',	'un-d',	'un-f',	'pr-f-0', 'pr-f-1' ]
 
 # convolution_type = 'same'
 convolution_type = 'same'
-broadening_fwhm = 5 # eV
+# broadening_fwhm = 5 # eV
+broadening_fwhm = .025 # eV
 
 x_str = 'Energy (eV)'
 y_str = 'DOS/eV'
@@ -39,13 +40,16 @@ x_min, x_max = -5, 15 # eV
 x_min_conv, x_max_conv = 0, 15 # eV
 
 x_min_eels, x_max_eels = 0, 5 # eV
-y_min_eels, y_max_eels = -2, 65 # eV
+y_min_eels, y_max_eels = -2, 5.5 # eV
+
+exp_scalar = 1 / 120
 
 wf.slide_art_styles()
 
 DOS_colors = [ 'red', 'orange', 'grey', 'maroon', 'black', 'red', 'orange', 'grey', 'maroon' ]
-convolution_colors = [ 'orange', 'white', 'green', 'maroon', 'black', 'blue', 'orange', 'grey', 'green', 'maroon', 'black', 'blue' ]
+convolution_colors = [ 'grey', 'black', 'orange', 'maroon', 'red', 'white', 'green', 'grey', 'white' ]
 # convolution_colors = [ 'red', 'orange', 'grey', 'maroon', 'black', 'blue', 'blue', 'blue', 'blue', 'blue', 'blue', 'blue' ]
+ # con_p_f_pr, con_d_f_pr, con_p_f, con_d_f, con_s_p, con_p_s, con_p_d, con_d_p, con_f_d 
 
 output_file_path = 'C:/Crozier_Lab/Writing/2015_PCO10 interband states/figures/single-scattering-model/'
 output_file_name = 'single-scattering-model'
@@ -88,7 +92,11 @@ def plot_figure( x, y1, y2, y1y2_conv ):
     
 def plot_DOSs( x, curves ):
     for index, curve_n in enumerate( curves ):
-        pl.plot( x, curve_n, color = DOS_colors[ index ] )
+        pl.plot( x, curve_n, color = DOS_colors[ index ], lw = 0.9, ls = '-' )
+    
+def plot_DOSs_rotated( x, curves ):
+    for index, curve_n in enumerate( curves ):
+        pl.plot( curve_n, x, color = DOS_colors[ index ], lw = 0.9, ls = '-' )
     
 # def plot_convolutions( curves ):
 #     for index, curve_n in enumerate( curves ):
@@ -97,9 +105,9 @@ def plot_DOSs( x, curves ):
 def plot_convolutions( curves, x = None ):
     for index, curve_n in enumerate( curves ):
         if x == None:
-            pl.plot( curve_n, color = convolution_colors[ index ] )
+            pl.plot( curve_n, color = convolution_colors[ index ], lw = 0.9, ls = '-' )
         else:
-            pl.plot( x, curve_n, color = convolution_colors[ index ] )
+            pl.plot( x, curve_n, color = convolution_colors[ index ], lw = 0.9, ls = '-' )
 
 def style_plot( convolved = True ):
     pl.xlim( x_min, x_max )
@@ -154,6 +162,8 @@ experiment_ev, experiment_raw, experiment_processed = experiment_data.T
 
 # pl.figure()
 DOSs = ( oc_s, oc_p, oc_d, oc_f, un_s, un_p, un_d, un_f )
+# for rotated comparison plot with DOSs_pr DONT USE FOR CALCULATIONS!
+DOSs_for_pr_compare = ( oc_s, oc_p, oc_d, oc_f, un_s, un_p, un_d, un_f, un_f )
 # DOSs_convolved = ( con_s_p, con_p_d, con_p_f, con_d_f )
 # con_sum = con_s_p + con_p_d + con_p_f + con_d_f
 DOSs_convolved = ( con_s_p, con_p_s, con_p_d, con_p_f, con_d_p, con_d_f, con_f_d )
@@ -182,84 +192,172 @@ energy_convolved = energy_convolved + x_tick_shift
 
 
 
-pl.figure()
 # DOSs_pr = ( oc_s, oc_p, oc_d, oc_f, un_s, un_p, un_d, un_f, un_f_pr )
 # DOSs_pr_convolved = ( con_s_p, con_p_d, con_p_f, con_d_f, con_p_f_pr, con_d_f_pr )
 DOSs_pr = ( oc_s, oc_p, oc_d, oc_f, un_f_pr, un_s, un_p, un_d, un_f )
-DOSs_pr_convolved = ( con_s_p, con_p_s, con_p_d, con_p_f, con_p_f_pr, con_d_p, con_d_f, con_d_f_pr, con_f_d ) # rearranged for paper
+DOSs_pr_occ = ( oc_s, oc_p, oc_d, oc_f )
+DOSs_pr_sum = [ sum( x ) for x in zip( *DOSs_pr_occ ) ] # [2]
+DOSs_pr_convolved = ( con_p_f_pr, con_d_f_pr, con_p_f, con_d_f, con_s_p, con_p_s, con_p_d, con_d_p, con_f_d ) # rearranged for paper
 # DOSs_pr_convolved = ( con_p_f, con_p_f_pr, con_d_f, con_d_f_pr, con_f_d, con_s_p, con_p_s, con_p_d, con_d_p )
 con_sum_pr = con_s_p + con_p_s + con_p_d + con_p_f + con_p_f_pr + con_d_p + con_d_f + con_d_f_pr + con_f_d
 con_sum_pr_broadened = broaden( con_sum_pr )
 
-pl.subplot( 2, 2, 1 )
-plot_DOSs( energy, DOSs_pr )
-pl.legend( ( 's', 'p', 'd', 'f' ), loc = 'best' )
-style_plot( convolved = False )
-pl.subplot( 2, 2, 2 )
-plot_convolutions( DOSs_pr_convolved, x = energy_convolved )
-pl.legend( ( 's*p', '', 'p*d', 'p*f', 'p*f_Pr', 'd*p', 'd*f_Pr', 'd*f', 'f*d' ), loc = 'best' )
-style_plot()
-pl.subplot( 2, 2, 3 )
-pl.plot( energy_convolved, con_sum_broadened, color = 'maroon', lw = 0.8, dashes = [ 2, 2 ] )
-pl.plot( energy_convolved, con_sum_pr_broadened, color = 'maroon' )
-pl.plot( experiment_ev, experiment_processed / 10, ls = 'None', marker = '.', ms = 1, color = 'grey' )
-pl.legend( ( 'CeO2', 'PCO', 'Exp.' ), loc = 'best' )
-# style_plot()
-# pl.xlim( x_min_eels, x_max_eels )
-pl.xlim( x_min_eels, 4.9 )
-pl.ylim( y_min_eels, y_max_eels )
-pl.xlabel( x_str )
-pl.ylabel( y_str )
-pl.minorticks_on()
+# if True:
+if False:
 
-pl.subplot( 2, 2, 4 )
-pl.plot( energy_convolved, con_sum, color = 'blue' )
-pl.plot( energy_convolved, con_sum_pr, color = 'maroon' )
-pl.legend( ( 'CeO2', 'PCO' ), loc = 'best' )
-style_plot()
+    # figure showing various important plots
+    pl.figure()
+    
+    pl.subplot( 2, 2, 1 )
+    plot_DOSs( energy, DOSs_pr )
+    pl.legend( ( 's', 'p', 'd', 'f' ), loc = 'best' )
+    style_plot( convolved = False )
+    pl.subplot( 2, 2, 2 )
+    plot_convolutions( DOSs_pr_convolved, x = energy_convolved )
+    pl.legend( ( 'p*f_Pr', 'd*f_Pr', 'p*f', 'd*f', 's*p', '', 'p*d', 'd*p', '' ), loc = 'best' )
+    style_plot()
+    pl.subplot( 2, 2, 3 )
+    pl.plot( energy_convolved, con_sum_broadened, color = 'maroon', lw = 0.8, dashes = [ 2, 2 ] )
+    pl.plot( energy_convolved, con_sum_pr_broadened, color = 'maroon' )
+    pl.plot( experiment_ev, experiment_processed * exp_scalar, ls = 'None', marker = '.', ms = 1, color = 'grey' )
+    pl.legend( ( 'CeO2', 'PCO', 'Exp.' ), loc = 'best' )
+    # style_plot()
+    # pl.xlim( x_min_eels, x_max_eels )
+    pl.xlim( x_min_eels, 4.9 )
+    pl.ylim( y_min_eels, y_max_eels )
+    pl.xlabel( x_str )
+    pl.ylabel( y_str )
+    pl.minorticks_on()
+    
+    pl.subplot( 2, 2, 4 )
+    pl.plot( energy_convolved, con_sum, color = 'blue' )
+    pl.plot( energy_convolved, con_sum_pr, color = 'maroon' )
+    pl.legend( ( 'CeO2', 'PCO' ), loc = 'best' )
+    style_plot()
+
+# if True:
+if False:
+    # figure for paper showing DOS, convolved DOS up to 5 eV and sum convolve compared w/ data
+    pl.figure( figsize = ( 3.4, 7 ) )
+    wf.slide_art_styles() # presentation styling
+    fontsize = mpl.rcParams[ 'font.size' ]
+    
+    # pl.subplot( 2, 1, 1 )
+    pl.subplot( 3, 1, 1 )
+    plot_DOSs( energy, DOSs_pr )
+    pl.legend( ( '$s_{CeO_{2}}$', '$p_{CeO_{2}}$', '$d_{CeO_{2}}$', '$f_{CeO_{2}}$', '$f_{Pr^{4+}}$' ), loc = 'upper left', fontsize = fontsize, labelspacing = .01, handletextpad = 0.2 )
+    
+    pl.xlim( x_min, x_max )
+    pl.minorticks_on()
+    wf.ticks_off( 'y' )
+    
+    pl.subplot( 3, 1, 2 )
+    plot_convolutions( DOSs_pr_convolved, x = energy_convolved )
+    # pl.legend( ( 's*p', 'p*s', 'p*d', 'p*f', 'p*f_Pr', 'd*p', 'd*f_Pr', 'd*f', 'f*d' ), loc = 'best' )
+    pl.legend( ( '$p_{CeO_{2}}*f_{Pr^{4+}}$', '$d_{CeO_{2}}*f_{Pr^{4+}}$',
+    '$p_{CeO_{2}}*f_{CeO_{2}}$', '$d_{CeO_{2}}*f_{CeO_{2}}$' ), loc = 'upper left',
+    fontsize = fontsize, labelspacing = .01, handletextpad = 0.2 )
+    
+    pl.xlim( x_min_eels, 4.9 )
+    pl.ylim( 0.02, 2.5 )
+    pl.ylabel( y_str )
+    pl.minorticks_on()
+    wf.ticks_off( 'y' )
+    
+    # pl.subplot( 2, 1, 2 )
+    pl.subplot( 3, 1, 3 )
+    pl.plot( energy_convolved, con_sum_broadened, color = 'maroon', dashes = [ 2, 2 ] )
+    pl.plot( energy_convolved, con_sum_pr_broadened, color = 'maroon' )
+    pl.plot( experiment_ev, experiment_processed * exp_scalar, ls = 'None', marker = '.', ms = 0.8, color = 'grey' )
+    pl.legend( ( r'$ \mathrm{CeO_{2}}$ model', 'PCO model', 'PCO experiment' ), loc = 'best', fontsize = fontsize, labelspacing = .01, handletextpad = 0.2 )
+    
+    pl.xlim( x_min_eels, x_max_eels )
+    pl.xlim( x_min_eels, 4.9 )
+    pl.ylim( 0, y_max_eels )
+    pl.xlabel( x_str )
+    pl.ylabel( '' )
+    pl.minorticks_on()
+    wf.ticks_off( 'y' )
+    
+    pl.savefig( output_file_path + output_file_name + '25meV-1000dpi.png', format = 'png', dpi = 1000 )
 
 
-# for paper
-pl.figure( figsize = ( 3.4, 9 ) )
-wf.slide_art_styles() # presentation styling
-fontsize = mpl.rcParams[ 'font.size' ]
+# if True:
+if False:
+    # figure for paper showing ceria and PCO DOS (symmetry projected)
+    
+    output_file_path_DOS_compare = 'C:/Crozier_Lab/Writing/2015_PCO10 interband states/figures/DOS-compare/'
+    output_file_name_DOS_compare = 'DOS-compare'
+    
+    
+    pl.figure( figsize = ( 3.4, 4.5 ) )
+    wf.slide_art_styles() # presentation styling
+    fontsize = mpl.rcParams[ 'font.size' ]
+    
+    pl.subplot( 2, 1, 1 ) # DOS w/out Pr state
+    plot_DOSs_rotated( energy, DOSs_pr )
+    pl.legend( ( '$s_{CeO_{2}}$', '$p_{CeO_{2}}$', '$d_{CeO_{2}}$', '$f_{CeO_{2}}$', '$f_{Pr^{4+}}$' ), loc = 'lower right', fontsize = fontsize, labelspacing = .01, handletextpad = 0.2 )
+    
+    pl.xlim( 0.02, 2.5 )
+    pl.ylim( -1, 4 )
+    pl.ylabel( x_str )
+    pl.minorticks_on()
+    wf.ticks_off( 'x' )
+    
+    pl.subplot( 2, 1, 2 ) # DOS w/out Pr state
+    plot_DOSs_rotated( energy, DOSs_pr )
+    pl.legend( ( '$s_{CeO_{2}}$', '$p_{CeO_{2}}$', '$d_{CeO_{2}}$', '$f_{CeO_{2}}$', '$f_{Pr^{4+}}$' ), loc = 'lower right', fontsize = fontsize, labelspacing = .01, handletextpad = 0.2 )
+    
+    pl.xlim( 0.02, 2.5 )
+    pl.ylim( -1, 4 )
+    pl.xlabel( y_str )
+    pl.ylabel( x_str )
+    pl.minorticks_on()
+    wf.ticks_off( 'x' )
 
-# pl.subplot( 2, 1, 1 )
-pl.subplot( 3, 1, 1 )
-plot_DOSs( energy, DOSs_pr )
-pl.legend( ( '$s_{CeO_{2}}$', '$p_{CeO_{2}}$', '$d_{CeO_{2}}$', '$f_{CeO_{2}}$', '$f_{Pr^{4+}}$' ), loc = 'upper left', fontsize = fontsize, labelspacing = .01, handletextpad = 0.2 )
+# pl.savefig( output_file_path_DOS_compare + output_file_name_DOS_compare + '-1000dpi.png', format = 'png', dpi = 1000 )
 
-pl.xlim( x_min, x_max )
-pl.minorticks_on()
-wf.ticks_off( 'y' )
 
-pl.subplot( 3, 1, 2 )
-plot_convolutions( DOSs_pr_convolved, x = energy_convolved )
-# pl.legend( ( 's*p', 'p*s', 'p*d', 'p*f', 'p*f_Pr', 'd*p', 'd*f_Pr', 'd*f', 'f*d' ), loc = 'best' )
+if True:
+# if False:
+    # figure for paper showing ceria and PCO DOS (symmetry summed)
+    
+    output_file_path_DOS_compare_sum = 'C:/Crozier_Lab/Writing/2015_PCO10 interband states/figures/DOS-compare/'
+    output_file_name_DOS_compare_sum = 'DOS-compare-sum'
+    
+    
+    pl.figure( figsize = ( 3.4, 4.5 ) )
+    wf.slide_art_styles() # presentation styling
+    fontsize = mpl.rcParams[ 'font.size' ]
+    
+    pl.subplot( 2, 1, 1 ) # DOS w/out Pr state
+    pl.plot( un_f, energy, color = 'maroon', lw = 0.9, ls = '-' )
+    pl.plot( un_f_pr, energy, color = 'black', lw = 0.9, ls = '-' )
+    pl.plot( DOSs_pr_sum, energy, color = 'grey', lw = 0.9, ls = '-' )
+    pl.legend( ( r'$f_{Ce^{4+}}$', r'$f_{Pr^{4+}}$', 'VB' ), loc = 'lower right', fontsize = fontsize, labelspacing = .01, handletextpad = 0.2 )
+    
+    pl.xlim( 0.02, 2.5 )
+    pl.ylim( -2, 4 )
+    pl.ylabel( x_str )
+    pl.minorticks_on()
+    wf.ticks_off( 'x' )
+    
+    pl.subplot( 2, 1, 2 ) # DOS w/out Pr state
+    pl.plot( un_f, energy, color = 'maroon', lw = 0.9, ls = '-' )
+    pl.plot( un_f_pr, energy, color = 'black', lw = 0.9, ls = '-' )
+    pl.plot( DOSs_pr_sum, energy, color = 'grey', lw = 0.9, ls = '-' )
+    pl.legend( ( r'$f_{Ce^{4+}}$', r'$f_{Pr^{4+}}$', 'VB' ), loc = 'lower right', fontsize = fontsize, labelspacing = .01, handletextpad = 0.2 )
+    
+    pl.xlim( 0.02, 2.5 )
+    pl.ylim( -2, 4 )
+    pl.xlabel( y_str )
+    pl.ylabel( x_str )
+    pl.minorticks_on()
+    wf.ticks_off( 'x' )
 
-pl.xlim( x_min_eels, 4.9 )
-pl.ylim( 0.02, 2.5 )
-pl.ylabel( y_str )
-pl.minorticks_on()
-wf.ticks_off( 'y' )
-
-# pl.subplot( 2, 1, 2 )
-pl.subplot( 3, 1, 3 )
-pl.plot( energy_convolved, con_sum_broadened, color = 'maroon', dashes = [ 2, 2 ] )
-pl.plot( energy_convolved, con_sum_pr_broadened, color = 'maroon' )
-pl.plot( experiment_ev, experiment_processed / 10, ls = 'None', marker = '.', ms = 0.8, color = 'grey' )
-pl.legend( ( r'$ \mathrm{ CeO_{2} }$ model', 'PCO model', 'PCO experiment' ), loc = 'best', fontsize = fontsize, labelspacing = .01, handletextpad = 0.2 )
-
-pl.xlim( x_min_eels, x_max_eels )
-pl.xlim( x_min_eels, 4.9 )
-pl.ylim( 0, y_max_eels )
-pl.xlabel( x_str )
-pl.ylabel( '' )
-pl.minorticks_on()
-wf.ticks_off( 'y' )
-
-# pl.savefig( output_file_path + output_file_name + '.png', format = 'png', dpi = 1000 )
+    pl.savefig( output_file_path_DOS_compare_sum + output_file_name_DOS_compare_sum + '-1000dpi.png', format = 'png', dpi = 1000 )
 
 ''' ########################### REFERENCES ###########################
 1. http://stackoverflow.com/questions/6518811/interpolate-nan-values-in-a-numpy-array
+2. http://stackoverflow.com/questions/3223043/how-do-i-sum-the-columns-in-2d-list
 '''
