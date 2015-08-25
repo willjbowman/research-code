@@ -8,7 +8,18 @@ Appends wills_modules directory path onto the module search path [2] variable.
 
 
 Usage:
-Save this file in a directory that is perminently in the module search path (e.g. 'C:\\pyzo2013c\\lib'). Then by adding the below line to the top of a script, all modules in the wills_modules directory become accessible.
+
+!*!*!*!*!*!*!*!*!
+
+THIS MUST BE DONE!
+
+Save this file in a directory that is perminently in the module search path (e.g. 'C:\\pyzo2013c\\lib').
+Keep a copy of this file for versioning only.
+
+!*!*!*!*!*!*!*!*!
+
+
+Then by adding the below line to the top of a script, all modules in the wills_modules directory become accessible.
 
 import add_modules_to_syspath
 
@@ -23,4 +34,5 @@ References:
 '''
 
 import sys
-sys.path.append( "/Crozier_Lab/research_PhD/code/github/python/wills_modules" )
+# sys.path.append( "C:/Users/willb/Dropbox/WillB/Crozier_Lab/research_PhD/code/github/python/wills_modules" )
+sys.path.append( "C:\\Users\\willb\\Dropbox\\WillB\\Crozier_Lab\\research_PhD\\code\\github\\python\\wills_modules" )

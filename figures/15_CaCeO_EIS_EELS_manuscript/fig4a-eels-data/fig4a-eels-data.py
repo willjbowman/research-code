@@ -50,8 +50,8 @@ Ce_min_y = np.nanmax( counts_Ce_off ) * -y_min_multiple
 
 # plot Ca
 pl.subplot( 1, 3, 1 )
-pl.plot( ev_Ca, counts_Ca_off, color = col_off, dashes = dash )
 pl.plot( ev_Ca, counts_Ca_on, color = col_on, dashes = dash )
+pl.plot( ev_Ca, counts_Ca_off, color = col_off, dashes = dash )
 
 ax = pl.gca()
 ax.set_ylabel( 'Counts (arbitrary units)', labelpad = 0 )
@@ -71,8 +71,8 @@ ax.legend( legend_labels, loc = legend_loc, handlelength = 1.5,
 
 # plot O
 pl.subplot( 1, 3, 2 )
-pl.plot( ev_O, counts_O_off, color = col_off, dashes = dash )
 pl.plot( ev_O, counts_O_on, color = col_on, dashes = dash )
+pl.plot( ev_O, counts_O_off, color = col_off, dashes = dash )
 
 ax = pl.gca()
 # ax.set_xlabel( 'Distance (nm)', labelpad = 0 ) 
@@ -87,8 +87,8 @@ ax.set_xlabel( 'Energy-loss (eV)', labelpad = 0 )
     
 # plot Ce
 pl.subplot( 1, 3, 3 )
-pl.plot( ev_Ce, counts_Ce_off, color = col_off, dashes = dash )
 pl.plot( ev_Ce, counts_Ce_on, color = col_on, dashes = dash )
+pl.plot( ev_Ce, counts_Ce_off, color = col_off, dashes = dash )
 # pl.plot( dist_2 + shift_both, Ca_2, color = col_2, marker = Ca_mark, linestyle = 'none',
 #     fillstyle = fill_2, mew = mark_width, mec = col_2, markersize = marker_size )
 

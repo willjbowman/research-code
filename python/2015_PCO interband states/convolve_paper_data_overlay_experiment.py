@@ -23,8 +23,8 @@ from scipy import signal
 
 ''' ########################### USER-DEFINED ########################### '''
 
-data_path = "C:/Crozier_Lab/Writing/2015_PCO10 interband states/figures/Dholobhai et al ceria PDOS_addPr_NoLowOcP_Eg35_25meV.txt" # path to data file
-experiment_data_path = 'C:/Crozier_Lab/Writing/2015_PCO10 interband states/data/pco-valence-loss.txt'
+data_path = "C:/Users/willb/Dropbox/WillB/Crozier_Lab/Writing/2015_PCO10 interband states/figures/Dholobhai et al ceria PDOS_addPr_NoLowOcP_Eg35_25meV.txt" # path to data file
+experiment_data_path = 'C:/Users/willb/Dropbox/WillB/Crozier_Lab/Writing/2015_PCO10 interband states/data/pco-valence-loss.txt'
 # data_path = "C:/Crozier_Lab/Writing/2015_PCO10 interband states/Dholobhai et al ceria PDOS_addPr.txt" # path to data file
 curve_names = [ 'oc-s', 'oc-p',	'oc-d',	'oc-f',	'un-s',	'un-p',	'un-d',	'un-f',	'pr-f-0', 'pr-f-1' ]
 
@@ -42,17 +42,37 @@ x_min_conv, x_max_conv = 0, 15 # eV
 x_min_eels, x_max_eels = 0, 5 # eV
 y_min_eels, y_max_eels = -2, 5.5 # eV
 
-exp_scalar = 1 / 120
+exp_scalar = 1 / 120 # scale experimental data
 
 wf.slide_art_styles()
 
 DOS_colors = [ 'red', 'orange', 'grey', 'maroon', 'black', 'red', 'orange', 'grey', 'maroon' ]
 convolution_colors = [ 'grey', 'black', 'orange', 'maroon', 'red', 'white', 'green', 'grey', 'white' ]
 # convolution_colors = [ 'red', 'orange', 'grey', 'maroon', 'black', 'blue', 'blue', 'blue', 'blue', 'blue', 'blue', 'blue' ]
- # con_p_f_pr, con_d_f_pr, con_p_f, con_d_f, con_s_p, con_p_s, con_p_d, con_d_p, con_f_d 
+# con_p_f_pr, con_d_f_pr, con_p_f, con_d_f, con_s_p, con_p_s, con_p_d, con_d_p, con_f_d 
 
 output_file_path = 'C:/Crozier_Lab/Writing/2015_PCO10 interband states/figures/single-scattering-model/'
-output_file_name = 'single-scattering-model'
+output_file_name = 'single-scattering-model-150825-full-convolution'
+
+
+# # specify selected orbitals for convolution
+# s_p = False
+# 
+# p_s = False
+# p_d = False
+# p_f = False # hybridization
+# p_f_pr = False # hybridization
+# 
+# d_p = False
+# d_f = False
+# d_f_pr = False
+# 
+# f_d = False
+
+# # figure flags
+plot_DOSs = False # this is just the DOS plots for CeO2 and PCO
+plot_full_convolution = True # symmetry-projected convolutions, summed compared
+# plot_selected_convolution = True # symmetry-projected convolutions, summed compared
 
 ''' ########################### FUNCTIONS ########################### '''
 
@@ -134,24 +154,38 @@ un_f = interpolate( data[ :, 8 ] )
 un_f_pr = interpolate( data[ :, 10 ] )
 # un_f_pr = interpolate( data[ :, 10 ] ) * 2
 
-# the occupied DOSs are passed to reverse() so that when the unoccupied DOSs
-# are convolved with the (reversed) occupied DOSs, the lowest channels of the 
-# convolution output are the resuls of convolveing the valence band maxima
-# with the conduction band minimum. This is physically what is happening during
-# EELS: transitions from the VB max to the CB min is the lowest energy 
-# ioniziation.
+'''
+The occupied DOSs are passed to reverse() so that when the unoccupied DOSs
+are convolved with the (reversed) occupied DOSs, the lowest channels of the 
+convolution output are the resuls of convolving the valence band maxima
+with the conduction band minimum. This is physically what is happening during
+EELS: transition from the VB max to the CB min is the lowest energy 
+transfer.
+'''
+
+# con_s_s
 con_s_p = convolve( reverse( oc_s ), un_p )
+# con_s_d
+# con_s_f
+# con_s_f_pr
 
 con_p_s = convolve( reverse( oc_p ), un_s )
+# con_p_p
 con_p_d = convolve( reverse( oc_p ), un_d )
 con_p_f = convolve( reverse( oc_p ), un_f ) # hybridization
 con_p_f_pr = convolve( reverse( oc_p ), un_f_pr ) # hybridization
 
+# con_d_s
 con_d_p = convolve( reverse( oc_d ), un_p )
+# con_d_d
 con_d_f = convolve( reverse( oc_d ), un_f )
 con_d_f_pr = convolve( reverse( oc_d ), un_f_pr )
 
+# con_f_s
+# con_f_p
 con_f_d = convolve( reverse( oc_f ), un_d )
+# con_f_f
+# con_f_f_pr
 
 # read experimental data (background subtracted valence loss)
 experiment_data = np.loadtxt( experiment_data_path )
@@ -197,15 +231,40 @@ energy_convolved = energy_convolved + x_tick_shift
 DOSs_pr = ( oc_s, oc_p, oc_d, oc_f, un_f_pr, un_s, un_p, un_d, un_f )
 DOSs_pr_occ = ( oc_s, oc_p, oc_d, oc_f )
 DOSs_pr_sum = [ sum( x ) for x in zip( *DOSs_pr_occ ) ] # [2]
+
+''' including only dipole-selected convolutions '''
 DOSs_pr_convolved = ( con_p_f_pr, con_d_f_pr, con_p_f, con_d_f, con_s_p, con_p_s, con_p_d, con_d_p, con_f_d ) # rearranged for paper
 # DOSs_pr_convolved = ( con_p_f, con_p_f_pr, con_d_f, con_d_f_pr, con_f_d, con_s_p, con_p_s, con_p_d, con_d_p )
 con_sum_pr = con_s_p + con_p_s + con_p_d + con_p_f + con_p_f_pr + con_d_p + con_d_f + con_d_f_pr + con_f_d
+
+''' including all convolutions '''
+DOSs_pr_convolved = ( con_p_f_pr, con_d_f_pr, con_p_f, con_d_f, con_s_p, con_p_s, con_p_d, con_d_p, con_f_d ) # rearranged for paper
+# DOSs_pr_convolved = ( con_p_f, con_p_f_pr, con_d_f, con_d_f_pr, con_f_d, con_s_p, con_p_s, con_p_d, con_d_p )
+con_sum_pr = con_s_p + con_p_s + con_p_d + con_p_f + con_p_f_pr + con_d_p + con_d_f + con_d_f_pr + con_f_d
+
+''' sum convolutions '''
 con_sum_pr_broadened = broaden( con_sum_pr )
+
+if plot_DOSs:
+    pl.figure()
+    plot_DOSs( energy, DOSs_pr )
+    pl.legend( ( 's', 'p', 'd', 'f' ), loc = 'best' )
+    style_plot( convolved = False )
+    
+if plot_full_convolution:
+    oc_sum = oc_s + oc_p + oc_d + oc_f
+    un_sum = un_s + un_p + un_d + un_f + un_f_pr
+    con_full = convolve( reverse( oc_sum ), un_sum )
+    pl.figure()
+    pl.plot( energy_convolved, con_full, lw = 0.9, ls = '-' )
+    exp_scalar_full_conv = 1 / 45 # scale experimental data
+    pl.plot( experiment_ev, experiment_processed * exp_scalar_full_conv, ls = 'None', marker = '.', ms = 1, color = 'grey' )
+    
 
 # if True:
 if False:
 
-    # figure showing various important plots
+    # figure showing various important plots: 1. PCO DOS, 2. selected convolution
     pl.figure()
     
     pl.subplot( 2, 2, 1 )
@@ -318,8 +377,8 @@ if False:
 # pl.savefig( output_file_path_DOS_compare + output_file_name_DOS_compare + '-1000dpi.png', format = 'png', dpi = 1000 )
 
 
-if True:
-# if False:
+# if True:
+if False:
     # figure for paper showing ceria and PCO DOS (symmetry summed)
     
     output_file_path_DOS_compare_sum = 'C:/Crozier_Lab/Writing/2015_PCO10 interband states/figures/DOS-compare/'
@@ -355,7 +414,7 @@ if True:
     pl.minorticks_on()
     wf.ticks_off( 'x' )
 
-    pl.savefig( output_file_path_DOS_compare_sum + output_file_name_DOS_compare_sum + '-1000dpi.png', format = 'png', dpi = 1000 )
+    # pl.savefig( output_file_path_DOS_compare_sum + output_file_name_DOS_compare_sum + '-1000dpi.png', format = 'png', dpi = 1000 )
 
 ''' ########################### REFERENCES ###########################
 1. http://stackoverflow.com/questions/6518811/interpolate-nan-values-in-a-numpy-array

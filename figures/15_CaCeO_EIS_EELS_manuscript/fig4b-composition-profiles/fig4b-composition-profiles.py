@@ -1,12 +1,12 @@
 # plot the composition profiles of 10CCO gb2 map3 and 2CCO gb5 map9
 
-input_file_dir = 'C:/Users/willb/Dropbox/Crozier Group Users - Will Bowman/Crozier_Lab/Writing/2015_IS EBSD EELS of CaCeria grain boundaries/figures/FIGURE-PANELS/panel_04-stem-eels/figb-composition-profiles/'
+input_file_dir = 'C:/Users/willb/Dropbox/WillB/Crozier_Lab/Writing/2015_IS EBSD EELS of CaCeria grain boundaries/figures/FIGURE-PANELS/panel_04-stem-eels/fig4b-composition-profiles/'
 
 input_file_name = 'comp-profiles-10-2-CCO.txt'
 
 output_file_dir = input_file_dir
 output_file_name = 'fig4b-comp-profiles-10-2-CCO'
-dots = 1200
+dots = 400
 
 import numpy as np
 import pylab as pl
@@ -36,10 +36,10 @@ shift_2, shift_10, shift_both = 0, 4.0, -7.5
 # plot 10CCO
 pl.plot( dist_10 + shift_10 + shift_both, O_10, color = col_10, marker = O_mark, linestyle = 'none',
     fillstyle = fill_10, mew = mark_width, mec = col_10, markersize = marker_size )
-pl.plot( dist_10 + shift_10 + shift_both, Ce_10, color = col_10, marker = Ce_mark, linestyle = 'none',
-    fillstyle = fill_10, mew = mark_width, mec = col_10, markersize = marker_size )
-pl.plot( dist_10 + shift_10 + shift_both, Ca_10, color = col_10, marker = Ca_mark, linestyle = 'none',
-    fillstyle = fill_10, mew = mark_width, mec = col_10, markersize = marker_size )
+pl.plot( dist_10 + shift_10 + shift_both, Ce_10, color = col_10, marker = Ce_mark, linestyle = '-',
+    fillstyle = fill_10, mew = mark_width, mec = col_10, markersize = 3 )
+pl.plot( dist_10 + shift_10 + shift_both, Ca_10, color = col_10, marker = Ca_mark, linestyle = '-',
+    fillstyle = fill_10, mew = mark_width, mec = col_10, markersize = 3 )
     
 # plot 10CCO
 pl.plot( dist_2 + shift_both, O_2, color = col_2, marker = O_mark, linestyle = 'none',
@@ -91,4 +91,4 @@ ax.minorticks_on()
 
 pl.tight_layout()
 pl.show()
-pl.savefig( output_file_dir + output_file_name + '-' + str( dots ) + 'dpi.png', format = 'png', dpi = dots )
+pl.savefig( output_file_dir + output_file_name + '-' + str( dots ) + 'dpi.png', format = 'png', dpi = dots, transparent = True )
