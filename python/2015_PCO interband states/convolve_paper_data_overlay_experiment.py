@@ -24,6 +24,7 @@ from scipy import signal
 ''' ########################### USER-DEFINED ########################### '''
 
 data_path = "C:/Users/willb/Dropbox/WillB/Crozier_Lab/Writing/2015_PCO10 interband states/figures/Dholobhai et al ceria PDOS_addPr_NoLowOcP_Eg35_25meV.txt" # path to data file
+# data_path = "C:/Users/willb/Dropbox/WillB/Crozier_Lab/Writing/2015_PCO10 interband states/figures/Dholobhai et al ceria PDOS_addPr_NoLowOcP_Eg35_25meV_double_peak.txt" # path to data file
 experiment_data_path = 'C:/Users/willb/Dropbox/WillB/Crozier_Lab/Writing/2015_PCO10 interband states/data/pco-valence-loss.txt'
 # data_path = "C:/Crozier_Lab/Writing/2015_PCO10 interband states/Dholobhai et al ceria PDOS_addPr.txt" # path to data file
 curve_names = [ 'oc-s', 'oc-p',	'oc-d',	'oc-f',	'un-s',	'un-p',	'un-d',	'un-f',	'pr-f-0', 'pr-f-1' ]
@@ -69,10 +70,11 @@ output_file_name = 'single-scattering-model-150825-full-convolution'
 # 
 # f_d = False
 
-# # figure flags
-plot_DOSs = False # this is just the DOS plots for CeO2 and PCO
-plot_full_convolution = True # symmetry-projected convolutions, summed compared
-# plot_selected_convolution = True # symmetry-projected convolutions, summed compared
+''' figure flags '''
+plot_DOS_curves = False # this is just the DOS plots for CeO2 and PCO
+plot_full_convolution = False # symmetry-projected convolutions, summed compared
+plot_selected_convolution = False # symmetry-projected convolutions, summed compared
+DOS_compare_sum_reduced_shifted = True
 
 ''' ########################### FUNCTIONS ########################### '''
 
@@ -245,7 +247,7 @@ con_sum_pr = con_s_p + con_p_s + con_p_d + con_p_f + con_p_f_pr + con_d_p + con_
 ''' sum convolutions '''
 con_sum_pr_broadened = broaden( con_sum_pr )
 
-if plot_DOSs:
+if plot_DOS_curves:
     pl.figure()
     plot_DOSs( energy, DOSs_pr )
     pl.legend( ( 's', 'p', 'd', 'f' ), loc = 'best' )
@@ -259,6 +261,8 @@ if plot_full_convolution:
     pl.plot( energy_convolved, con_full, lw = 0.9, ls = '-' )
     exp_scalar_full_conv = 1 / 45 # scale experimental data
     pl.plot( experiment_ev, experiment_processed * exp_scalar_full_conv, ls = 'None', marker = '.', ms = 1, color = 'grey' )
+    pl.ylim( 0, 15 )
+    pl.xlim( x_min_eels, 5 )
     
 
 # if True:
@@ -377,35 +381,34 @@ if False:
 # pl.savefig( output_file_path_DOS_compare + output_file_name_DOS_compare + '-1000dpi.png', format = 'png', dpi = 1000 )
 
 
-# if True:
-if False:
-    # figure for paper showing ceria and PCO DOS (symmetry summed)
+if DOS_compare_sum_reduced_shifted:
+    # figure for paper showing symmerty-summed PCO DOS with bottom Pr shifted +0.3eV
     
-    output_file_path_DOS_compare_sum = 'C:/Crozier_Lab/Writing/2015_PCO10 interband states/figures/DOS-compare/'
-    output_file_name_DOS_compare_sum = 'DOS-compare-sum'
-    
+    output_file_path_DOS_compare_sum = 'C:/Users/willb/Dropbox/WillB/Crozier_Lab/Writing/2015_PCO10 interband states/figures/DOS-compare/'
+    output_file_name_DOS_compare_sum = 'DOS-compare-sum-reduced-shifted'
     
     pl.figure( figsize = ( 3.4, 4.5 ) )
-    wf.slide_art_styles() # presentation styling
+    # wf.slide_art_styles() # presentation styling
     fontsize = mpl.rcParams[ 'font.size' ]
     
     pl.subplot( 2, 1, 1 ) # DOS w/out Pr state
     pl.plot( un_f, energy, color = 'maroon', lw = 0.9, ls = '-' )
     pl.plot( un_f_pr, energy, color = 'black', lw = 0.9, ls = '-' )
     pl.plot( DOSs_pr_sum, energy, color = 'grey', lw = 0.9, ls = '-' )
-    pl.legend( ( r'$f_{Ce^{4+}}$', r'$f_{Pr^{4+}}$', 'VB' ), loc = 'lower right', fontsize = fontsize, labelspacing = .01, handletextpad = 0.2 )
+    pl.legend( ( r'$f_{Ce^{4+}}$', r'$f_{Pr^{4+}}$', 'VB' ), loc = 'lower right', fontsize = fontsize, labelspacing = .01, handletextpad = 0.2, frameon = False )
     
     pl.xlim( 0.02, 2.5 )
     pl.ylim( -2, 4 )
     pl.ylabel( x_str )
     pl.minorticks_on()
     wf.ticks_off( 'x' )
+    pl.tight_layout()
     
     pl.subplot( 2, 1, 2 ) # DOS w/out Pr state
     pl.plot( un_f, energy, color = 'maroon', lw = 0.9, ls = '-' )
-    pl.plot( un_f_pr, energy, color = 'black', lw = 0.9, ls = '-' )
+    pl.plot( un_f_pr, energy + 0.3, color = 'black', lw = 0.9, ls = '-' )
     pl.plot( DOSs_pr_sum, energy, color = 'grey', lw = 0.9, ls = '-' )
-    pl.legend( ( r'$f_{Ce^{4+}}$', r'$f_{Pr^{4+}}$', 'VB' ), loc = 'lower right', fontsize = fontsize, labelspacing = .01, handletextpad = 0.2 )
+    pl.legend( ( r'$f_{Ce^{4+}}$', r'$f_{Pr^{3+}}$', 'VB' ), loc = 'lower right', fontsize = fontsize, labelspacing = .01, handletextpad = 0.2, frameon = False )
     
     pl.xlim( 0.02, 2.5 )
     pl.ylim( -2, 4 )
@@ -413,8 +416,9 @@ if False:
     pl.ylabel( x_str )
     pl.minorticks_on()
     wf.ticks_off( 'x' )
+    pl.tight_layout()
 
-    # pl.savefig( output_file_path_DOS_compare_sum + output_file_name_DOS_compare_sum + '-1000dpi.png', format = 'png', dpi = 1000 )
+    pl.savefig( output_file_path_DOS_compare_sum + output_file_name_DOS_compare_sum + '-1200dpi.png', format = 'png', dpi = 1200 )
 
 ''' ########################### REFERENCES ###########################
 1. http://stackoverflow.com/questions/6518811/interpolate-nan-values-in-a-numpy-array
