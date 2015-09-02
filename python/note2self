@@ -1,1 +1,6 @@
-you need to save your matplotlib config file and the ide style file and the default sublime text styler
+# make a module that allows the user to select file from a gui, then asks each
+# time if the files are correct. want to get rid of the need to type the file
+# path each time.
+
+# also can you make a wf module that stores all mpl customizations so I can those
+# under git

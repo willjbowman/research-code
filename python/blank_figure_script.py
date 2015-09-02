@@ -41,9 +41,7 @@ fontsize = mpl.rcParams[ 'font.size' ]
 
 pl.tight_layout() # can run once to apply to all subplots, i think
 
-
 output_name = wf.save_name( data_dir, output_file, dots, file_type )
-# pl.savefig( output_name, format = file_type, dpi = dots, transparent = True )
-# pl.savefig( output_path_single_scattering + output_file_single_scattering + '-' + str( dots ) + 'dpi.png', format = 'png', dpi = dots )
+pl.savefig( output_name, format = file_type, dpi = dots, transparent = True )
     
 ''' ########################### REFERENCES ########################### '''

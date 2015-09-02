@@ -13,6 +13,31 @@ to reload a module:
 '''
 
 
+''' ########################## mpl_customizations ########################## 
+
+set rc params to customize matplotlib. This file in under git, matplotlibrc is not
+Usage:
+>>> wf.mpl_customizations()
+
+'''
+
+def mpl_customizations():
+    pass
+
+''' ########################## save_name ########################## 
+
+generate an output file name for saving figures.
+Usage:
+>>> wf.save_name( dir, name, dpi, file_type )
+
+'''
+
+def save_name( dir, name, dpi, file_type ):
+    name = dir + name + '-' + str( dpi ) + 'dpi.' + file_type
+    print( 'file name: ' + name )
+    return name
+
+
 ''' ########################## ticks off ########################## 
 
 turns off the ticks on the current plot's axis specified by argument. 
@@ -190,6 +215,12 @@ def plot_xy( x, y ):
 #     height_mm = 
 #     width_inches = 
 #     return ( height_inches * height_cols, width_inches * width_cols )
+
+def hex_gold():
+    return '#FFA500'
+
+def mpl_customizations():
+    pass
     
 def slide_art_styles( ):
     mpl.rcParams[ 'font.family' ] = 'Times New Roman'
@@ -268,9 +299,13 @@ def close_all():
     
 # get key index of value(s) from np array. pass single value or tuple, returns list
 def array_index( array, values ):
-    key_indicies = []
-    for value in values:
-        key_index = np.where( array == value )[0][0]
-        key_indicies.append( key_index )
-    return key_indicies
-    pl.close( 'all' )
+    try:
+        key_indicies = []
+        for value in values:
+            key_index = np.where( array == value )[0][0]
+            key_indicies.append( key_index )
+        return key_indicies
+        pl.close( 'all' )
+    except:
+        value_index = np.where( array == values )[0][0]
+        return value_index
