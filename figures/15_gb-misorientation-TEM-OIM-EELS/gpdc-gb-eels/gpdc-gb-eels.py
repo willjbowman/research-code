@@ -102,7 +102,7 @@ ax1 = pl.gca()
 pl.plot( d_ev, stack( d_off, d_on ), c=c_eels )
 pl.plot( d_ev, d_on, c=c_eels, dashes=ls_on )
 eels_style( ax1 )
-pl.ylabel( eels_y_lab )
+pl.ylabel( eels_y_lab, labelpad=0.5 )
 pl.legend( eels_entries, loc='upper center', fontsize=fontsize )
 
 pl.subplot( 2, 3, 2 ) # ( sub_y, sub_x, sub_i )
@@ -110,7 +110,7 @@ ax2 = pl.gca()
 pl.plot( e_ev, stack( e_off, e_on ), c=c_eels )
 pl.plot( e_ev, e_on, c=c_eels, dashes=ls_on )
 eels_style( ax2 )
-pl.xlabel( eels_x_lab )
+pl.xlabel( eels_x_lab, labelpad=0.3 )
 
 pl.subplot( 2, 3, 3 ) # ( sub_y, sub_x, sub_i )
 ax3 = pl.gca()
@@ -126,7 +126,7 @@ pl.plot( g_nm+g_shift_x, g_gd, marker=gd_m, c=gd_c )
 pl.plot( g_nm+g_shift_x, g_pr, marker=pr_m, c=pr_c )
 pl.xlim( g_conc_x )
 conc_style( ax4 )
-pl.ylabel( conc_y_lab )
+pl.ylabel( conc_y_lab, labelpad=0.5 )
 pl.legend( conc_entries, loc='center left', fontsize=fontsize, numpoints = 3 )
 
 
@@ -138,7 +138,7 @@ pl.plot( h_nm+h_shift_x, h_pr, marker=pr_m, c=pr_c )
 pl.xlim( h_conc_x )
 conc_style( ax5 )
 ax5.yaxis.set_ticklabels([]) # y tick labels off
-pl.xlabel( conc_x_lab )
+pl.xlabel( conc_x_lab, labelpad=0.3 )
 
 
 pl.subplot( 2, 3, 6 ) # ( sub_y, sub_x, sub_i )
@@ -150,7 +150,8 @@ pl.xlim( i_conc_x )
 ax6.yaxis.set_ticklabels([]) # y tick labels off
 conc_style( ax6 )
 
-pl.tight_layout( pad=0.3, h_pad=0.3 ) # can run once to apply to all subplots, i think
+# applies to all subplots, h_pad defined vertical spacing
+pl.tight_layout( pad=0.3, h_pad=0.6 )
 
 output_name = wf.save_name( data_dir, output_file, dots, file_type )
 pl.savefig( output_name, format = file_type, dpi = dots, transparent = True )
