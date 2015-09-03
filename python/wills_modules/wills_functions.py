@@ -41,16 +41,19 @@ I put this in a funciton called mpl_customizations() which sits in each figure
 script so each figure can be customized futher.
 '''
 
-def wills_mpl():
+def wills_mpl( fontsize ):
     mpl.rc( 'lines', linewidth=1.0, mew=0.01, markersize=3 )
     # mpl.rc( 'pathces' )
-    mpl.rc( 'font', family='sans-serif', serif='Helvetica', weight='normal',size=fsize )
+    mpl.rc( 'font', family='sans-serif', serif='Helvetica', weight='normal',
+        size=fontsize )
     # mpl.rc( 'text' )
     # mpl.rc( 'axes' )
     # mpl.rc( 'ticks' )
     # mpl.rc( 'grids' )
-    mpl.rc( 'legend', borderpad = 0.1, labelspacing = 0.1 )
+    mpl.rc( 'legend', fancybox=False, borderpad=0.1, labelspacing=0.1,
+        fontsize=fontsize )
     # mpl.rc( 'figure' )
+    mpl.rc( 'mathtext', default='regular' )
 
 ''' ########################## save_name ########################## 
 
@@ -249,9 +252,6 @@ def plot_xy( x, y ):
 
 def hex_gold():
     return '#FFA500'
-
-def mpl_customizations():
-    pass
     
 def slide_art_styles( ):
     mpl.rcParams[ 'font.family' ] = 'Times New Roman'
