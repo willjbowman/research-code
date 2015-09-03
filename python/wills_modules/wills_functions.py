@@ -4,6 +4,7 @@ import pylab as pl
 import matplotlib as mpl
 import csv
 import wills_functions as wf
+import datetime as dt
 
 ''' ############################### NOTES ################################ '''
 '''
@@ -13,16 +14,43 @@ to reload a module:
 '''
 
 
-''' ########################## mpl_customizations ########################## 
+''' ########################## stack ########################## 
 
-set rc params to customize matplotlib. This file in under git, matplotlibrc is not
+Shifts the top_curve vertically so its at the max of the bottom curve.
+
+Example:
+>>> pl.plot( d_ev, stack( d_off, d_on ) )
+
+top_curve and bottom_curve are 1D arrays which are to be plotted together.
+'''
+    
+def stack( top_curve, bottom_curve ):
+    shifted_top = top_curve + np.max( bottom_curve ) - np.min( bottom_curve )
+    return shifted_top
+
+
+''' ########################## wills_mpl ########################## 
+
+set rc params to customize matplotlib for will. This file in under git, 
+matplotlibrc is not. This serves as the base level of customization for will,
+and is analagous to hard-coding changes to matplotlibrc.
 Usage:
->>> wf.mpl_customizations()
+>>> wf.wills_mpl()
 
+I put this in a funciton called mpl_customizations() which sits in each figure
+script so each figure can be customized futher.
 '''
 
-def mpl_customizations():
-    pass
+def wills_mpl():
+    mpl.rc( 'lines', linewidth=1.0, mew=0.01, markersize=3 )
+    # mpl.rc( 'pathces' )
+    mpl.rc( 'font', family='sans-serif', serif='Helvetica', weight='normal',size=fsize )
+    # mpl.rc( 'text' )
+    # mpl.rc( 'axes' )
+    # mpl.rc( 'ticks' )
+    # mpl.rc( 'grids' )
+    mpl.rc( 'legend', borderpad = 0.1, labelspacing = 0.1 )
+    # mpl.rc( 'figure' )
 
 ''' ########################## save_name ########################## 
 
@@ -33,9 +61,12 @@ Usage:
 '''
 
 def save_name( dir, name, dpi, file_type ):
-    name = dir + name + '-' + str( dpi ) + 'dpi.' + file_type
-    print( 'file name: ' + name )
-    return name
+    basename = dir + name + '-'
+    date = str( dt.date.today() ).replace( '-', '' ) + '-'
+    dots = str( dpi ) + 'dpi'
+    outname = basename + date + dots + '.' + file_type
+    print( 'file name: ' + outname )
+    return outname
 
 
 ''' ########################## ticks off ########################## 

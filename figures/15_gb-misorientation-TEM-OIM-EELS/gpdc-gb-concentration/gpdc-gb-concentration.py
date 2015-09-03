@@ -1,7 +1,7 @@
 ''' ########################### OVERVIEW ########################### '''
 '''
- Created 2015-09-02 by Will Bowman. This creates a figure with eels data and 
- composition profiles 
+ Created 2015-09-03 by Will Bowman. This creates a figure with GPDC boundary 
+ composition and character data 
 '''
 
 ''' ########################### IMPORT MODULES ########################### '''
