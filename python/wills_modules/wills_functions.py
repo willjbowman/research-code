@@ -12,7 +12,60 @@ to reload a module:
 >>>import imp
 >>>imp.reload( module_name )
 '''
+    
 
+''' ########################## major_ticks ########################## 
+
+Applies axis limits to a pylab plot
+
+Example:
+>>> wf.major_ticks( ax, sp1_maj_loc )
+
+ax is pl.gca()
+sp1_maj_loc is a list of numbers which define the major tick intervals: [ x, y ]
+'''
+
+def major_ticks( ax, maj_locs ):
+    if maj_locs[0]:
+        ax.xaxis.set_major_locator( mpl.ticker.MultipleLocator( maj_locs[0] ) )
+    if maj_locs[1]:
+        ax.yaxis.set_major_locator( mpl.ticker.MultipleLocator( maj_locs[1] ) )
+    
+
+''' ########################## ax_limits ########################## 
+
+Applies axis limits to a pylab plot
+
+Example:
+>>> wf.ax_limits( sp1_lims )
+
+sp1_lims is a list of lists containing x and y min and max [[x_min,x_max],[y_min,y_max]]
+'''
+
+def ax_limits( lims ):
+    if lims[0]:
+        pl.xlim( lims[0] )
+    if lims[1]:
+        pl.ylim( lims[1] )
+    
+
+''' ########################## ax_labels ########################## 
+
+Applies axis labels to a pylab plot
+
+Example:
+>>> wf.ax_labels( sp1_ax_labs, pad )
+
+sp1_ax_labs is a list of strings [ 'x_label', 'y_label' ]
+pad is the labelpad, default is 0.5
+'''
+
+def ax_labels( labs, pad=0.5 ):
+    if labs[0]:
+        pl.xlabel( labs[0], labelpad=pad )
+    if labs[1]:
+        pl.ylabel( labs[1], labelpad=pad )
+    
 
 ''' ########################## stack ########################## 
 
