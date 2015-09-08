@@ -25,11 +25,14 @@ ax is pl.gca()
 sp1_maj_loc is a list of numbers which define the major tick intervals: [ x, y ]
 '''
 
-def major_ticks( ax, maj_locs ):
+def major_ticks( ax, maj_locs, scientific=False ):
     if maj_locs[0]:
         ax.xaxis.set_major_locator( mpl.ticker.MultipleLocator( maj_locs[0] ) )
     if maj_locs[1]:
         ax.yaxis.set_major_locator( mpl.ticker.MultipleLocator( maj_locs[1] ) )
+    if scientific:
+        ax.yaxis.get_major_formatter().set_powerlimits((0, 1))
+        ax.xaxis.get_major_formatter().set_powerlimits((0, 1))
     
 
 ''' ########################## ax_limits ########################## 
