@@ -117,16 +117,21 @@ sp1_x = np.arange( len( pr_len ) )
 pl.bar( sp1_x + bar_shift, pr_len, color=pr_c, alpha=0.5 )
 pl.bar( sp1_x + bar_shift, gd_len, color=gd_c, alpha=0.5 )
 pl.bar( sp1_x + bar_shift, ce_len, color=ce_c, alpha=0.5 )
+
 sp1_style( ax1 )
 pl.ylabel( sp1_y_lab, labelpad=0.5 )
 pl.xlabel( sp1_x_lab, labelpad=0.5 )
 pl.legend( sp1_entries )
 
+pl.plot( normal_hist_x, normal_hist_pr, color=pr_c, marker=sp0_m[0], ls='-', linewidth=1 )
+pl.plot( normal_hist_x, normal_hist_gd, color=gd_c, marker=sp0_m[1], ls='-', linewidth=1 )
+pl.plot( normal_hist_x, normal_hist_ce, color=ce_c, marker=sp0_m[2], ls='-', linewidth=1 )
+
 # applies to all subplots, h_pad defined vertical spacing
 pl.tight_layout( pad=0.3, h_pad=0.6 )
 
-for dot in dots:
-    output_name = wf.save_name( data_dir, output_file, dot, file_type )
-    pl.savefig( output_name, format = file_type, dpi = dot, transparent = True )
+# for dot in dots:
+#     output_name = wf.save_name( data_dir, output_file, dot, file_type )
+#     pl.savefig( output_name, format = file_type, dpi = dot, transparent = True )
     
 ''' ########################### REFERENCES ########################### '''

@@ -36,7 +36,7 @@ d_2_skiprows = 1
 # font size, resolution (DPI), file type, fig_size
 # create a figure of size ( width", height" )
 # font_size, dots, file_type, fig_size = 10, [ 300, 1200 ], 'png', ( 3.33, 4 )
-font_size, dots, file_type, fig_size = 10, [ 300 ], 'png', ( 3.33, 4 )
+font_size, dots, file_type, fig_size = 10, [ 300, 1200 ], 'png', ( 3.33, 4 )
 # sub_plots = ( 2, 1, 1 ) # suplot 0 ( sub_y, sub_x, sub_i )
 
 # subplot 0 (sp0): length fraction v misorientation angle
@@ -50,7 +50,7 @@ sp0_maj_loc = [ 0.5e5, 0.5e5 ] # [x,y] major tick locators
 sp0_leg_loc = 'upper right'
 
 # subplot1 (sp1): length fraction v concentration
-sp1_ax_labs = [ '1000/T (1/K)', '$\sigma$ (S cm$^{-1}$)' ]
+sp1_ax_labs = [ r'10$^3 T^{-1} (K^{-1})$', r'$\sigma_{G.B.}$ (S $cm^{-1})$' ]
 sp1_entries = ( '(Pr,Gd)-CeO$_2$', 'Gd-CeO$_2$' )
 sp1_c = [ 'maroon', 'grey' ] # line colors
 sp1_m, sp1_m_width = [ '^', 'o' ], 1 # markers
