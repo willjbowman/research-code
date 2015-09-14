@@ -123,15 +123,36 @@ pl.ylabel( sp1_y_lab, labelpad=0.5 )
 pl.xlabel( sp1_x_lab, labelpad=0.5 )
 pl.legend( sp1_entries )
 
-pl.plot( normal_hist_x, normal_hist_pr, color=pr_c, marker=sp0_m[0], ls='-', linewidth=1 )
-pl.plot( normal_hist_x, normal_hist_gd, color=gd_c, marker=sp0_m[1], ls='-', linewidth=1 )
-pl.plot( normal_hist_x, normal_hist_ce, color=ce_c, marker=sp0_m[2], ls='-', linewidth=1 )
+# add 'random sampling' result based on the measured mean and std dev.
+def normal( bins, mean, stddev ):
+    gaussian = 1 / ( stddev * np.sqrt( 2 * np.pi ) ) * np.exp( -( bins - mean ) **2 / (2 * stddev **2 ) )
+    return gaussian
+
+bins_100 = np.linspace( 0, 100, 101 ) # bins for calcuating normal distribution
+mu, sigma = [ 13, 26, 62 ], [ 3, 7, 13 ] # mean concentration and std dev [pr, gd, ce]
+pr = normal( bins_100, mu[0], sigma[0] ) # calcuate Gaussian
+gd = normal( bins_100, mu[1], sigma[1] )
+ce = normal( bins_100, mu[2], sigma[2] )
+
+normal_hist_bins = np.linspace( 0, 95, 20 ) # bins for summing Gaussian over 5mol% ranges
+normal_hist_pr, normal_hist_gd, normal_hist_ce = [], [], []
+for i in normal_hist_bins:
+    global normal_hist_pr, normal_hist_gd, normal_hist_ce
+    normal_hist_pr.append( np.sum(pr[i:i+5]) ) # sum 5 Gaussian channels 
+    normal_hist_gd.append( np.sum(gd[i:i+5]) )
+    normal_hist_ce.append( np.sum(ce[i:i+5]) )
+    
+normal_hist_x = np.linspace( 0, 19, 20 ) # x values with dimensions matching experimental data
+# overlay the 'random sampling' result
+pl.plot( normal_hist_x, normal_hist_pr, color=pr_c, ls='-', linewidth=1 )
+pl.plot( normal_hist_x, normal_hist_gd, color=gd_c, ls='-', linewidth=1 )
+pl.plot( normal_hist_x, normal_hist_ce, color=ce_c, ls='-', linewidth=1 )
 
 # applies to all subplots, h_pad defined vertical spacing
 pl.tight_layout( pad=0.3, h_pad=0.6 )
 
-# for dot in dots:
-#     output_name = wf.save_name( data_dir, output_file, dot, file_type )
-#     pl.savefig( output_name, format = file_type, dpi = dot, transparent = True )
+for dot in dots:
+    output_name = wf.save_name( data_dir, output_file, dot, file_type )
+    pl.savefig( output_name, format = file_type, dpi = dot, transparent = True )
     
 ''' ########################### REFERENCES ########################### '''
