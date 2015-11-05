@@ -1,4 +1,5 @@
 ''' ########################### IMPORT MODULES ########################### '''
+import add_modules_to_syspath # put ~/wills_modules in pyzo path variable
 import numpy as np
 import pylab as pl
 import matplotlib as mpl
@@ -13,6 +14,26 @@ to reload a module:
 >>>imp.reload( module_name )
 '''
     
+
+''' ########################## normal ########################## 
+
+generate normal distribution
+
+Example:
+
+>>> bins_100 = np.linspace( 0, 100, 101 ) # bins for calcuating normal distribution
+>>> mu, sigma = [ 13, 26, 62 ], [ 3, 7, 13 ] # mean concentration and std dev [pr, gd, ce]
+>>> pr = normal( bins_100, mu[0], sigma[0] ) # calcuate Gaussian
+
+ax is pl.gca()
+sp1_maj_loc is a list of numbers which define the major tick intervals: [ x, y ]
+'''
+
+# add 'random sampling' result based on the measured mean and std dev.
+def normal( bins, mean, stddev ):
+    gaussian = 1 / ( stddev * np.sqrt( 2 * np.pi ) ) * np.exp( -( bins - mean )**2 / (2 * stddev**2 ) )
+    return gaussian
+
 
 ''' ########################## major_ticks ########################## 
 
@@ -33,7 +54,7 @@ def major_ticks( ax, maj_locs, scientific=False ):
     if scientific:
         ax.yaxis.get_major_formatter().set_powerlimits((0, 1))
         ax.xaxis.get_major_formatter().set_powerlimits((0, 1))
-    
+
 
 ''' ########################## ax_limits ########################## 
 
