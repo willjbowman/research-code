@@ -16,7 +16,7 @@ import csv, imp, os
 
 ''' ########################### USER-DEFINED ########################### '''
 # path to data file (make gui to pick files?)
-data_dir = 'C:/Users/willb/Dropbox/WillB/Crozier_Lab/Writing/...'
+data_dir = 'C:/Users/willb/Dropbox/WillB/Crozier_Lab/Writing.../'
 
 # 
 eels_d = data_dir + 'eels-data/140203_3aGPDCfib_EELSSI2_highloss_gbAB.txt'
