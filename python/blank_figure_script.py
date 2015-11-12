@@ -63,7 +63,7 @@ pl.close( 'all' ) # close all open figures
 pl.figure( figsize = ( 3.4, 3 ) ) # create a figure of size ( width", height" )
 ax = pl.gca() # store current axis
 
-wf.mpl_customizations() # apply mpl customizations for this figure
+mpl_customizations() # apply mpl customizations for this figure
 # wf.slide_art_styles() # figure styling
 
 # example of subplot
