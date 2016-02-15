@@ -17,7 +17,7 @@ import csv, imp, os
 
 ''' ########################### USER-DEFINED ########################### '''
 # make gui to pick files?
-data_dir = 'C:/Users/willb/Dropbox/WillB/Crozier_Lab/Writing/2015_Co GDC gb electrical conductivity/figures/electrical-properties/' # path to data file
+data_dir = 'C:/Users/crozier/Dropbox/WillB/Crozier_Lab/Writing/15_Co GDC gb electrical conductivity/figures/electrical-properties/' # path to data file
 
 # electrical and sample data:s
 d_ele_GCO = data_dir + '140612_sdGDC10-2_150-700c_ELECTRICAL.txt'
