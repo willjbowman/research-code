@@ -132,6 +132,18 @@ def wills_mpl( fontsize ):
     # mpl.rc( 'figure' )
     mpl.rc( 'mathtext', default='regular' )
 
+''' ########################## date_str ########################## 
+
+generate a string with current date formatted 'XXXXYYZZ', where XXXX is year
+YY is month and ZZ is day
+Usage:
+>>> today_date = wf.date_str( )
+
+'''
+
+def date_str():
+    return str( dt.date.today() ).replace( '-', '' )
+
 ''' ########################## save_name ########################## 
 
 generate an output file name for saving figures.
@@ -331,7 +343,8 @@ def hex_gold():
     return '#FFA500'
     
 def slide_art_styles( ):
-    mpl.rcParams[ 'font.family' ] = 'Times New Roman'
+    # mpl.rcParams[ 'font.family' ] = 'Times New Roman'
+    mpl.rcParams[ 'font.family' ] = 'Sans Serif'
     mpl.rcParams[ 'font.weight' ] = 'normal' # modify matplotlib defaults
     mpl.rcParams[ 'font.size' ] = 10
     mpl.rcParams[ 'lines.linewidth' ] = 1.5

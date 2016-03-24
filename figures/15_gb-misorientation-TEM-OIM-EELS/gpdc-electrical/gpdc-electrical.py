@@ -21,7 +21,7 @@ import math as math
 # saved here with a file name containing the directory name
 fig_dir = 'gpdc-electrical'
 # this is the full path to figure directory (for reading data and writing files)
-figs_dir = 'C:/Users/willb/Dropbox/WillB/Crozier_Lab/Writing/2015_gb misorientation OIM EELS/figures/' + fig_dir + '/'
+figs_dir = 'C:/Users/Besitzer/Dropbox/WillB/Crozier_Lab/Writing/15_WJB_gb misorientation OIM EELS/figures/' + fig_dir + '/'
 
 # sp0: GPDC Nyquist
 d_0 = figs_dir + 'GPDC_200C_fitted_140305.txt'
@@ -36,11 +36,11 @@ d_2_skiprows = 1
 # font size, resolution (DPI), file type, fig_size
 # create a figure of size ( width", height" )
 # font_size, dots, file_type, fig_size = 10, [ 300, 1200 ], 'png', ( 3.33, 4 )
-font_size, dots, file_type, fig_size = 10, [ 300, 1200 ], 'png', ( 3.33, 4 )
+font_size, dots, file_type, fig_size = 10, [ 300, 1200 ], 'png', ( 3.33, 4.5 )
 # sub_plots = ( 2, 1, 1 ) # suplot 0 ( sub_y, sub_x, sub_i )
 
 # subplot 0 (sp0): length fraction v misorientation angle
-sp0_ax_labs = [ 'Z$_{Real}$ ($\Omega$)', 'Z$_{Imag.}$ ($\Omega$)' ]
+sp0_ax_labs = [ 'Z$_{Real}$ ($\Omega$)', '-Z$_{Imag.}$ ($\Omega$)' ]
 sp0_entries = ( 'Data', 'Fit' ) # legend entries
 sp0_c = [ 'maroon', 'grey' ] # line colors
 sp0_m, sp0_m_width = [ 'o', None ], 1 # markers
@@ -51,11 +51,12 @@ sp0_leg_loc = 'upper right'
 
 # subplot1 (sp1): length fraction v concentration
 sp1_ax_labs = [ r'10$^3 T^{-1} (K^{-1})$', r'$\sigma_{G.B.}$ (S $cm^{-1})$' ]
-sp1_entries = ( '(Pr,Gd)-CeO$_2$', 'Gd-CeO$_2$' )
+sp1_entries = ( '(Pr,Gd)CeO$_2$', 'GdCeO$_2$' )
 sp1_c = [ 'maroon', 'grey' ] # line colors
 sp1_m, sp1_m_width = [ '^', 'o' ], 1 # markers
-sp1_ls = [ '', '' ] # line styles (use '' instead of None)
-sp1_lims = [ [ 1.5, 3.0 ], [ 1e-12, 1e-7 ] ] # axis limits
+sp1_ls = [ '-', '--' ] # line styles (use '' instead of None)
+sp1_lims = [ [ .9, 2.8 ], [ 1e-12, 1e0 ] ] # axis limits
+sp1_y_ticks = [ 1e0, 1e-4, 1e-8, 1e-12 ]
 sp1_maj_loc = [ 0.5, 1e-2 ] # [x,y] major tick locators
 sp1_leg_loc = 'upper right'
 
@@ -67,8 +68,9 @@ def mpl_customizations():
     # wf.slide_art_styles()
     # mpl.rc( 'font', family='serif', serif='Times New Roman', weight='normal' )
     mpl.rc( 'font', family='sans-serif', serif='Helvetica', weight='normal' )
-    mpl.rc( 'lines', ls='', mew=0.01, markersize=4 )
-    mpl.rc( 'legend', numpoints=1, handletextpad=0.5, borderpad=0.5 )
+    mpl.rc( 'lines', ls='', mew=0.01, markersize=6 )
+    mpl.rc( 'legend', numpoints=1, handletextpad=0.2, borderpad=0.2, 
+      frameon=False, fontsize=10, labelspacing=.01 )
 
 def sp0_style( ax ):
     wf.ax_limits( sp0_lims )
@@ -84,6 +86,7 @@ def sp1_style( ax ):
     pl.minorticks_on()
     wf.ax_labels( sp1_ax_labs )
     ax.set_yscale( 'log' )
+    ax.set_yticks( sp1_y_ticks ) #add ticks and labels to axis
     # wf.major_ticks( ax, sp1_maj_loc )
     pl.legend( sp1_entries, loc=sp1_leg_loc ) # locate legend x,y from bottom left
     # ax.yaxis.set_ticklabels([]) # y tick labels off
@@ -111,19 +114,34 @@ sp0_style( ax0 )
 
 pl.subplot( 2, 1, 2 ) # suplot 1 ( sub_y, sub_x, sub_i )
 ax1 = pl.gca()
-pl.errorbar( sp1_x0, sp1_y2, sp1_y3, c=sp1_c[0], marker=sp1_m[0], ls=sp1_ls[0] )
+pl.errorbar( sp1_x0, sp1_y0, sp1_y1, c=sp1_c[0], marker=sp1_m[0], ls=sp1_ls[0] )
+pl.errorbar( sp1_x1, sp1_y4, sp1_y5, c=sp1_c[1], marker=sp1_m[1], ls=sp1_ls[0] )
+pl.errorbar( sp1_x0, sp1_y2, sp1_y3, c=sp1_c[0], marker=sp1_m[0], ls=sp1_ls[1] )
 pl.errorbar( sp1_x1, sp1_y6, sp1_y7, c=sp1_c[1], marker=sp1_m[1], ls=sp1_ls[1] )
 sp1_style( ax1 )
+
+ax2 = ax1.twiny() #create a second x-axis which shares ax1's y-axis
+Tc_axis_label = 'T ($^\circ$C)'
+ax2_Tc_ticks = np.linspace( 700, 100, 13 ) # Celcius axis ticks and labels
+ax2_Tc_ticklabels = np.array( [ 700, '', '', '', 500, '', 400, '', 300, '', 200, '', 100 ] )
+ax2_tick_Tk_locations = 1000 / ( ax2_Tc_ticks + 273 ) #calculate 2nd axis tick locations
+ax2_tick_Tc_locations = ( ax2_tick_Tk_locations - sp1_lims[0][0] ) / ( sp1_lims[0][1] - sp1_lims[0][0] )
+ax2.set_xticks( ax2_tick_Tc_locations ) #add ticks and labels to 2nd axis
+ax2.set_xticklabels( ax2_Tc_ticklabels )
+ax2.set_xlabel( Tc_axis_label )
 
 # applies to all subplots, h_pad defined vertical spacing
 pl.tight_layout( pad=0.3, h_pad=0.6 )
 
 # output file info
-output_dir = figs_dir
+output_dir = figs_dir + wf.date_str() + '/'
 output_file = fig_dir
-
+    
 for dot in dots:
-    output_name = wf.save_name( figs_dir, output_file, dot, file_type )
+    # pass
+    if not os.path.isdir( output_dir ):
+        os.mkdir( output_dir )
+    output_name = wf.save_name( output_dir, output_file, dot, file_type )
     pl.savefig( output_name, format = file_type, dpi = dot, transparent = True )
 
 ''' ########################### REFERENCES ########################### '''

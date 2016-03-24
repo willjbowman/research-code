@@ -17,35 +17,38 @@ import csv, imp, os
 
 ''' ########################### USER-DEFINED ########################### '''
 # make gui to pick files?
-data_dir = 'C:/Users/crozier/Dropbox/WillB/Crozier_Lab/Writing/15_WJB_IS EBSD EELS Ca-Ceria gbs/figures/arrhenius-CCO-GCO10/CCO-GCO10/' # path to data file
+data_dir = 'C:/Users/Besitzer/Dropbox/WillB/Crozier_Lab/Writing/15_WJB_IS EBSD EELS Ca-Ceria gbs/figures/arrhenius-CCO-GCO10/CCO-GCO10/' # path to data file
 
 # electrical and sample data:s
-d_ele = [ data_dir + '140612_sdGDC10-2_150-700c_ELECTRICAL.txt',
-    data_dir + '140325_sdCaDC2_100-700c-PUB_ELECTRICAL.txt',
+d_ele = [ data_dir + '140325_sdCaDC2_100-700c-PUB_ELECTRICAL.txt',
     data_dir + '140327_sdCaDC5_100-700c_pub_ELECTRICAL.txt',
-    data_dir + '140617_sdCa10DC-2_150-700c_PUB_ELECTRICAL.txt'
+    data_dir + '140617_sdCa10DC-2_150-700c_PUB_ELECTRICAL.txt',
+    data_dir + '140612_sdGDC10-2_150-700c_ELECTRICAL.txt'
     ]
     
-d_sam = [ data_dir + '140612_sdGDC10-2_150-700c_SAMPLE.txt',
-    data_dir + '140325_sdCaDC2_100-700c-PUB_SAMPLE.txt',
+d_sam = [ data_dir + '140325_sdCaDC2_100-700c-PUB_SAMPLE.txt',
     data_dir + '140327_sdCaDC5_100-700c_pub_SAMPLE.txt',
-    data_dir + '140617_sdCa10DC-2_150-700c_PUB_SAMPLE.txt'
+    data_dir + '140617_sdCa10DC-2_150-700c_PUB_SAMPLE.txt',
+    data_dir + '140612_sdGDC10-2_150-700c_SAMPLE.txt'
     ]
 
 # path to output directory
-output_dir = data_dir
+output_dir = data_dir + wf.date_str() + '/'
 output_file = 'arrhenius-CCO-GCO10'
 
 # font size, resolution (DPI), file type
 fsize, dots, file_type = 10, [300,1200], 'png'
 cols = [ 'maroon', 'grey', 'black', 'gold' ]
-marks = [ 's', 'o', '^', 'x' ]
-leg_ents = [ 'GCO-10', 'CCO-2', 'CCO-5', 'CCO-10' ]
+marks, msize = [ 's', 'o', '^', 'x' ], 6
+leg_ents = [ '2Ca', '5Ca', '10Ca', '10Gd' ]
 x_lab, y_lab = '1000/T (1/K)', '$log\sigma$ (S/cm)'
 
 # grain boundary thickness (nm)
 # del_gb_nm, del_gb_nm_Co5, del_gb_nm_Co1, del_gb_nm_Co2 = 2, 2, 2, 2 # gb width (nm)
-deg_gb_nm = 2 # gb width (nm)
+del_gb_nm = 2 # gb width (nm)
+
+x_lims, y_lims = [ 1, 2.4 ], [ -14, 0 ]
+file_anno = [ '-0of3', '-1of3', '-2of3', '-3of3' ]
 
 ''' ########################### FUNCTIONS ########################### '''
 
@@ -113,33 +116,33 @@ for i in range( 0, len( R_gr ) ):
 
 
 '''CALCULATE EFFECTIVE CONDUCTIVITY (S/cm)'''
-# S_g = 1/Rg * (L/A), S_gb_ef = 1/Rgb * (L/A)
+# S_g = 1/Rg * (L/A), S_gb = 1/Rgb * (L/A), S_tot = 1/(Rgr+Rgb) * (L/A)
 
 S_gr, S_gr_er, S_gb, S_gb_er, S_tot, S_tot_err = [],[],[],[],[],[]
 
 for i in range( 0, len( R_gr ) ):
-    S_gr.append( t_cm[i] / ( R_gr[i] * a_cm[i] ) )
+    S_gr.append( 1 / R_gr[i] * ( t_cm[i] / a_cm[i] ) )
     S_gb.append( 1 / R_gb[i] * ( t_cm[i] / a_cm[i] ) )
-    S_tot.append( t_cm[i] / ( R_gr[i] + R_gb[i] * a_cm[i] ) )
+    S_tot.append( 1 / ( R_gr[i] + R_gb[i] ) * ( t_cm[i] / a_cm[i] ) )
 
 
 '''CALCULATE SPECIFIC GB CONDUCTIVITY FROM Cg/Cgb (S/cm)'''
-# Sgb_sp = 1/R_gb * (L/A) * (C_g/C_gb)
+# S_gb_sp_cc = 1/R_gb * (L/A) * (C_g/C_gb)
 
 S_gb_sp_cc, S_gb_sp_cc_err =[],[]
 
 for i in range( 0, len( R_gr ) ):
-    S_gb_sp_cc.append( ( R_gr[i] * C_gr[i] ) / ( R_gb[i] * C_gb[i] ) * S_gr[i] )
+    S_gb_sp_cc.append( S_gb[i] * ( t_cm[i] / a_cm[i] ) * ( C_gr[i] / C_gb[i] ) )
     # S_gb_sp_cc_err.append(  )
 
 
 '''CALCULATE SPECIFIC GB CONDUCTIVITY FROM d/D (S/cm)'''
-# Sgb_sp = 1/R_gb * (L/A) * (d/D)
+# S_gb_sp_dD = 1/R_gb * (L/A) * (d/D)
 
 S_gb_sp_dD, S_gb_sp_dD_err = [],[]
 
 for i in range( 0, len( R_gr ) ):
-    S_gb_sp_dD.append( ( 1/R_gb[i] * (t_cm[i] / a_cm[i]) * (del_gb_nm / d_nm[i]) ) )
+    S_gb_sp_dD.append( S_gb[i] * ( t_cm[i] / a_cm[i] ) * (del_gb_nm / d_nm[i]) ) 
     # S_gb_sp_dD_err.append(  )
 
 
@@ -161,55 +164,73 @@ for i in range( 0, len( R_gr ) ):
 pl.close( 'all' ) # close all open figures
 pl.figure( figsize = ( 3.4, 3 ) ) # create a figure
 ax = pl.gca() # store current axis
+# ax2 = ax.twiny() #create a second x-axis which shares ax1's y-axis
 
 mpl_customizations() # apply customizations to matplotlib
-wf.slide_art_styles() # figure styling
+# wf.slide_art_styles() # figure styling
 fontsize = mpl.rcParams[ 'font.size' ]
 
-for i in range( 0, len( R_gr ) ):
-    pl.plot( TK_inv[i], np.log10(S_gr[i]), c=cols[i], marker=marks[i] )
-    # pl.plot( TK_inv[i], np.log10( S_tot[i] ) )
-    pl.plot( TK_inv[i], np.log10( S_gb[i]), c=cols[i], marker=marks[i], ls='--' )
+legend_handles = [] # container for legend handles (filled in loop)
 
+for h in range( 1, len( file_anno ) + 1 ):
+    
+    pl.close( 'all' ) # close all open figures
+    pl.figure( figsize = ( 3.4, 3 ) ) # create a figure
+    ax = pl.gca() # store current axis
+    # ax2 = ax.twiny() #create a second x-axis which shares ax1's y-axis
+    
+    mpl_customizations() # apply customizations to matplotlib
+    # wf.slide_art_styles() # figure styling
+    fontsize = mpl.rcParams[ 'font.size' ]
 
-# pl.tight_layout() # can run once to apply to all subplots, i think
-pl.legend( leg_ents )
-pl.ylabel( y_lab, labelpad=0.5 )
-pl.xlabel( x_lab, labelpad=0.5 )
-
-
-'''COMPARE EFFECTIVE AND SPECIFIC BOUNDARY CONDUCTIVITY (calculated from d/D and Cg/Cgb)'''
-pl.figure( figsize = ( 3.4, 3 ) ) # create a figure
-ax = pl.gca() # store current axis
-
-mpl_customizations() # apply customizations to matplotlib
-wf.slide_art_styles() # figure styling
-fontsize = mpl.rcParams[ 'font.size' ]
-
-pl.plot( TK_cal_inv, np.log10( S_gb ), color = cols[0], marker = marks[1] )
-pl.plot( TK_cal_inv_Co5, np.log10( S_gb_Co5 ), color = cols[1], marker = marks[1] )
-pl.plot( TK_cal_inv_Co1, np.log10( S_gb_Co1 ), color = cols[2], marker = marks[1] )
-pl.plot( TK_cal_inv_Co2, np.log10( S_gb_Co2 ), color = cols[3], marker = marks[1] )
-
-pl.plot( TK_cal_inv, np.log10( S_gb_sp_dD ), color = cols[0] )
-pl.plot( TK_cal_inv_Co5, np.log10( S_gb_sp_dD_Co5 ), color = cols[1] )
-pl.plot( TK_cal_inv_Co1, np.log10( S_gb_sp_dD_Co1 ), color = cols[2] )
-pl.plot( TK_cal_inv_Co2, np.log10( S_gb_sp_dD_Co2 ), color = cols[3] )
-
-pl.plot( TK_cal_inv, np.log10( S_gb_sp_cc ), color = cols[0], ls='--' )
-pl.plot( TK_cal_inv_Co5, np.log10( S_gb_sp_cc_Co5 ), color = cols[1], ls='--' )
-pl.plot( TK_cal_inv_Co1, np.log10( S_gb_sp_cc_Co1 ), color = cols[2], ls='--' )
-pl.plot( TK_cal_inv_Co2, np.log10( S_gb_sp_cc_Co2 ), color = cols[3], ls='--' )
-
-# pl.tight_layout() # can run once to apply to all subplots, i think
-pl.legend( leg_ents )
-pl.ylabel( y_lab, labelpad=1.5 )
-pl.xlabel( x_lab, labelpad=1.5 )
-
-for dot in dots:
-    pass
-    # output_name = wf.save_name( data_dir, output_file, dot, file_type )
-    # pl.savefig( output_name, format = file_type, dpi = dot, transparent = True )
+    for i in range( 0, h ):
+    # for i in range( 0, 1 ):
+        col, mark = cols[i], marks[i]
+        pl.plot( TK_inv[i], np.log10(S_gr[i]), c=cols[i], marker=marks[i], markersize=msize )
+        # pl.plot( TK_inv[i], np.log10( S_tot[i] ), marker=marks[i] )
+        pl.plot( TK_inv[i], np.log10( S_gb_sp_cc[i]), c=cols[i], marker=marks[i], ls='--', markersize=msize )
+        # pl.plot( TK_inv[i], np.log10( S_gb_sp_dD[i]), c=cols[i], marker=marks[i], ls='-.' )
+    
+        if h == len( file_anno ):
+            # legend handler for ith curve
+            leg_info = mpl.lines.Line2D( [], [], color = col, marker = mark, 
+                markersize = msize, linestyle = '-' )
+            legend_handles.append( leg_info ) # append ith legend handler to legend handles
+    
+    
+    # pl.legend( leg_ents )
+    pl.ylabel( y_lab, labelpad=1.5 )
+    pl.xlabel( x_lab, labelpad=1.5 )
+    ax.set_xlim( x_lims )
+    ax.set_ylim( y_lims )
+    
+    ax2 = ax.twiny() #create a second x-axis which shares ax1's y-axis
+    Tc_axis_label = 'T ($^\circ$C)'
+    ax2_Tc_ticks = np.linspace( 700, 100, 13 ) # Celcius axis ticks and labels
+    ax2_Tc_ticklabels = np.array( [ 700, '', '', '', 500, '', 400, '', 300, '', 200, '', 100 ] )
+    ax2_tick_Tk_locations = 1000 / ( ax2_Tc_ticks + 273 ) #calculate 2nd axis tick locations
+    ax2_tick_Tc_locations = ( ax2_tick_Tk_locations - x_lims[0] ) / ( x_lims[1] - x_lims[0] )
+    ax2.set_xticks( ax2_tick_Tc_locations ) #add ticks and labels to 2nd axis
+    ax2.set_xticklabels( ax2_Tc_ticklabels )
+    ax2.set_xlabel( Tc_axis_label )
+    
+    pl.tight_layout() # can run once to apply to all subplots, i think
+    
+    
+    # # pl.tight_layout() # can run once to apply to all subplots, i think
+    # ax.legend( leg_ents )
+    ax.legend( legend_handles, leg_ents, loc = 'lower left',
+        numpoints = 1, frameon = False, fontsize = 10, labelspacing = .01,
+        handletextpad = .01 )
+    # pl.ylabel( y_lab, labelpad=1.5 )
+    # pl.xlabel( x_lab, labelpad=1.5 )
+    
+    for dot in dots:
+        # pass
+        if not os.path.isdir( output_dir ):
+            os.mkdir( output_dir )
+        output_name = wf.save_name( output_dir, output_file + file_anno[h-1], dot, file_type )
+        pl.savefig( output_name, format = file_type, dpi = dot, transparent = True )
 
 
 ''' ########################### REFERENCES ########################### '''
