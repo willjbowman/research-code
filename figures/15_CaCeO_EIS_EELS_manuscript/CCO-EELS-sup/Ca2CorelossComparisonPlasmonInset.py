@@ -23,6 +23,7 @@ output_file_name = 'Ca2_coreloss_comparison_plasmon_inset'
 
 # font size, resolution (DPI), file type
 fsize, dots, file_type = 10, [300,1200], 'png'
+inset = False
 
 ## store data
 # import data
@@ -79,28 +80,29 @@ pl.minorticks_on()
 ax1.set_yticks([])
 
 # add inset axes
-axin = pl.axes([ .5, .535, .4, .4 ]) 
-pl.xlim( axin_xlim ), pl.ylim( axin_ylim )
+if inset:
+    axin = pl.axes([ .5, .535, .4, .4 ]) 
+    pl.xlim( axin_xlim ), pl.ylim( axin_ylim )
+    
+    pl.plot( plasmon_on_x, plasmon_on_y, color = 'maroon', linestyle = '-' )
+    pl.plot( plasmon_off_x, plasmon_off_y, color = 'maroon', dashes = dash )
+    
+    wf.centered_annotation( 15, 2.7e5, 'ZLP', 'black', fontsize=fontsize )
+    wf.centered_annotation( 33, 0.7e5, 'Plasmon', 'black', fontsize=fontsize )
+    
+    # pl.xlabel( xaxis_label ), pl.ylabel( axin_yaxis_label )
+    
+    pl.minorticks_on()
 
-pl.plot( plasmon_on_x, plasmon_on_y, color = 'maroon', linestyle = '-' )
-pl.plot( plasmon_off_x, plasmon_off_y, color = 'maroon', dashes = dash )
+    axin.set_xticks( np.linspace( 0, 75, 4 ) )
+    axin.set_yticks([])
 
-wf.centered_annotation( 15, 2.7e5, 'ZLP', 'black', fontsize=fontsize )
-wf.centered_annotation( 33, 0.7e5, 'Plasmon', 'black', fontsize=fontsize )
-
-# pl.xlabel( xaxis_label ), pl.ylabel( axin_yaxis_label )
-
-pl.minorticks_on()
-axin.set_xticks( np.linspace( 0, 75, 4 ) )
-axin.set_yticks([])
-
-pl.legend( legend_labels, frameon = False, fontsize = 10, labelspacing = .01,
-    handletextpad = 0.2, loc = 'upper right' )
+    pl.legend( legend_labels, frameon = False, fontsize = 10, labelspacing = .01,
+        handletextpad = 0.2, loc = 'upper right' )
 
 pl.tight_layout()
 pl.show()
-pl.savefig( output_file_name + '.png', format = 'png', dpi = 600 )
-    
+
 for dot in dots:
     # pass
     if not os.path.isdir( output_dir ):
