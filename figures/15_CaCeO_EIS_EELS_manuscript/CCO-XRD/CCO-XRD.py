@@ -29,8 +29,9 @@ output_file = 'CCO-XRD'
 
 # font size, resolution (DPI), file type
 fsize, dots, file_type = 10, [300,1200], 'png'
-cols = [ 'maroon', 'grey', 'black', 'gold' ]
-dash = [ 2, 2 ] # [ pix_on pix_off ]
+cols = [ 'maroon', 'grey', 'black', wf.colors('dark_gold') ]
+dash, width = [ 4, 2 ], 1.5 # [ pix_on pix_off ], linewidth
+norm = 100
 # marks, msize, mwidth = [ 's', 'o' ], 7, 0.5
 # leg_ents = [ 'GB Conductivity (300 $^\circ$C)', 'GB Concentration (EELS)' ]
 x_lab = '${2\Theta}$ (Degrees)'
@@ -38,7 +39,7 @@ y1_lab, y2_lab = 'Counts (Arbitrary units)', ''
 # naming sequence of figs with successive curves on same axis
 # file_anno = [ '-0of1', '-1of1' ]
 file_anno = [] # for single fig with all curves
-x_lims, y1_lims, y2_lims = [25, 55], [0, None], [.1, .6]
+x_lims, y1_lims, y2_lims = [25, 60], [-900, 200], [.1, .6]
 y1_ticks = False
 
 
@@ -76,6 +77,12 @@ x_10s, y_10s = d_exp[:,10], d_exp[:,11]
 x_CaO, y_CaO = d_ref0[:,0], d_ref0[:,1]
 x_CaO2, y_CaO2 = d_ref0[:,0], d_ref1[:,1]
 
+ys = [ y_2p, y_2s, y_5p, y_5s, y_10p, y_10s, y_CaO, y_CaO2 ]
+norm_ys = []
+
+for i in np.arange( len(ys) ):
+    norm_ys.append( wf.normalize( ys[i], norm ) - ( 1.2 * i * norm ) )
+
 
 '''GENERATE FIGURES'''
 
@@ -88,20 +95,21 @@ if len( file_anno ) == 0:
     # wf.slide_art_styles() # figure styling
     fontsize = mpl.rcParams[ 'font.size' ]
     
-    pl.plot( x_2p, y_2p, color='maroon' )
-    pl.plot( x_2s, y_2s, color='maroon', dashes=dash )
-    pl.plot( x_5p, y_5p, color='grey' )
-    pl.plot( x_5s, y_5s, color='grey', dashes=dash )
-    pl.plot( x_10p, y_10p, color='black' )
-    pl.plot( x_10s, y_10s, color='black', dashes=dash )
-    pl.plot( x_CaO, y_CaO, color='gold')
-    pl.plot( x_CaO2, y_CaO2, color='gold', dashes=dash )
+    pl.plot( x_2p, norm_ys[0], color=cols[0], lw = width )
+    pl.plot( x_2s, norm_ys[1], color=cols[0], dashes=dash, lw = width )
+    pl.plot( x_5p, norm_ys[2], color=cols[1], lw = width )
+    pl.plot( x_5s, norm_ys[3], color=cols[1], dashes=dash, lw = width )
+    pl.plot( x_10p, norm_ys[4], color=cols[2], lw = width )
+    pl.plot( x_10s, norm_ys[5], color=cols[2], dashes=dash, lw = width )
+    pl.plot( x_CaO, norm_ys[6], color=cols[3], lw = width )
+    pl.plot( x_CaO2, norm_ys[7], color=cols[3], dashes=dash, lw = width )
     
     ax0.set_xlim( x_lims )
     ax0.set_ylim( y1_lims )
     ax0.set_xlabel( x_lab )
     ax0.set_ylabel( y1_lab )
     ax0.set_yticks([])
+    ax0.minorticks_on()
     
     # ax1_leg_hand = mpl.lines.Line2D( [], [], c=cols[0], marker=marks[0], ms=msize, ls='' )    
     # ax1.legend( [ax1_leg_hand], leg_ents, loc = 'upper right',
@@ -109,7 +117,7 @@ if len( file_anno ) == 0:
     #     handletextpad = .01 )
     #         
     pl.tight_layout() # can run once to apply to all subplots, i think
-    
+    # save_fig( output_file )
     
 
 elif len( file_anno ) > 0:

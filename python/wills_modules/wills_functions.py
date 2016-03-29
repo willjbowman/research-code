@@ -15,6 +15,56 @@ to reload a module:
 '''
     
 
+''' ########################## normalize ########################## 
+
+return list, 'curve', normalized to specified max value, 'normalized_max'
+
+Example [CCO-XRD.py]:
+
+ys = [ y_2p, y_2s, y_5p, y_5s, y_10p, y_10s, y_CaO, y_CaO2 ] 
+norm_ys = []
+
+for i in np.arange( len(ys) ):
+    norm_ys.append( wf.normalize( ys[i], norm ) - ( 1.2 * i * norm ) )
+
+
+ys is a list of lists to be normalized (e.g. stacking curves for figurs).
+norm_ys is a list to be populated with normalized lists in ys.
+ys[i] is the list to be normalized to the max value of norm.
+'''
+
+def normalize( curve, normalized_max ):
+    curve_max = np.nanmax( curve )
+    scalar = normalized_max / curve_max
+    return curve * scalar
+    
+
+''' ########################## colors ########################## 
+
+return custom colors as RGB tuple
+
+Example [CCO-XRD.py]:
+
+>>> cols = [ 'maroon', 'grey', 'black', wf.colors('dark-gold') ]
+
+>>> pl.plot( x_CaO, norm_ys[6], color=cols[3], lw = width )
+
+wf.colors() takes a name string of a custom color (defined in wills_functions.py)
+and returns an RGB tuple (normalized to 1) which can be used in pl.plot()
+
+to define new custom colors just add an entry to the dictionary in the function 
+below
+'''
+
+def colors( color_name ):
+    custom_colors_RGB = {
+    'dark_gold': [230, 200, 0],
+    }
+    RGB = custom_colors_RGB[ color_name ]
+    normalized_RGB = [ x/255 for x in RGB ]
+    return normalized_RGB
+    
+
 ''' ########################## normal ########################## 
 
 generate normal distribution
