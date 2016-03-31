@@ -72,7 +72,7 @@ pl.plot( coreloss_on_x, coreloss_on_y + shift0, color = 'maroon', linestyle = '-
 wf.centered_annotation( 380, 1.05e5, 'Ca $L_{23}$', 'black', fontsize=fsize )
 wf.centered_annotation( 553, 0.54e5, 'O K', 'black', fontsize=fsize )
 wf.centered_annotation( 815, 0.35e5, 'Ce $M_{45}$', 'black', fontsize=fsize )
-wf.centered_annotation( 450, 1.3e5, '2 mole% Ca$^{2+}$', 'black', fontsize=fsize )
+wf.centered_annotation( 450, 1.3e5, '$Ca_{0.02}Ce_{0.98}O_{2-\delta}$\ngrain boundary', 'black', fontsize=fsize )
 
 pl.xlabel( xaxis_label ), pl.ylabel( yaxis_label )
 
