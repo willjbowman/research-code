@@ -38,7 +38,7 @@ output_file = 'arrhenius-CCO-GCO10'
 
 # font size, resolution (DPI), file type
 fsize, dots, file_type = 10, [300,1200], 'png'
-cols = [ 'maroon', 'grey', 'black', 'gold' ]
+cols = [ 'maroon', 'grey', 'black', 'goldenrod' ] # wf.colors('dark_gold')  [ 255/255, 40/255, 40/255 ]
 marks, msize = [ 's', 'o', '^', 'x' ], 6
 leg_ents = [ '2Ca', '5Ca', '10Ca', '10Gd' ]
 x_lab, y_lab = '1000/T (1/K)', '$log\sigma$ (S/cm)'

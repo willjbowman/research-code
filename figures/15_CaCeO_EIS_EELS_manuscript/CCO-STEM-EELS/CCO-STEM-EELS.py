@@ -1,16 +1,29 @@
-# plot the eels data on and off of the gbin 10CCO
+''' ########################### OVERVIEW ########################### '''
+'''
+ Updated 2016-03-31 by Will Bowman. This script is for plotting EELS spectra
+ acquired on and off grain boundary in 10CCO for a paper figure
+'''
 
-input_file_dir = 'C:/Users/willb/Dropbox/WillB/Crozier_Lab/Writing/2015_IS EBSD EELS of CaCeria grain boundaries/figures/FIGURE-PANELS/panel_04-stem-eels/fig4a-eels-data/'
+''' ########################### IMPORT MODULES ########################### '''
+import add_modules_to_syspath # put ~/wills_modules in pyzo path variable
+import numpy as np
+import pylab as pl
+import matplotlib as mpl
+import wills_functions as wf
+import csv, imp, os
+
+
+# plot the eels data on and off of the gbin 10CCO
+data_dir = 'C:/Users/Besitzer/Dropbox/WillB/Crozier_Lab/Writing/15_WJB_IS EBSD EELS Ca-Ceria gbs/figures/FIGURE-PANELS/panel_04-stem-eels/fig4a-eels-data/'
+
+input_file_dir = 'C:/Users/Besitzer/Dropbox/WillB/Crozier_Lab/Writing/15_WJB_IS EBSD EELS Ca-Ceria gbs/figures/FIGURE-PANELS/CCO-STEM-EELS/fig4a-eels-data/'
 
 input_file_name = '141118_10Ca_EELS_03_gb2-splice.txt'
 
 output_file_dir = input_file_dir
-output_file_name = 'fig4a-eels-data'
+output_file_name = 'CCO-STEM-EELS'
 dots = 1200
 
-import numpy as np
-import pylab as pl
-import matplotlib as mpl
 
 ## store data
 # import data
@@ -38,11 +51,11 @@ Ca_min_x, Ca_max_x = 335, 375
 O_min_x, O_max_x = 525, 560
 Ce_min_x, Ce_max_x = 870, 925
 
-y_min_multiple, y_max_multiple = 0.1, 1.3
+y_min_multiple, y_max_multiple = 0.1, 1.5
 
-Ca_max_y = np.nanmax( counts_Ca_on ) * 1.3
-O_max_y = np.nanmax( counts_O_off ) * 1.3
-Ce_max_y = np.nanmax( counts_Ce_off ) * 1.3
+Ca_max_y = np.nanmax( counts_Ca_on ) * y_max_multiple
+O_max_y = np.nanmax( counts_O_off ) * y_max_multiple
+Ce_max_y = np.nanmax( counts_Ce_off ) * y_max_multiple
 
 Ca_min_y = np.nanmax( counts_Ca_on ) * -y_min_multiple
 O_min_y = np.nanmax( counts_O_off ) * -y_min_multiple
@@ -54,7 +67,7 @@ pl.plot( ev_Ca, counts_Ca_on, color = col_on, dashes = dash )
 pl.plot( ev_Ca, counts_Ca_off, color = col_off, dashes = dash )
 
 ax = pl.gca()
-ax.set_ylabel( 'Counts (arbitrary units)', labelpad = 0 )
+ax.set_ylabel( 'Counts (Arbitrary units)', labelpad = 0 )
 ax.set_xlim( Ca_min_x, Ca_max_x )
 ax.set_ylim( Ca_min_y, Ca_max_y )
 ax.minorticks_on()
@@ -63,7 +76,7 @@ ax.set_yticklabels( [] )
 # ax.xaxis.set_major_locator( mpl.ticker.MultipleLocator( Ca_major ) )
 
 # LEGEND ON FIRST SUBPLOT
-legend_labels = [ 'On G.B.', 'Off' ]
+legend_labels = [ 'On GB', 'Off GB' ]
 legend_loc = 'best' # ( 4.5 / 11, 0 )
 ax.legend( legend_labels, loc = legend_loc, handlelength = 1.5,
     frameon = False, fontsize = 10, labelspacing = .01,

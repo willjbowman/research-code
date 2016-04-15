@@ -45,7 +45,7 @@ return custom colors as RGB tuple
 
 Example [CCO-XRD.py]:
 
->>> cols = [ 'maroon', 'grey', 'black', wf.colors('dark-gold') ]
+>>> cols = [ 'maroon', 'grey', 'black', wf.colors('dark_gold') ]
 
 >>> pl.plot( x_CaO, norm_ys[6], color=cols[3], lw = width )
 
