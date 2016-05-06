@@ -59,6 +59,8 @@ below
 def colors( color_name ):
     custom_colors_RGB = {
     'dark_gold': [230, 200, 0],
+    'eth_blue': [31, 64, 122],
+    'eth_green': [130, 190, 30]
     }
     RGB = custom_colors_RGB[ color_name ]
     normalized_RGB = [ x/255 for x in RGB ]

@@ -1,6 +1,6 @@
 # plot the composition profiles of 10CCO gb2 map3 and 2CCO gb5 map9
 
-input_file_dir = 'C:/Users/willb/Dropbox/WillB/Crozier_Lab/Writing/2015_IS EBSD EELS of CaCeria grain boundaries/figures/FIGURE-PANELS/panel_04-stem-eels/fig4b-composition-profiles/'
+input_file_dir = 'C:/Users/willb/Dropbox/WillB/Crozier_Lab/Writing/2015_IS EBSD EELS of CaCeria grain boundaries/figures/FIGURE-PANELS/composition-profiles/'
 
 input_file_name = 'comp-profiles-10-2-CCO.txt'
 
