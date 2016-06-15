@@ -24,12 +24,12 @@ ref_d1 =  data_dir + 'CaO2_F4--mmm_139_Kotov_1941_ZhurFizichKhim_20275.csv'
 
 # path to output directory
 output_dir = data_dir
-subfolder_save = True
+# subfolder_save = True
 output_file = 'CCO-XRD'
 
 # font size, resolution (DPI), file type
-fsize, dots, file_type = 10, [300,1200], 'png'
-cols = [ 'maroon', 'grey', 'black', wf.colors('dark_gold') ]
+fsize, dots, file_types = 10, [300], ['png','svg']
+cols = [ 'maroon', 'grey', 'black', 'goldenrod' ]
 dash, width = [ 4, 2 ], 1.5 # [ pix_on pix_off ], linewidth
 norm = 100
 # marks, msize, mwidth = [ 's', 'o' ], 7, 0.5
@@ -48,15 +48,31 @@ y1_ticks = False
 def mpl_customizations():
     wf.wills_mpl( fsize ) # pass the figure's fontsize
     
-def save_fig(output_file_name):
-    for dot in dots:
-        if subfolder_save:
-            output_dir = data_dir + wf.date_str() + '/'
-            if not os.path.isdir( output_dir ):
-                os.mkdir( output_dir )
-        output_name = wf.save_name( output_dir, output_file_name, dot, file_type )
-        pl.savefig( output_name, format = file_type, dpi = dot, transparent = True )
-    
+def save_fig( output_file_name, subfolder_save=True ):
+    # create subfolder with date as name
+    if subfolder_save:
+        output_dir = data_dir + wf.date_str() + '/'
+        if not os.path.isdir( output_dir ):
+            os.mkdir( output_dir )
+
+    for file_type in file_types:
+        if file_type == 'png':
+            for dot in dots:
+                output_name = wf.save_name( output_dir, output_file_name, dot, 
+                    file_type )
+                pl.savefig( output_name, format = file_type, dpi = dot, 
+                    transparent = True )
+        elif file_type == 'svg':
+                output_name = wf.save_name( output_dir, output_file_name, False, 
+                    file_type )
+                pl.savefig( output_name, format = file_type )
+
+def clip_xy( lims_x, arr_x, arr_y ):
+    min_ind = np.where( arr_x >= lims_x[0] )[0][0]
+    max_ind = np.where( arr_x <= lims_x[1] )[0][-1]
+    x_clip = arr_x[ min_ind:max_ind ]
+    y_clip = arr_y[ min_ind:max_ind ]
+    return x_clip, y_clip
     
 ''' ########################### MAIN SCRIPT ########################### '''
 
@@ -67,15 +83,23 @@ d_ref0 = np.genfromtxt( ref_d0, delimiter = ',' )
 d_ref1 = np.genfromtxt( ref_d1, delimiter = ',' )
 
 # x, x_gb, x_gb_err, S_gb, S_gb_err = d.T
-x_2p, y_2p = d_exp[:,0], d_exp[:,1]
-x_2s, y_2s = d_exp[:,2], d_exp[:,3]
-x_5p, y_5p = d_exp[:,4], d_exp[:,5]
-x_5s, y_5s = d_exp[:,6], d_exp[:,7]
-x_10p, y_10p = d_exp[:,8], d_exp[:,9]
-x_10s, y_10s = d_exp[:,10], d_exp[:,11]
+# x_2p, y_2p = d_exp[:,0], d_exp[:,1]
+x_2p, y_2p = clip_xy( x_lims, d_exp[:,0], d_exp[:,1] )
+# x_2s, y_2s = d_exp[:,2], d_exp[:,3]
+x_2s, y_2s = clip_xy( x_lims, d_exp[:,2], d_exp[:,3] )
+# x_5p, y_5p = d_exp[:,4], d_exp[:,5]
+x_5p, y_5p = clip_xy( x_lims, d_exp[:,4], d_exp[:,5] )
+# x_5s, y_5s = d_exp[:,6], d_exp[:,7]
+x_5s, y_5s = clip_xy( x_lims, d_exp[:,6], d_exp[:,7] )
+# x_10p, y_10p = d_exp[:,8], d_exp[:,9]
+x_10p, y_10p = clip_xy( x_lims, d_exp[:,8], d_exp[:,9] )
+# x_10s, y_10s = d_exp[:,10], d_exp[:,11]
+x_10s, y_10s = clip_xy( x_lims, d_exp[:,10], d_exp[:,11] )
 
-x_CaO, y_CaO = d_ref0[:,0], d_ref0[:,1]
-x_CaO2, y_CaO2 = d_ref0[:,0], d_ref1[:,1]
+# x_CaO, y_CaO = d_ref0[:,0], d_ref0[:,1]
+x_CaO, y_CaO = clip_xy( x_lims, d_ref0[:,0], d_ref0[:,1] )
+# x_CaO2, y_CaO2 = d_ref0[:,0], d_ref1[:,1]
+x_CaO2, y_CaO2 = clip_xy( x_lims, d_ref0[:,0], d_ref1[:,1] )
 
 ys = [ y_2p, y_2s, y_5p, y_5s, y_10p, y_10s, y_CaO, y_CaO2 ]
 norm_ys = []
@@ -117,7 +141,7 @@ if len( file_anno ) == 0:
     #     handletextpad = .01 )
     #         
     pl.tight_layout() # can run once to apply to all subplots, i think
-    # save_fig( output_file )
+    save_fig( output_file )
     
 
 elif len( file_anno ) > 0:

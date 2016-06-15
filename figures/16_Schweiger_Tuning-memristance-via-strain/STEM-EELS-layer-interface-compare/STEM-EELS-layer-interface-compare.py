@@ -35,7 +35,7 @@ output_dir = data_dir
 output_file = 'STEM-EELS-layer-interface-compare'
 subfolder_save = True
 
-fig_size = ( 5, 3.5 ) # ( width, hight ) in inches
+fig_size = ( 4, 3.4 ) # ( width, hight ) in inches
 subplot_white_space = 0.05 # see pl.subplots_adjust()
 # font size, resolution (DPI), file type
 fsize, dots, file_type = 10, [300,1200], 'png'
@@ -87,7 +87,7 @@ def save_fig(output_file_name):
             if not os.path.isdir( output_dir ):
                 os.mkdir( output_dir )
         output_name = wf.save_name( output_dir, output_file_name, dot, file_type )
-        pl.savefig( output_name, format = file_type, dpi = dot, transparent = True )
+        pl.savefig( output_name, format=file_type, dpi=dot, transparent=True )
     
 
 ''' ########################### MAIN SCRIPT ########################### '''
@@ -96,25 +96,7 @@ for h in range( 1, len( file_anno ) + 1 ):
   
     pl.close( 'all' )
     pl.figure( figsize = fig_size ) # ( width, height )
-
-    # ls_off, ls_on = '-', '' 
-    # fill_10, fill_2 = 'full', 'none'
-    # dash = ( 4, 1 )
-    # Ca_major, O_major, Ce_major = 20, 40, 20
-
-    # Ca_min_x, Ca_max_x = 335, 375
-    # O_min_x, O_max_x = 525, 560
-    # Ce_min_x, Ce_max_x = 870, 925
-
-    # y_min_multiple, y_max_multiple = 0.1, 1.5
-
-    # Ca_max_y = np.nanmax( counts_Ca_on ) * y_max_multiple
-    # O_max_y = np.nanmax( counts_O_off ) * y_max_multiple
-    # Ce_max_y = np.nanmax( counts_Ce_off ) * y_max_multiple
-
-    # Ca_min_y = np.nanmax( counts_Ca_on ) * -y_min_multiple
-    # O_min_y = np.nanmax( counts_O_off ) * -y_min_multiple
-    # Ce_min_y = np.nanmax( counts_Ce_off ) * -y_min_multiple
+    mpl_customizations() # apply customizations to matplotlib
 
     # pl.subplot( 1, 2, 1 ) # subplot( height, width, subplot_number )
     # gridspec( (rows,cols), (plot_location), colspan )
@@ -145,58 +127,19 @@ for h in range( 1, len( file_anno ) + 1 ):
     pl.plot( Gd_int_x, Gd_int_y, c=cols[1], ls=lines[0] )
     pl.plot( GCO20_ref_x, GCO20_ref_y_pl, c=cols[2], ls=lines[0] )
     # pl.plot( ev_O, counts_O_on, color = col_on, dashes = dash )
-    # pl.plot( ev_O, counts_O_off, color = col_off, dashes = dash )
 
     ax = pl.gca()
     ax.set_xlim( x_lims[1][0], x_lims[1][1] )
     ax.set_ylim( y_lims[1][0], y_lims[1][1] )
 
     ax.minorticks_on()
-    ax.set_yticklabels([])
     ax.xaxis.set_major_locator( mpl.ticker.MultipleLocator( x_maj_tick_loc[1] ) )
     ax.set_xticklabels( x_maj_tick_lab[1] )
-        
-    # pl.subplot( 1, 3, 3 )
-    # pl.plot( ev_Ce, counts_Ce_on, color = col_on, dashes = dash )
-    # pl.plot( ev_Ce, counts_Ce_off, color = col_off, dashes = dash )
-    # pl.plot( dist_2 + shift_both, Ca_2, color = col_2, marker = Ca_mark, linestyle = 'none',
-    #     fillstyle = fill_2, mew = mark_width, mec = col_2, markersize = marker_size )
-
-
-    # ax.set_xticklabels( [] )
-    # ax.set_yticks( np.linspace( 0, 4e-2, 9 ) )
-    # ax.yaxis.set_major_locator( mpl.ticker.MultipleLocator( 2e-2 ) )
-    # ax = pl.gca()
-    # ax.set_xlim( Ce_min_x, Ce_max_x )
-    # ax.set_ylim( Ce_min_y, Ce_max_y )
-    # ax.minorticks_on()
-    # ax.set_xticklabels( [ '', '880','', '', '910' ] )
-    # ax.set_yticklabels( [] )
-    # ax.xaxis.set_major_locator( mpl.ticker.MultipleLocator( Ce_major ) )
-    # ax.set_yticks( [ 0.1, 0.2, 0.3, 0.4 ] )
+    ax.set_yticklabels([])
 
     pl.subplots_adjust( wspace=subplot_white_space, bottom=0.15 )
 
-    # plot 5CCO
-    # pl.subplot( 2, 1, 2 )
-    # pl.plot( deg_5, num_5, color = mark_col, marker = mark, linestyle = 'none',
-    #     fillstyle = 'full', mew = 1, mec = mark_col, markersize = marker_size )
-    # pl.plot( deg_5, ran_len_5, color = rand_col, linestyle = '-' )
-    # 
-    # ax = pl.gca()
-    # ax.set_yticks( np.linspace( 0, 4e-2, 9 ) )
-    # ax.yaxis.set_major_locator( mpl.ticker.MultipleLocator( 2e-2 ) )
-    # ax.minorticks_on()
-    # ax.set_xlabel( r'Misorientation angle ($^\circ$)', labelpad = 0 )
-    # ax.set_ylabel( 'Number fraction', labelpad = 0 )
-
-     
-
-    # ax1.set_xticks( np.linspace( 100, 500, 5 ) )
-    # ax1.set_xticklabels( np.linspace( 100, 500, 5 ) )
-    # ax1.set_yticks( [ 0.1, 0.2, 0.3, 0.4 ] )
-    # ax.minorticks_on()
-
     # pl.tight_layout()
-    pl.show()
-    # pl.savefig( output_file_dir + output_file_name + '-' + str( dots ) + 'dpi.png', format = 'png', dpi = dots, bbox_inches = 'tight', transparent = True )
+    # pl.show()
+    save_fig( output_file + file_anno[h-1] ) # save files at each dpi
+    pl.savefig( output_file + '.svg', format = 'svg' ) # create svg output
