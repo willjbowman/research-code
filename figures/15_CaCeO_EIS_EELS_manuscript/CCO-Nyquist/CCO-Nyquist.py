@@ -28,7 +28,7 @@ output_dir = data_dir
 subfolder_save = True
 output_file = 'CCO10-Nyquist'
 
-fig_size = ( 6, 3 ) # ( width, hight ) in inches 
+fig_size = ( 6, 3 ) # ( width, hight ) in inches
 # font size, resolution (DPI), file type
 fsize, dots, file_type = 10, [300,1200], 'png'
 cols = [ 'maroon', 'grey', 'black', wf.colors('dark_gold') ]

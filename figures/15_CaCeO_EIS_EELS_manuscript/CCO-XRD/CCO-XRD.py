@@ -68,8 +68,8 @@ def save_fig( output_file_name, subfolder_save=True ):
                 pl.savefig( output_name, format = file_type )
 
 def clip_xy( lims_x, arr_x, arr_y ):
-    min_ind = np.where( arr_x >= lims_x[0] )[0][0]
-    max_ind = np.where( arr_x <= lims_x[1] )[0][-1]
+    min_ind = np.where( arr_x > lims_x[0] )[0][0]
+    max_ind = np.where( arr_x < lims_x[1] )[0][-1]
     x_clip = arr_x[ min_ind:max_ind ]
     y_clip = arr_y[ min_ind:max_ind ]
     return x_clip, y_clip

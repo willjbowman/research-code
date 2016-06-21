@@ -108,6 +108,27 @@ def major_ticks( ax, maj_locs, scientific=False ):
         ax.xaxis.get_major_formatter().set_powerlimits((0, 1))
 
 
+''' ########################## clip_xy ########################## 
+
+clips x and y data arrays according to the x axis limit values such that curves
+do not extend beyond the y-axes. This addresses a rendering bug in the svg
+backend of matplotlib 
+
+Example [CCO-XRD.py]:
+>>> x_5p, y_5p = clip_xy( x_lims, d_exp[:,4], d_exp[:,5] )
+
+lims_x is a list [ x_min, x_max ]
+arr_x, arr_y are np arrays (not sure what the dimensional requirements are...?)
+'''
+
+def clip_xy( lims_x, arr_x, arr_y ):
+    min_ind = np.where( arr_x > lims_x[0] )[0][0]
+    max_ind = np.where( arr_x < lims_x[1] )[0][-1]
+    x_clip = arr_x[ min_ind:max_ind ]
+    y_clip = arr_y[ min_ind:max_ind ]
+    return x_clip, y_clip
+
+
 ''' ########################## ax_limits ########################## 
 
 Applies axis limits to a pylab plot
@@ -232,7 +253,31 @@ def ticks_off( axis ):
         ax.set_xticks([])
 
 
-''' ########################## electronic charge ########################## '''
+''' ########################## phys_constant ########################## '''
+''''returns physical constant with specified name and in specified units.
+Usage:
+>>>kb = wf.phys_constant( 'Boltzmann', 'eV/K' )
+returns k_b in J/K if boolean_0 = true, or eV/K if boolean_1 = true.
+'''
+
+# def phys_constant( constant_name, units ):
+    # contants = {
+    #     'Boltzmann': {
+    #         'eV/K': 8.61733e-5,
+    #         'J/K': 
+    #     },
+    #     'Electronic charge': {
+    #         'C': 1.602177e-19
+    #     }
+    # }
+
+    # if constants[ constant_name[ units ] ]:
+    #     return constants[ constant_name[ units ] ]
+    # else
+    #     print( constant_name + ' was not found.' )
+
+
+''' ########################## elementary charge ########################## '''
 ''''returns Boltzmann constant in specified units.
 Usage:
 >>>k_b = wf.boltzmann( boolean_0, boolean_1 )
@@ -316,7 +361,9 @@ def read_csv_2col( file_path ):
 
 
 '''
-fills a figure object with data contained in vertical columns (see np.vstack().T) ranging between columns labelled col_0 to col_n. I.e. first column is the x-axis data and all other columns contain y-axis data.
+fills a figure object with data contained in vertical columns 
+(see np.vstack().T) ranging between columns labelled col_0 to col_n. 
+I.e. first column is the x-axis data and all other columns contain y-axis data.
 
 Example(s): python/plot_gb_concentration_profiles.py
 '''
