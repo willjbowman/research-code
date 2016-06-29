@@ -15,19 +15,24 @@ import csv, imp, os
 ''' ########################### USER-DEFINED ########################### '''
 
 # # path to data file
-data_dir = ("C:/Users/Besitzer/Dropbox/WillB/Crozier_Lab/Writing/"
+data_dir_2 = ("C:/Users/Besitzer/Dropbox/WillB/Crozier_Lab/Writing/"
+"15_WJB_IS EBSD EELS Ca-Ceria gbs/figures/CCO-gouy-chapman/CCO2/")
+data_dir_5 = ("C:/Users/Besitzer/Dropbox/WillB/Crozier_Lab/Writing/"
+"15_WJB_IS EBSD EELS Ca-Ceria gbs/figures/CCO-gouy-chapman/CCO5/")
+data_dir_10 = ("C:/Users/Besitzer/Dropbox/WillB/Crozier_Lab/Writing/"
 "15_WJB_IS EBSD EELS Ca-Ceria gbs/figures/CCO-gouy-chapman/CCO10/")
-exper_d0 = data_dir + 'map_03_gb_2.txt'
-exper_d1 = data_dir + 'map_04_gb_2.txt'
-# ref_d0 =  data_dir + 'CaO_Fm-3m_225_Shen_2001_MatResBull_20275.csv'
-# ref_d1 =  data_dir + 'CaO2_F4--mmm_139_Kotov_1941_ZhurFizichKhim_20275.csv'
+
+path_d_exp_2 = data_dir_2 + 'map_09_gb_5.txt'
+path_d_exp_5 = data_dir_5 + 'map_2.3_gb_1.txt'
+path_d_exp_10 = data_dir_10 + 'map_03_gb_2.txt'
 
 # # path to output directory
 output_dir = data_dir
 # subfolder_save = False # True by default, uncomment if you want False
-output_file = 'CCO-gouy-chapman'
+output_file = 'CCO-space-charge'
 
 # # constants
+Ca_bulk_2, Ca_bulk_5, Ca_bulk_10 = 0.02, 0.05, 0.10
 # xs = np.arange( 0, 1e-8, 1e-10 ) # m; distance from GB
 lambdas = np.arange( 0, 1e-8, 1e-9 ) # m; debye length
 # lambdas = np.array([ 9e-9 ]) # m; debye length
@@ -37,7 +42,7 @@ dPhis = np.arange( 0, 1, 0.01 ) # V; change in space charge potential
 # change in space charge potential (Tuller et al. 2011)
 
 z = -2 # relative charge of mobile species, Ca_Ce// in this case
-T = 1800 # K ; temperature (maybe the sintering temperature)
+T = 1300 # K ; temperature (maybe the sintering temperature)
 
 # e = 1.602177e-19 # C ; electronic charge
 # e = wf.phys_constant( 'Electronic charge', 'C' ) # 1.602e-19 C; electron charge
@@ -159,14 +164,54 @@ return values and plot exp and theo
 
 # # READ AND STORE DATA IN VARIABLES
 # d = np.loadtxt( data, skiprows = 1 )
-exp_d0 = np.loadtxt( exper_d0, skiprows=4 )
-# exp_d1 = np.loadtxt( exper_d1, skiprows=4 )
+d_exp_2 = np.loadtxt( path_d_exp_2, skiprows=4 )
+d_exp_5 = np.loadtxt( path_d_exp_5, skiprows=4 )
+d_exp_10 = np.loadtxt( path_d_exp_10, skiprows=4 )
 
 # # x, I_CaL, I_OK, I_CeM, I_Ca/Ce, I_O/Ce, I_Ca/Ce, C_Ca, C_Ce, C_O = exp_d0.T
-x_d0 = exp_d0[:,0] * 10e-9
-Ca_d0 = exp_d0[:,8]
-Ce_d0 = exp_d0[:,9]
-O_d0 = exp_d0[:,10]
+# x_d0 = exp_d0[:,0] * 10e-9
+# Ca_d0 = exp_d0[:,8]
+# Ce_d0 = exp_d0[:,9]
+# O_d0 = exp_d0[:,10]
+x_exp_2 = ( d_exp_2[:,0] * 10e-9 )[ 1:36 ]
+Ca_exp_2 = d_exp_2[:,8][ 1:36 ][ ::-1 ]
+x_exp_5 = ( d_exp_5[:,0] * 10e-9 )[ 1:29 ]
+Ca_exp_5 = d_exp_5[:,8][ 1:29 ][ ::-1 ]
+x_exp_10 = ( d_exp_10[:,0] * 10e-9 )[ 1:20 ]
+Ca_exp_10 = d_exp_10[:,8][ 0:19 ][ ::-1 ]
+
+pl.close('all')
+
+pl.figure()
+# pl.subplot( 1, 2, 1 ) # subplot( height, width, subplot_number )
+pl.subplot2grid( (2,2), (0,0) )
+pl.plot( x_exp_2, Ca_exp_2 )
+pl.plot( x_exp_5, Ca_exp_5 )
+pl.plot( x_exp_10, Ca_exp_10 )
+ax_0 = pl.gca()
+ax_0.set_ylabel( '[Ca](x) (mole/mole)')
+ax_0.legend([ '2 CCO', '5 CCO', '10 CCO' ])
+
+pl.subplot2grid( (2,2), (0,1) )
+Ca_CxCb_2 = Ca_exp_2 / Ca_bulk_2
+Ca_CxCb_5 = Ca_exp_5 / Ca_bulk_5
+Ca_CxCb_10 = Ca_exp_10 / Ca_bulk_10
+pl.plot( x_exp_2, Ca_CxCb_2 )
+pl.plot( x_exp_5, Ca_CxCb_5 )
+pl.plot( x_exp_10, Ca_CxCb_10 )
+ax_1 = pl.gca()
+ax_1.set_ylabel( 'C(x)/C_bulk')
+
+def dPhi_x( CxCb_x, T, z ):
+    dPhi = -np.log( CxCb_x ) * kb * T / ( z * e_ )
+    return dPhi
+
+pl.subplot2grid( (2,2), (1,0) )
+pl.plot( x_exp_2, dPhi_x( Ca_CxCb_2, T, z ) )
+pl.plot( x_exp_5, dPhi_x( Ca_CxCb_5, T, z ) )
+pl.plot( x_exp_10, dPhi_x( Ca_CxCb_10, T, z ) )
+ax_2 = pl.gca()
+ax_2.set_ylabel( 'd_Phi(x)')
 
 xs_exp = x_d0[ 1:20 ]
 Ca_exp = Ca_d0[ 0:19 ][ ::-1 ] # reverse arrays so GB is at x=0
