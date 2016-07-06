@@ -99,7 +99,7 @@ nyv = 8*ny;                 % anion-cation next-nearest-neighbor bond density, m
 nyy = 4*ny;                 % cation-cation next-nearest-neighbor bond density, mol/m^3
 
 vd = yd/4;                  % bulk vacancy site fraction (assuming 3+ dopant)
-vd = yd/2;                  % bulk vacancy site fraction (assuming 2+ dopant)
+% vd = yd/2;                  % bulk vacancy site fraction (assuming 2+ dopant)
 
 if (length(varargin{4}) == 1)
     h = L*ones(N+1,1)/(N+1);
