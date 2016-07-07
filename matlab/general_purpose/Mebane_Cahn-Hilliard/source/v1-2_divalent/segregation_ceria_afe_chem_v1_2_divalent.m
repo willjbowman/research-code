@@ -1,5 +1,7 @@
 
-% segregation_ceria_afe_chem, v. 1.1
+% segregation_ceria_afe_chem, v. 1.2
+% Note: compared to v. 1.1 changes of the electrostatic terms are made for
+% divalent dopant-  Xiaorui
 
 % Grain boundary segregation in doped ceria, taking the segregated vacancy
 % as occurring in a separate phase, and no preferential dopant segregation.
@@ -38,7 +40,9 @@
 
 
 function [y, v, phi, lamv, lambd, nodes, flag] = ...
-    segregation_ceria_afe_chem_3_cvs_cds(varargin)
+    segregation_ceria_afe_chem_v1_2_divalent(varargin)
+
+sprintf( 'segregation_ceria_afe_chem_v1_2_divalent' )
 
 % y: dopant site fraction profile
 % v: vacancy site fraction profile
@@ -48,8 +52,7 @@ function [y, v, phi, lamv, lambd, nodes, flag] = ...
 % nodes: distances from interface corresponding to y, v, phi
 % flag: 1 = success; 2 = failure
 
-if nargin < 5
-% if nargin ~= 5
+if nargin ~= 5
     disp('Error: bad argument list: (<temperature in Kelvin>, <bulk dopant site fraction>, <number of initial elements>/<initial guess vector>, <grain radius>/<vector of nodes>, <parameter file name>)')
     y=0;
     v=0;
@@ -83,18 +86,13 @@ avnum = 6.022e23;
 % material parameters
 paramfile = varargin{5};
 par = importdata(paramfile,' ',2);
-no = par.data(1);       % surface site density for vacancies, mol/m^2 (NvGB)
-no = 2.6e-6; %v[2.6e-5]
+no = par.data(1);       % surface site density for vacancies, mol/m^2
 fv = par.data(2);       % vacancy self-interaction, J/mol
 fo = par.data(3);       % vacancy segregation energy, J/mol
 fy = par.data(4);       % dopant self-interaction, J/mol
-fy = 5e3; % [1e4]
 fyv = par.data(5);      % dopant-vacancy interaction, J/mol
-% fyv = -1.4e4;
 cv = par.data(6);       % vacancy gradient energy coefficient, J/mol-m
-cv = varargin{6}; % parametric study
 cd = par.data(7);       % dopant gradient energy coefficient, J/mol-m
-cd = varargin{7}; % parametric study
 epsr = par.data(8);     % relative permittivity
 latpar = par.data(9);   % lattice parameter, m
 
@@ -105,8 +103,8 @@ nvv = 3*nv;                 % anion-anion next-nearest-neighbor bond density, mo
 nyv = 8*ny;                 % anion-cation next-nearest-neighbor bond density, mol/m^3
 nyy = 4*ny;                 % cation-cation next-nearest-neighbor bond density, mol/m^3
 
-vd = yd/4;                  % bulk vacancy site fraction (assuming 3+ dopant)
-% vd = yd/2;                  % bulk vacancy site fraction (assuming 2+ dopant)
+vd = yd/4;                  % bulk vacancy site fraction
+vd = yd/2;                  % bulk vacancy site fraction for divalent
 
 if (length(varargin{4}) == 1)
     h = L*ones(N+1,1)/(N+1);
@@ -140,9 +138,9 @@ while (1)
     
     x = [y; v; phi; lamv; lambd];
     
-    f(1) = cd*(y(1)/h(1) - y(2)/h(1)) + h(1)*(2*nyy*fy*y(1) + nyv*fyv*v(1) + ny*R*T*log(y(1)/(1-y(1))) - ny*F*phi(1) + lambd)/2;
+    f(1) = cd*(y(1)/h(1) - y(2)/h(1)) + h(1)*(2*nyy*fy*y(1) + nyv*fyv*v(1) + ny*R*T*log(y(1)/(1-y(1))) - ny*2*F*phi(1) + lambd)/2;
     for i=2:N+1
-        f(i) = cd*(-y(i-1)/h(i-1) + y(i)*(1/h(i-1) + 1/h(i)) - y(i+1)/h(i)) + (h(i-1) + h(i))*(2*nyy*fy*y(i) + nyv*fyv*v(i) + ny*R*T*log(y(i)/(1-y(i))) - ny*F*phi(i) + lambd)/2;
+        f(i) = cd*(-y(i-1)/h(i-1) + y(i)*(1/h(i-1) + 1/h(i)) - y(i+1)/h(i)) + (h(i-1) + h(i))*(2*nyy*fy*y(i) + nyv*fyv*v(i) + ny*R*T*log(y(i)/(1-y(i))) - ny*2*F*phi(i) + lambd)/2;
     end
     f(N+2) = cd*(-y(N+1)/h(N+1) + y(N+2)/h(N+1)) + h(N+1)*(2*nyy*fy*y(N+2) + nyv*fyv*v(N+2) + ny*R*T*log(y(N+2)/(1-y(N+2))) + lambd)/2;
     
@@ -152,11 +150,11 @@ while (1)
     end
     f(2*N+4) = cv*(-v(N+1)/h(N+1) + v(N+2)/h(N+1)) + h(N+1)*(2*nvv*fv*v(N+2) + nyv*fyv*y(N+2) + nv*R*T*log(v(N+2)/(1-v(N+2))) + lamv)/2;
     
-    f(2*N+5) = epsr*eps0*(-phi(1)/h(1) + phi(2)/h(1)) + h(1)*F*(2*nv*v(1) - ny*y(1))/2;
+    f(2*N+5) = epsr*eps0*(-phi(1)/h(1) + phi(2)/h(1)) + h(1)*F*(2*nv*v(1) - 2*ny*y(1))/2;
     for i=2:N
-        f(2*N+4+i) = epsr*eps0*(phi(i-1)/h(i-1) - phi(i)*(1/h(i-1) + 1/h(i)) + phi(i+1)/h(i)) + (h(i-1) + h(i))*F*(2*nv*v(i) - ny*y(i))/2;
+        f(2*N+4+i) = epsr*eps0*(phi(i-1)/h(i-1) - phi(i)*(1/h(i-1) + 1/h(i)) + phi(i+1)/h(i)) + (h(i-1) + h(i))*F*(2*nv*v(i) - 2*ny*y(i))/2;
     end
-    f(3*N+5) = epsr*eps0*(phi(N)/h(N) - phi(N+1)*(1/h(N) + 1/h(N+1))) + (h(N) + h(N+1))*F*(2*nv*v(N+1) - ny*y(N+1))/2;
+    f(3*N+5) = epsr*eps0*(phi(N)/h(N) - phi(N+1)*(1/h(N) + 1/h(N+1))) + (h(N) + h(N+1))*F*(2*nv*v(N+1) - 2*ny*y(N+1))/2;
     
     f(3*N+6) = (y(1) - yd)*h(1)/2;
     for i=2:N+1
@@ -181,7 +179,7 @@ while (1)
         J(1,1) = cd/h(1) + h(1)*(2*nyy*fy + ny*R*T/(y(1)*(1 - y(1))))/2;
         J(1,2) = -cd/h(1);
         J(1,N+3) = h(1)*nyv*fyv/2;
-        J(1,2*N+5) = -h(1)*ny*F/2;
+        J(1,2*N+5) = -h(1)*ny*2*F/2;
         J(1,3*N+7) = h(1)/2;
         for i=2:N+1
             J(i,i) = cd*(1/h(i-1) + 1/h(i)) + (h(i-1) + h(i))*(2*nyy*fy + ny*R*T/(y(i)*(1 - y(i))))/2;
@@ -189,7 +187,7 @@ while (1)
             J(i,i-1) = -cd/h(i-1);
             
             J(i,i+N+2) = (h(i-1) + h(i))*nyv*fyv/2;
-            J(i,i+2*N+4) = -(h(i-1) + h(i))*ny*F/2;
+            J(i,i+2*N+4) = -(h(i-1) + h(i))*ny*2*F/2;
             J(i,3*N+7) = (h(i-1) + h(i))/2;
         end
         J(N+2,N+2) = cd/h(N+1) + h(N+1)*(2*nyy*fy + ny*R*T/(y(N+2)*(1 - y(N+2))))/2;
@@ -219,19 +217,19 @@ while (1)
         J(2*N+5,2*N+5) = -epsr*eps0/h(1);
         J(2*N+5,2*N+6) = epsr*eps0/h(1);
         J(2*N+5,N+3) = h(1)*F*nv;
-        J(2*N+5,1) = -h(1)*F*ny/2;
+        J(2*N+5,1) = -h(1)*F*ny;
         for i=2:N
             J(i+2*N+4,i+2*N+4) = -epsr*eps0*(1/h(i-1) + 1/h(i));
             J(i+2*N+4,i+2*N+3) = epsr*eps0/h(i-1);
             J(i+2*N+4,i+2*N+5) = epsr*eps0/h(i);
             
             J(i+2*N+4,i+N+2) = (h(i-1) + h(i))*F*nv;
-            J(i+2*N+4,i) = -(h(i-1) + h(i))*F*ny/2;
+            J(i+2*N+4,i) = -(h(i-1) + h(i))*F*ny;
         end
         J(3*N+5,3*N+5) = -epsr*eps0*(1/h(N) + 1/h(N+1));
         J(3*N+5,3*N+4) = epsr*eps0/h(N);
         J(3*N+5,2*N+3) = (h(N) + h(N+1))*nv*F;
-        J(3*N+5,N+1) = -(h(N) + h(N+1))*ny*F/2;
+        J(3*N+5,N+1) = -(h(N) + h(N+1))*ny*F;
         
         J(3*N+6,1) = h(1)/2;
         for i=2:N+1
@@ -257,9 +255,9 @@ while (1)
             lamv = xtest(3*N+6);
             lambd = xtest(3*N+7);
             
-            ftest(1) = cd*(y(1)/h(1) - y(2)/h(1)) + h(1)*(2*nyy*fy*y(1) + nyv*fyv*v(1) + ny*R*T*log(y(1)/(1-y(1))) - ny*F*phi(1) + lambd)/2;
+            ftest(1) = cd*(y(1)/h(1) - y(2)/h(1)) + h(1)*(2*nyy*fy*y(1) + nyv*fyv*v(1) + ny*R*T*log(y(1)/(1-y(1))) - ny*2*F*phi(1) + lambd)/2;
             for i=2:N+1
-                ftest(i) = cd*(-y(i-1)/h(i-1) + y(i)*(1/h(i-1) + 1/h(i)) - y(i+1)/h(i)) + (h(i-1) + h(i))*(2*nyy*fy*y(i) + nyv*fyv*v(i) + ny*R*T*log(y(i)/(1-y(i))) - ny*F*phi(i) + lambd)/2;
+                ftest(i) = cd*(-y(i-1)/h(i-1) + y(i)*(1/h(i-1) + 1/h(i)) - y(i+1)/h(i)) + (h(i-1) + h(i))*(2*nyy*fy*y(i) + nyv*fyv*v(i) + ny*R*T*log(y(i)/(1-y(i))) - ny*2*F*phi(i) + lambd)/2;
             end
             ftest(N+2) = cd*(-y(N+1)/h(N+1) + y(N+2)/h(N+1)) + h(N+1)*(2*nyy*fy*y(N+2) + nyv*fyv*v(N+2) + ny*R*T*log(y(N+2)/(1-y(N+2))) + lambd)/2;
             
@@ -269,11 +267,11 @@ while (1)
             end
             ftest(2*N+4) = cv*(-v(N+1)/h(N+1) + v(N+2)/h(N+1)) + h(N+1)*(2*nvv*fv*v(N+2) + nyv*fyv*y(N+2) + nv*R*T*log(v(N+2)/(1-v(N+2))) + lamv)/2;
             
-            ftest(2*N+5) = epsr*eps0*(-phi(1)/h(1) + phi(2)/h(1)) + h(1)*F*(2*nv*v(1) - ny*y(1))/2;
+            ftest(2*N+5) = epsr*eps0*(-phi(1)/h(1) + phi(2)/h(1)) + h(1)*F*(2*nv*v(1) - 2*ny*y(1))/2;
             for i=2:N
-                ftest(2*N+4+i) = epsr*eps0*(phi(i-1)/h(i-1) - phi(i)*(1/h(i-1) + 1/h(i)) + phi(i+1)/h(i)) + (h(i-1) + h(i))*F*(2*nv*v(i) - ny*y(i))/2;
+                ftest(2*N+4+i) = epsr*eps0*(phi(i-1)/h(i-1) - phi(i)*(1/h(i-1) + 1/h(i)) + phi(i+1)/h(i)) + (h(i-1) + h(i))*F*(2*nv*v(i) - 2*ny*y(i))/2;
             end
-            ftest(3*N+5) = epsr*eps0*(phi(N)/h(N) - phi(N+1)*(1/h(N) + 1/h(N+1))) + (h(N) + h(N+1))*F*(2*nv*v(N+1) - ny*y(N+1))/2;
+            ftest(3*N+5) = epsr*eps0*(phi(N)/h(N) - phi(N+1)*(1/h(N) + 1/h(N+1))) + (h(N) + h(N+1))*F*(2*nv*v(N+1) - 2*ny*y(N+1))/2;
             
             ftest(3*N+6) = (y(1) - yd)*h(1)/2;
             for i=2:N+1

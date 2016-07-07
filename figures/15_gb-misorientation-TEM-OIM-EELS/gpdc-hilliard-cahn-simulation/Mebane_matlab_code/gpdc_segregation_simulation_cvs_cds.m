@@ -15,15 +15,19 @@ fig_h = fig_w;
 line_w = 1.5;
 x_label = 'Distance from interface (m)';
 legend_info = {}; % cell array for legend entries
+cols = { ...
+    [ 0 0 0 ], [ 0 0 1 ], [ 1 0 0 ], [ 0 1 0 ], [ 1 0 1 ], [ 0 1 1 ] ...
+};
 
-T = 500+273;                             % temperature
+T = 1000+273;                             % temperature
 % Ts = [ 440, ] + 273;                             % temperature
 % fys = [ 1e3, 5e3, 1e4, 5e4, 1e5, 5e5, 1e6 ]; % =1e4 [published]
 % fyvs = -[ 1e3, 5e3, 1e4, 5e4, 1e5, 5e5, 1e6 ]; % =-7e3 [published]
-cvs = [ 5e-11, 1e-10, 5e-10, 1e-9, 5e-9, 1e-8, 5e-8 ]; % = 1e-9 [published]
-cvs = [ 5e-10, 1e-9, 5e-9 ]; % = 1e-9 [published]
-cds = [ 5e-10, 1e-9, 5e-9, 1e-8, 5e-8, 1e-7, 5e-7 ]; % = 1e-8 [published]
+cvs = [ 5e-10, 1e-9, 5e-9, 1e-8 ]; % = 1e-9 [published]
+% cvs = [ 5e-10, 1e-9, 5e-9 ]; % = 1e-9 [published]
 cds = [ 5e-9, 1e-8, 5e-8 ]; % = 1e-8 [published]
+cds = [ 1e-9, 5.1e-9, 9.8e-9, 2.2e-8 ]; % = 1e-8 [published]
+% cds = [ 5e-9, 1e-8, 5e-8 ]; % = 1e-8 [published]
 par_name = 'cv-cd';
 par_vals = 1;
 par_vals = cds;
@@ -110,18 +114,19 @@ for g = 1:len_cvs % loop on cvs
 
         legend_info_y{ f } = [ strcat( ...
             'cv =', num2str( cv ), '; cd =', num2str( cd ), ...
-            '; fwhm =', num2str( fwhm_i * 1e9, 2 ), ' nm' ...
+            '; fwhm =', num2str( fwhm_i*1e9*2, 2 ), ' nm' ... % profile fwhm*2
         ) ];
 
         % red = f;
         % gre = 0;
         % blu = ( len_cvs * len_cds ) - f;
         % color = [ red gre blu ] / ( len_cvs * len_cds );
-        red = g / len_cvs;
-        gre = 0;
-        blu = 1 - red;
+        % red = g / len_cvs; % 0 < rgba values < 1
+        % gre = 0;
+        % blu = 1 - red;
         alp = 1 - h / ( 1.5 * len_cds );
-        color = [ red gre blu, alp ];
+        color = [ red gre blu alp ];
+        color = [ cols{g}, alp ];
 
         figure( fig_nv ) % make figure current
         plot( nodes, v/(na_b_i/4), 'Linewidth', line_w, 'color', color )

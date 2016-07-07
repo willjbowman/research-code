@@ -7,8 +7,8 @@ na_bulks = [ .05, .1 ];  % bulk dopant site fractions
 % na_bulks = [ .02, .05, .1 ];  % bulk dopant site fractions
 node_n = 100;
 r_gr = 5e-7;            % grain radius
-par_file = 'segpar_ceria3_wb.txt';
-par_file = 'segpar_ceria2_wb.txt';
+par_file = 'segpar_ceria3.txt';
+% par_file = 'segpar_ceria3_wb.txt';
 
 % for h = 1:length( fys )
 for h = 1:length( fyvs )    
@@ -24,7 +24,10 @@ for h = 1:length( fyvs )
         na_b_i = na_bulks(i);
         disp( strcat( {'@ '}, datestr(now,'HH:MM:SS') ) );
         disp( strcat( {'tyring: na_b_i = '}, num2str(na_b_i) ) );
-        [y,v,phi,lamv,lambd,nodes,flag] = segregation_ceria_afe_chem_divalent( T, na_b_i, node_n, r_gr, par_file, fyvs(h) );
+        [y,v,phi,lamv,lambd,nodes,flag] = ...
+            segregation_ceria_afe_chem_v1_2_divalent( ...
+                T, na_b_i, node_n, r_gr, par_file, fyvs(h) ...
+            );
         ys{i} = y; % dopant site fraction
         vs{i} = v; % vacancy site fraction
         phis{i} = phi;
@@ -102,5 +105,5 @@ for h = 1:length( fyvs )
     ylabel( 'phi (V)' )
     xlabel( 'distance from interface (m)' )
     
-    saveas( gcf, sprintf([ save_dir 'fy-' num2str( fyv ) '.png' ]) )
+    % saveas( gcf, sprintf([ save_dir 'fy-' num2str( fyv ) '.png' ]) )
 end
