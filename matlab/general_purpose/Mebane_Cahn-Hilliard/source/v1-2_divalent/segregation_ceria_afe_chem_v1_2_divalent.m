@@ -92,7 +92,8 @@ fo = par.data(3);       % vacancy segregation energy, J/mol
 fy = par.data(4);       % dopant self-interaction, J/mol
 fyv = par.data(5);      % dopant-vacancy interaction, J/mol
 cv = par.data(6);       % vacancy gradient energy coefficient, J/mol-m
-cd = par.data(7);       % dopant gradient energy coefficient, J/mol-m
+cd = par.data(7);       % dopant gradient energy coefficient, J/mol-m [1e-8]
+% cd = 5e-8;
 epsr = par.data(8);     % relative permittivity
 latpar = par.data(9);   % lattice parameter, m
 

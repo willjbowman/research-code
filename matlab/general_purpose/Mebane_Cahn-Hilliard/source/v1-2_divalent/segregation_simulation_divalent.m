@@ -3,7 +3,7 @@
 
 T = 440+273;                             % temperature
 % na_bulks = [ 1e-3, .01, .1, .2 ];  % bulk dopant site fractions
-na_bulks = [ .01, .05, .1, .15 ];  % bulk dopant site fractions
+na_bulks = [ .02, .05, .1 ];  % bulk dopant site fractions
 node_n = 400;
 r_gr = 1e-6;                             % grain radius
 par_file = 'segpar_ceria3_xiaorui.txt';

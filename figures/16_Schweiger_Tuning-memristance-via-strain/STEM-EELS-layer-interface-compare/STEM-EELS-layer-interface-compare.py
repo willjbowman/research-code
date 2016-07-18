@@ -20,25 +20,29 @@ import csv, imp, os
 
 ''' ########################### USER-DEFINED ########################### '''
 # path to data
-data_dir = 'C:/Users/Besitzer/Dropbox/WillB/ETH/writing/16_Schweiger S etal_' +\
-    'Tuning Memristance through Strain in Resistive Switching Devices/data/' +\
-    '160429_GDCERO-6_HD-STEM-EELS/'
+# data_dir = 'C:/Users/Besitzer/Dropbox/WillB/ETH/writing/16_Schweiger S etal_'+\
+#     'Tuning Memristance through Strain in Resistive Switching Devices/data/'+\
+#     '160429_GDCERO-6_HD-STEM-EELS/'
 
-d_Ce_lay = data_dir + 'Ce-M45-layer_160429_GDCERO-6_EELS_03_2mm-10s-700meV.txt'
-d_Ce_int = data_dir + 'Ce-M45-interface_160429_GDCERO-6_EELS_06_2mm-10s-700meV.txt'
-d_Gd_lay = data_dir + 'Gd-M45-layer_160429_GDCERO-6_EELS_03_2mm-10s-700meV.txt'
-d_Gd_int = data_dir + 'Gd-M45-interface_160429_GDCERO-6_EELS_06_2mm-10s-700meV.txt'
-d_GCO20_ref = data_dir + 'GCO20-ref-SSI-fig-4a.txt'
+data_dir = 'C:/Users/Besitzer/Dropbox/WillB/ETH/writing/16_Schweiger S etal_'+\
+    'Tuning Memristance through Strain in Resistive Switching Devices/data/'+\
+    '160716_ERO-GDC-x3_2010-STEM-EELS/'
+
+# single file with both spectra as columns
+d = data_dir +\
+    '160716_ERO-GDC-x3_EELS-SI_07_S_c2_eels-CL_700meV_3mm_BS-inter-layer.txt'
 
 # path to output directory
 output_dir = data_dir
 output_file = 'STEM-EELS-layer-interface-compare'
+save = True
+# save = False
 subfolder_save = True
 
 fig_size = ( 4, 3.4 ) # ( width, hight ) in inches
 subplot_white_space = 0.05 # see pl.subplots_adjust()
 # font size, resolution (DPI), file type
-fsize, dots, file_type = 10, [300,1200], 'png'
+fsize, dots, file_type = 10, [300], 'png'
 # wf.colors('col_name')
 cols = [ wf.colors('eth_blue'), 'black', 'grey', 'goldenrod' ]
 marks, msize = [ 's', 'o', '^', 'x' ], 6
@@ -46,7 +50,7 @@ lines = [ '-', '' ]
 leg_ents = [ 'Layer', 'Interface', 'Reference' ]
 leg_loc = 'upper right'
 x_lab, y_lab = 'Energy loss (eV)', 'Counts (Arbitrary units)'
-x_lims, y_lims = [ [860,960], [1155,1240] ], [ [-1000,1.2e4], [-1500,3000] ]
+x_lims, y_lims = [ [860,960], [1155,1240] ], [ [-1e4,15e4], [-1e4,15e4] ]
 x_maj_tick_loc = ['', 20]
 x_maj_tick_lab = [
     [ '', '880', '900', '920', '940' ],
@@ -54,26 +58,24 @@ x_maj_tick_lab = [
     ]
 file_anno = [''] # create multiple images each with an additional curve
 scale_x, scale_y = [], [7, 4, 0.6]
-shift_x, shift_y = [], [5e3, 1e3, -1700]
+shift_x, shift_y = [], [3e4, 1e3, -1700]
 
 # generate data objects from .txt
-Ce_lay = np.genfromtxt( d_Ce_lay, skiprows = 1, delimiter = '\t' )
-Ce_int = np.genfromtxt( d_Ce_int, skiprows = 1, delimiter = '\t' )
-Gd_lay = np.genfromtxt( d_Gd_lay, skiprows = 1, delimiter = '\t' )
-Gd_int = np.genfromtxt( d_Gd_int, skiprows = 1, delimiter = '\t' )
-GCO20_ref = np.genfromtxt( d_GCO20_ref, skiprows = 1, delimiter = '\t' )
-
+data = np.genfromtxt( d, skiprows=1, delimiter = '\t' )
 # store columns as variables
-Ce_lay_x, Ce_lay_y = Ce_lay.T
-Ce_int_x, Ce_int_y = Ce_int.T
-Gd_lay_x, Gd_lay_y = Gd_lay.T
-Gd_int_x, Gd_int_y = Gd_int.T
-GCO20_ref_x, GCO20_ref_y = GCO20_ref.T
+eV_x, int_y, lay_y = data.T
 
-# scale and shift data for plotting
-Ce_lay_y_pl = Ce_lay_y / scale_y[0] +shift_y[0]
-Gd_lay_y_pl = Gd_lay_y / scale_y[1] +shift_y[1]
-GCO20_ref_y_pl = GCO20_ref_y * scale_y[2] +shift_y[2]
+# clipping data so no overflow in x-axis (svg rendering bug)
+eV_x_ce, lay_y_ce_clip, lims_x_ce = wf.clip_xy( x_lims[0], eV_x, lay_y )
+eV_x_gd, lay_y_gd_clip, lims_x_gd = wf.clip_xy( x_lims[1], eV_x, lay_y )
+eV_x_ce, int_y_ce_clip, lims_x_ce = wf.clip_xy( x_lims[0], eV_x, int_y )
+eV_x_gd, int_y_gd_clip, lims_x_gd = wf.clip_xy( x_lims[1], eV_x, int_y )
+
+# adjust data for plotting
+lay_y_pl_ce = lay_y_ce_clip + shift_y[0]
+lay_y_pl_gd = lay_y_gd_clip + shift_y[0]
+int_y_pl_ce = int_y_ce_clip
+int_y_pl_gd = int_y_gd_clip
 
 ''' ########################### FUNCTIONS ########################### '''
 
@@ -88,7 +90,7 @@ def save_fig(output_file_name):
                 os.mkdir( output_dir )
         output_name = wf.save_name( output_dir, output_file_name, dot, file_type )
         pl.savefig( output_name, format=file_type, dpi=dot, transparent=True )
-    
+        pl.savefig( output_dir + output_file + '.svg', format = 'svg' )
 
 ''' ########################### MAIN SCRIPT ########################### '''
 
@@ -100,16 +102,16 @@ for h in range( 1, len( file_anno ) + 1 ):
 
     # pl.subplot( 1, 2, 1 ) # subplot( height, width, subplot_number )
     # gridspec( (rows,cols), (plot_location), colspan )
-    pl.subplot2grid( (1,3), (0,0), colspan=2 )
-    pl.plot( Ce_lay_x, Ce_lay_y_pl, c=cols[0], ls=lines[0] )
-    pl.plot( Ce_int_x, Ce_int_y, c=cols[1], ls=lines[0] )
-    pl.plot( GCO20_ref_x, GCO20_ref_y_pl-1e4, c=cols[2], ls=lines[0] )
     # pl.plot( ev_Ca, counts_Ca_off, color = col_off, dashes = dash )
+    pl.subplot2grid( (1,3), (0,0), colspan=2 )
+    pl.plot( eV_x_ce, lay_y_pl_ce, c=cols[0], ls=lines[0] )
+    pl.plot( eV_x_ce, int_y_pl_ce, c=cols[1], ls=lines[0] )
 
     ax = pl.gca()
     ax.set_ylabel( y_lab, labelpad=0 )
     ax.set_xlabel( x_lab, labelpad=0, horizontalalignment='left' )
-    ax.set_xlim( x_lims[0][0], x_lims[0][1] )
+    # ax.set_xlim( lims_x_ce[0], lims_x_ce[1] )
+    ax.set_xlim( lims_x_ce )
     ax.set_ylim( y_lims[0][0], y_lims[0][1] )
     ax.minorticks_on()
     ax.set_xticklabels( x_maj_tick_lab[0] )
@@ -123,13 +125,12 @@ for h in range( 1, len( file_anno ) + 1 ):
 
     # pl.subplot( 1, 2, 2 )
     pl.subplot2grid( (1,3), (0,2) )
-    pl.plot( Gd_lay_x, Gd_lay_y_pl, c=cols[0], ls=lines[0] )
-    pl.plot( Gd_int_x, Gd_int_y, c=cols[1], ls=lines[0] )
-    pl.plot( GCO20_ref_x, GCO20_ref_y_pl, c=cols[2], ls=lines[0] )
-    # pl.plot( ev_O, counts_O_on, color = col_on, dashes = dash )
+    pl.plot( eV_x_gd, lay_y_pl_gd, c=cols[0], ls=lines[0] )
+    pl.plot( eV_x_gd, int_y_pl_gd, c=cols[1], ls=lines[0] )
 
     ax = pl.gca()
-    ax.set_xlim( x_lims[1][0], x_lims[1][1] )
+    # ax.set_xlim( lims_x_gd[0], lims_x_gd[1] )
+    ax.set_xlim( lims_x_gd )
     ax.set_ylim( y_lims[1][0], y_lims[1][1] )
 
     ax.minorticks_on()
@@ -140,6 +141,6 @@ for h in range( 1, len( file_anno ) + 1 ):
     pl.subplots_adjust( wspace=subplot_white_space, bottom=0.15 )
 
     # pl.tight_layout()
-    # pl.show()
-    save_fig( output_file + file_anno[h-1] ) # save files at each dpi
-    pl.savefig( output_file + '.svg', format = 'svg' ) # create svg output
+    pl.show()
+    if save:
+        save_fig( output_file + file_anno[h-1] ) # save files at each dpi

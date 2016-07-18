@@ -92,9 +92,9 @@ fy = 5e3; % [1e4]
 fyv = par.data(5);      % dopant-vacancy interaction, J/mol
 % fyv = -1.4e4;
 cv = par.data(6);       % vacancy gradient energy coefficient, J/mol-m
-cv = varargin{6}; % parametric study
+cv = varargin{6}; % parametric study [1e-9]
 cd = par.data(7);       % dopant gradient energy coefficient, J/mol-m
-cd = varargin{7}; % parametric study
+cd = varargin{7}; % parametric study [1e-8]
 epsr = par.data(8);     % relative permittivity
 latpar = par.data(9);   % lattice parameter, m
 

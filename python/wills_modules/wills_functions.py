@@ -112,10 +112,11 @@ def major_ticks( ax, maj_locs, scientific=False ):
 
 clips x and y data arrays according to the x axis limit values such that curves
 do not extend beyond the y-axes. This addresses a rendering bug in the svg
-backend of matplotlib 
+backend of matplotlib. returns clipped x and y values arrays, and x axis limits
+as a list which can be used in e.g. ax.set_xlim( lims_x_clip )
 
 Example [CCO-XRD.py]:
->>> x_5p, y_5p = clip_xy( x_lims, d_exp[:,4], d_exp[:,5] )
+>>> x_5p, y_5p, x_5p_lims = clip_xy( x_lims, d_exp[:,4], d_exp[:,5] )
 
 lims_x is a list [ x_min, x_max ]
 arr_x, arr_y are np arrays (not sure what the dimensional requirements are...?)
@@ -126,7 +127,8 @@ def clip_xy( lims_x, arr_x, arr_y ):
     max_ind = np.where( arr_x < lims_x[1] )[0][-1]
     x_clip = arr_x[ min_ind:max_ind ]
     y_clip = arr_y[ min_ind:max_ind ]
-    return x_clip, y_clip
+    lims_x_clip = [ x_clip[0], x_clip[-1] ]
+    return x_clip, y_clip, lims_x_clip
 
 
 ''' ########################## ax_limits ########################## 
