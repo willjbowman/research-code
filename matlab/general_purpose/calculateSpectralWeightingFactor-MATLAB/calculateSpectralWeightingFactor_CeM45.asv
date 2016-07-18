@@ -1,0 +1,99 @@
+
+% import background-subtracted time-resolved EELS spectra
+% this is generated from DM via a custom script called dumpSIToText_wb.s
+inFile = '140404_7bCeO2crush_Nion100kV_timeResolved-CeM-BKGDSUBSI-870.txt';
+importdata(inFile);
+d = ans.data;
+
+%%
+siz = size(d);
+columns = siz(2);
+spectra = 400; % spectrum number corresponding to spectrum B
+
+%%
+close all
+% group multiple spectra to determine fractional contribution
+group = 5;
+
+eV = d( :, 1 ); % energy-loss axis
+
+% define constituent spectra (i.e. spectra A and B in alp*A+beta*B
+initial_spectrum = d( :, 2 ); % initial acquisition
+final_spectrum = d( :, spectra ); % final acquisiton
+
+% define number of weighting combinations used for matching
+steps = 100;
+
+for i = 2 : spectra
+    current_spectrum = d( :, i ); % current spectrum
+
+    % test linear combinations of initial and final spectra
+    for a = 1 : steps
+        % define alpha and beta
+        b = steps - a;
+        % generate linear combination spectrum
+        try_spectrum = ( a * initial_spectrum + b * final_spectrum ) / steps;
+        % compare linear combination with experimental data (current_spec)
+        difference_spectrum( a, : ) = abs ( current_spectrum - try_spectrum );
+        % sum difference at every point in difference_spectrum
+        sumDifference( a, 1 ) = sum( difference_spectrum( a, : ) );
+    end
+    
+    % minimum in difference_spectrum corresponds to linear combination
+    % most similar to experimental spectrum
+    [ minVal, minIndex ] = min( sumDifference );
+    delta( i ) = minVal;
+    fractionInitSpec( i ) = minIndex;
+    
+    figure( 1 )
+    xlabel( '% initial spectrum)' );
+    ylabel( 'Actual signal - composition signal' );
+    
+    r = 0;
+    g = i;
+    b = spectra - i;
+    color = [ g r b ] / spectra;
+    
+    plot( sumDifference, 'color', color )
+    ylim( [ 0 1e6 ] );
+    hold on
+end
+
+hold off
+% xlabel('% initial spectrum (Ce^{4+})');
+% ylabel('Actual signal - composition signal');
+%%
+figure
+for c = 2 : spectra
+    r = 0;
+    g = c;
+    b = spectra-c;
+    color = [g r b]/spectra;
+    plot(c,fractionInitSpec(c),'o','color',color);
+    hold on
+end
+hold off
+ylabel('% initial spectrum');
+xlabel('Acquisition');
+
+%%
+figure( 3 )
+median_delta = median( delta ) ;
+dev_from_median_delta = median_delta - delta ;
+chi_squared = sum ( dev_from_median_delta .^ 2 ) / spectra ;
+plot( dev_from_median_delta, 'o' );
+% y_max = 2e6;
+ylim( [ -1e5 1e5 ] );
+styleFont( 'bold', 'arial', 18 );
+
+%%
+
+for i = 2 : spectra
+    current_spectrum = d(:,i); % subject spectrum
+%     counts(i) = sum(sSubj);
+    counts = sum(current_spectrum);
+    sSubjNorm = current_spectrum ./ counts;
+    countsNorm(i) = sum(sSubjNorm);
+end
+figure
+plot(countsNorm)

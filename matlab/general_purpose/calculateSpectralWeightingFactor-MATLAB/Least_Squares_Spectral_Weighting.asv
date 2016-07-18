@@ -1,0 +1,133 @@
+
+% import background-subtracted time-resolved EELS spectra (spectrum image)
+% this is generated from DM via a custom script called dumpSIToText_wb.s
+
+% % THIS CELL ONLY NEEDS TO RUN ONCE 
+% % IT IMPORTS DATA FROM INPUT FILE AND STORES STATIC VARIABLES
+inFile = '140404_7bCeO2crush_Nion100kV_timeResolved-CeM-BKGDSUBSI-870.txt';
+importdata( inFile );
+d = ans.data; % store data as variable
+eV = d( :, 1 ); % energy-loss axis is in first column of inFile
+
+%%
+% % USER DEFINED VARIABLES
+% define constituent spectra (i.e. spectra A and B in alpha*A+beta*B)
+column_A = 2; % column number of spectrum A
+column_B = 300; % column number of spectrum B
+averaging = 7; % average over spectra to smooth reference spectra A and B
+
+spectra = column_B - column_A;
+if averaging > 1 % for averagin of spectra A and B
+    spectrum_A = ...
+        sum( d( :, column_A:( column_A + averaging ) ), 2 ) / averaging;
+    spectrum_B = ...
+        sum( d( :, column_B:( column_B + averaging ) ), 2 ) / averaging;
+else
+    spectrum_A = d( :, column_A ); % column number of spectrum A
+    spectrum_B = d( :, column_B ); % column number of spectrum A
+end
+
+close all
+
+% plot reference spectra A and B
+spec_AB_fig = figure(1)
+plot( eV, spectrum_A )
+hold on
+plot( eV, spectrum_B )
+legend( 'Spectrum A', 'Spectrum B' )
+hold off
+
+% GENERATE LIBRARY OF THEORETICAL SPECTRA TO MATCH AGAINST
+% number of alpha-beta combinations to generate reference spectra
+ab_combinations = 10;
+
+diff_squared_fig = figure(2)
+alpha_beta_fig = figure(3)
+
+ref_spectra = [];
+for h = 1 : ab_combinations % iterate through alpha
+    a = ( h - 1 ) / ( ab_combinations - 1 );
+    b = 1 - a; % define beta
+    % add reference spectrum to matching library
+    ref_spectra( :, h ) = ( a * spectrum_A + b * spectrum_B);
+end
+
+% MATCH EACH EXPERIMENTAL SPECTRUM TO EACH SPECTRUM IN MATCHING LIBRARY
+diff_spectra = [];
+sum_diff_spectrum_squared = [];
+delta = [];
+alpha = [];
+beta = [];
+for i = column_A : column_B
+    spectrum_i = d( :, i ); % store ith spectrum in variable
+    
+    for j = 1 : ab_combinations
+        ref_spectrum = ref_spectra( :, j ); % from matching library
+        diff_spectrum = spectrum_i - ref_spectrum; % experiment - reference
+        diff_spectra( j, : ) = diff_spectrum;
+        diff_spectrum_sqaured = diff_spectrum .^ 2;
+        % average of squared difference
+        sum_diff_spectrum_squared( j ) = sum( diff_spectrum_sqaured );
+    end
+    
+    % minimum in summed difference spectrum squared corresponds to best 
+    % linear combination (i.e. most similar to experimental spectrum)
+    [ minVal, minIndex ] = min( sum_diff_spectrum_squared );
+    % least sqaure of difference for spectrum_i
+    delta( i ) = minVal;
+    % alpha for spectrum_i
+    alpha( i ) = minIndex / ab_combinations ;
+    beta( i ) = 1 - alpha( i );
+    
+    % % PLOTTING RESULTS
+    % make curve color change from blue to red
+    r = 0;
+    g = i;
+    b = column_B - i;
+    color = [ g r b ] / column_B;
+    
+    figure( diff_squared_fig )
+    plot( sum_diff_spectrum_squared, 'color', color )
+    ylim( [ 0 1e9 ] ); % define axis y-limit
+    hold on
+    drawnow
+    
+    figure( alpha_beta_fig )
+    plot( i, alpha( i ), 'o', 'color', color )
+    hold on
+    plot( i, beta( i ), 's', 'color', color )
+    drawnow
+    
+end
+hold off
+
+figure( diff_squared_fig )
+xlabel( 'AB combinations' );
+ylabel( 'Sum of squared difference' );
+
+figure( alpha_beta_fig )
+ylabel( 'alpha, beta' );
+xlabel( 'Spectrum' );
+legend( 'alpha', 'beta' )
+
+%%
+% figure( 3 )
+% median_delta = median( delta ) ;
+% dev_from_median_delta = median_delta - delta ;
+% chi_squared = sum ( dev_from_median_delta .^ 2 ) / spectra ;
+% plot( dev_from_median_delta, 'o' );
+% % y_max = 2e6;
+% ylim( [ -1e5 1e5 ] );
+% styleFont( 'bold', 'arial', 18 );
+% 
+% %%
+% 
+% for i = 2 : spectra
+%     spectrum_i = d(:,i); % subject spectrum
+% %     counts(i) = sum(sSubj);
+%     counts = sum(spectrum_i);
+%     sSubjNorm = spectrum_i ./ counts;
+%     countsNorm(i) = sum(sSubjNorm);
+% end
+% figure
+% plot(countsNorm)
