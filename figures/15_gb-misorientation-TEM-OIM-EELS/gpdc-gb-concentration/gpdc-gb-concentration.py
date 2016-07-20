@@ -17,7 +17,7 @@ import csv, imp, os
 
 ''' ########################### USER-DEFINED ########################### '''
 # path to data file (make gui to pick files?)
-data_dir = 'C:/Users/willb/Dropbox/WillB/Crozier_Lab/Writing/2015_gb misorientation OIM EELS/figures/gpdc-gb-concentration/'
+data_dir = 'C:/Users/Besitzer/Dropbox/WillB/Crozier_Lab/Writing/15_WJB_gb misorientation OIM EELS/figures/gpdc-gb-character/'
 
 # concentration data; 
 d_conc_ang = data_dir + 'gpdc-gb-conc-v-angle_150828.txt'

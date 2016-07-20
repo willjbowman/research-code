@@ -18,7 +18,7 @@ import math as math
 
 ''' ########################### USER-DEFINED ########################### '''
 # path to data file (make gui to pick files?)
-fig_dir = 'C:/Users/willb/Dropbox/WillB/Crozier_Lab/Writing/2015_gb misorientation OIM EELS/figures/gpdc-gb-character/'
+fig_dir = 'C:/Users/Besitzer/Dropbox/WillB/Crozier_Lab/Writing/15_WJB_gb misorientation OIM EELS/figures/gpdc-gb-character/'
 
 # misorientation angle distribution (MAD)
 d_mad = fig_dir + 'misorientation-distribution/GPDCfib_gbLengthFraction.txt'
