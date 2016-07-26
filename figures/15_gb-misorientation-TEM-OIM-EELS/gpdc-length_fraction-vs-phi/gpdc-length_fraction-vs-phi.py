@@ -26,6 +26,9 @@ data_dir = 'C:/Users/Besitzer/Dropbox/WillB/Crozier_Lab/Research_PhD/code/'+\
     
 fig_dir = data_dir
 
+# experimental misorientation angles (MAD)
+d_ema = fig_dir + 'GPDC-FIB_misorientation-angles.txt'
+d_ema_skiprows = 1
 # misorientation angle distribution (MAD)
 d_mad = fig_dir + 'GPDCfib_gbLengthFraction.txt'
 d_mad_skiprows = 1
@@ -64,6 +67,7 @@ mack_scalar, mack_shift = 14, -0.004
 
 # generate data objects from .txt, skip header rows, store cols as variables
 # data = np.genfromtxt( d, skiprows=1, delimiter = '\t' )
+ema, ema_stdev  = np.genfromtxt( d_ema, skiprows=d_ema_skiprows ).T
 mad_ang, mad = np.loadtxt( d_mad, skiprows=d_mad_skiprows ).T
 mack_ang, mack_cor, mack_rand = np.loadtxt( d_mack, skiprows=d_mack_skiprows ).T
 
@@ -75,15 +79,32 @@ na_pr3 = na_pr / 2
 na_gb3 = na_gd + na_pr3
 na_ratio_3 = na_gb3 / 0.13
 phi_gb = 0.6652 * na_ratio_3 - 0.622
+# exp_phi_gb = 0.6652 * na_ratio_3 - 0.622
+
+# m, b = np.polyfit( )
+m_phi_gb_exp, b_phi_gb_exp = np.polyfit( mack_ang, phi_gb, 1 )
+phi_gb_exp = m_phi_gb_exp * ema + b_phi_gb_exp
 
 pl.close( 'all' )
 pl.figure()
 pl.plot( mack_ang, phi_gb, ls='-' )
-pl.legend( ['Phi vs. Misor. ang.'] )
+
+t = phi_gb_exp
+s = [ 7**2 for n in range( len( t ) ) ] # [2]
+pl.scatter( ema, phi_gb_exp, s=s, c=phi_gb_exp, cmap=mpl.cm.spectral_r )
+pl.colorbar()
+pl.grid('on')
+pl.legend( ['Phi vs. Misor. ang.'], loc='best' )
 
 pl.figure()
 pl.plot( phi_gb, mack, ls='-' )
-pl.legend( ['Lenth fraction vs. Phi'] )
+pl.legend( ['Lenth fraction vs. Phi'], loc='best' )
+
+# fig = plt.figure()
+# ax = fig.add_subplot(111, projection='3d')
+# ax.plot( ema, phi_gb_exp, marker='s', ls='', cm= )
+# plt.show()
+# Axes3D.plot()
 
 
 # # clipping data so no overflow in x-axis (svg rendering bug)
@@ -165,3 +186,8 @@ pl.legend( ['Lenth fraction vs. Phi'] )
 #     pl.show()
 #     if save:
 #         save_fig( output_file + file_anno[h-1] ) # save files at each dpi
+'''
+REFS
+[1] http://stackoverflow.com/questions/17682216/scatter-plot-and-color-mapping-in-python
+[2] http://stackoverflow.com/questions/14827650/pyplot-scatter-plot-marker-size
+'''

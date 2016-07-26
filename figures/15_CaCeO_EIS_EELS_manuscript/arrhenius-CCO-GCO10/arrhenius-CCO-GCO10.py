@@ -191,6 +191,8 @@ for h in range( 1, len( file_anno ) + 1 ):
         pl.plot( TK_inv[i], np.log10( S_gb_sp_cc[i]), c=cols[i], marker=marks[i], ls='--', markersize=msize )
         # pl.plot( TK_inv[i], np.log10( S_gb_sp_dD[i]), c=cols[i], marker=marks[i], ls='-.' )
     
+        # this applies legend to last figure, see gpdc-electrical.py if you
+        # want to apply legends to each figure
         if h == len( file_anno ):
             # legend handler for ith curve
             leg_info = mpl.lines.Line2D( [], [], color = col, marker = mark, 

@@ -60,7 +60,8 @@ def colors( color_name ):
     custom_colors_RGB = {
     'dark_gold': [230, 200, 0],
     'eth_blue': [31, 64, 122],
-    'eth_green': [130, 190, 30]
+    'eth_green': [130, 190, 30],
+    'dark_grey': [100, 100, 100]
     }
     RGB = custom_colors_RGB[ color_name ]
     normalized_RGB = [ x/255 for x in RGB ]
@@ -223,18 +224,18 @@ def date_str():
 
 generate an output file name for saving figures.
 Usage:
->>> wf.save_name( dir, name, dpi, file_type )
+>>> wf.save_name( dir, name, dpi )
 
 '''
 
-def save_name( dir, name, dpi, file_type ):
+def save_name( dir, name, dpi ):
     basename = dir + name
     date = '-' + str( dt.date.today() ).replace( '-', '' )
     if dpi:
         dots = '-' + str( dpi ) + 'dpi'
     else:
         dots = ''
-    outname = basename + date + dots + '.' + file_type
+    outname = basename + date + dots
     print( 'file name: ' + outname )
     return outname
 

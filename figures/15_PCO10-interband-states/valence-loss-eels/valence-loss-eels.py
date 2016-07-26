@@ -21,7 +21,7 @@ import math as math
 # saved here with a file name containing the directory name
 fig_dir = 'valence-loss-eels'
 # this is the full path to figure directory (for reading data and writing files)
-figs_dir = 'C:/Users/willb/Dropbox/WillB/Crozier_Lab/Writing/2015_PCO10 interband states/figures/' + fig_dir + '/'
+figs_dir = 'C:/Users/willb/Dropbox/WillB/Crozier_Lab/Writing/15_WJB_PCO10 interband states/figures/' + fig_dir + '/'
 
 # PCO particles
 d_0 = figs_dir + 'pco-valence-loss.txt'
@@ -34,6 +34,8 @@ d_1_skiprows = 1
 # create a figure of size ( width", height" )
 font_size, dots, file_type, fig_size = 10, [ 300, 1200 ], 'png', ( 4.75, 2.2 )
 # sub_plots = ( 2, 1, 1 ) # suplot 0 ( sub_y, sub_x, sub_i )
+saving = True
+saving = False
 
 # subplot 0 (sp0): length fraction v misorientation angle
 sp0_ax_labs = [ 'Energy-loss / eV', 'Counts / Arb. units' ]
@@ -114,8 +116,9 @@ pl.tight_layout( pad=0.3, h_pad=0.6 )
 output_dir = figs_dir
 output_file = fig_dir
 
-for dot in dots:
-    output_name = wf.save_name( figs_dir, output_file, dot, file_type )
-    pl.savefig( output_name, format = file_type, dpi = dot, transparent = True )
+if saving:
+    for dot in dots:
+        output_name = wf.save_name( figs_dir, output_file, dot, file_type )
+        pl.savefig( output_name, format = file_type, dpi = dot, transparent = True )
 
 ''' ########################### REFERENCES ########################### '''
