@@ -24,8 +24,12 @@ ref_d1 =  data_dir + 'CaO2_F4--mmm_139_Kotov_1941_ZhurFizichKhim_20275.csv'
 
 # path to output directory
 output_dir = data_dir
-# subfolder_save = True
 output_file = 'CCO-XRD'
+subfolder_save = True
+save = True
+# save = False
+
+fig_size = ( 6, 3 ) # ( width, hight ) in inches
 
 # font size, resolution (DPI), file type
 fsize, dots, file_types = 10, [300], ['png','svg']
@@ -40,6 +44,7 @@ y1_lab, y2_lab = 'Counts (Arbitrary units)', ''
 # file_anno = [ '-0of1', '-1of1' ]
 file_anno = [] # for single fig with all curves
 x_lims, y1_lims, y2_lims = [25, 60], [-900, 200], [.1, .6]
+x_lims_1, y1_lims_1, y2_lims_1 = [25, 40], [-875, -350], [.1, .6]
 y1_ticks = False
 
 
@@ -58,14 +63,14 @@ def save_fig( output_file_name, subfolder_save=True ):
     for file_type in file_types:
         if file_type == 'png':
             for dot in dots:
-                output_name = wf.save_name( output_dir, output_file_name, dot, 
-                    file_type )
-                pl.savefig( output_name, format = file_type, dpi = dot, 
-                    transparent = True )
+                output_name = wf.save_name( output_dir, output_file_name, dot,
+                file_type=file_type )
+                pl.savefig( output_name, format=file_type, dpi=dot, 
+                    transparent=True )
         elif file_type == 'svg':
-                output_name = wf.save_name( output_dir, output_file_name, False, 
-                    file_type )
-                pl.savefig( output_name, format = file_type )
+                output_name = wf.save_name( output_dir, output_file_name, False,
+                file_type=file_type )
+                pl.savefig( output_name, format=file_type )
 
 def clip_xy( lims_x, arr_x, arr_y ):
     min_ind = np.where( arr_x > lims_x[0] )[0][0]
@@ -83,22 +88,14 @@ d_ref0 = np.genfromtxt( ref_d0, delimiter = ',' )
 d_ref1 = np.genfromtxt( ref_d1, delimiter = ',' )
 
 # x, x_gb, x_gb_err, S_gb, S_gb_err = d.T
-# x_2p, y_2p = d_exp[:,0], d_exp[:,1]
 x_2p, y_2p = clip_xy( x_lims, d_exp[:,0], d_exp[:,1] )
-# x_2s, y_2s = d_exp[:,2], d_exp[:,3]
 x_2s, y_2s = clip_xy( x_lims, d_exp[:,2], d_exp[:,3] )
-# x_5p, y_5p = d_exp[:,4], d_exp[:,5]
 x_5p, y_5p = clip_xy( x_lims, d_exp[:,4], d_exp[:,5] )
-# x_5s, y_5s = d_exp[:,6], d_exp[:,7]
 x_5s, y_5s = clip_xy( x_lims, d_exp[:,6], d_exp[:,7] )
-# x_10p, y_10p = d_exp[:,8], d_exp[:,9]
 x_10p, y_10p = clip_xy( x_lims, d_exp[:,8], d_exp[:,9] )
-# x_10s, y_10s = d_exp[:,10], d_exp[:,11]
 x_10s, y_10s = clip_xy( x_lims, d_exp[:,10], d_exp[:,11] )
 
-# x_CaO, y_CaO = d_ref0[:,0], d_ref0[:,1]
 x_CaO, y_CaO = clip_xy( x_lims, d_ref0[:,0], d_ref0[:,1] )
-# x_CaO2, y_CaO2 = d_ref0[:,0], d_ref1[:,1]
 x_CaO2, y_CaO2 = clip_xy( x_lims, d_ref0[:,0], d_ref1[:,1] )
 
 ys = [ y_2p, y_2s, y_5p, y_5s, y_10p, y_10s, y_CaO, y_CaO2 ]
@@ -107,17 +104,35 @@ norm_ys = []
 for i in np.arange( len(ys) ):
     norm_ys.append( wf.normalize( ys[i], norm ) - ( 1.2 * i * norm ) )
 
+# x, x_gb, x_gb_err, S_gb, S_gb_err = d.T
+x_2p_1, y_2p_1 = clip_xy( x_lims_1, d_exp[:,0], d_exp[:,1] )
+x_2s_1, y_2s_1 = clip_xy( x_lims_1, d_exp[:,2], d_exp[:,3] )
+x_5p_1, y_5p_1 = clip_xy( x_lims_1, d_exp[:,4], d_exp[:,5] )
+x_5s_1, y_5s_1 = clip_xy( x_lims_1, d_exp[:,6], d_exp[:,7] )
+x_10p_1, y_10p_1 = clip_xy( x_lims_1, d_exp[:,8], d_exp[:,9] )
+x_10s_1, y_10s_1 = clip_xy( x_lims_1, d_exp[:,10], d_exp[:,11] )
+
+x_CaO_1, y_CaO_1 = clip_xy( x_lims_1, d_ref0[:,0], d_ref0[:,1] )
+x_CaO2_1, y_CaO2_1 = clip_xy( x_lims_1, d_ref0[:,0], d_ref1[:,1] )
+
+ys_1 = [ y_2p_1, y_2s_1, y_5p_1, y_5s_1, y_10p_1, y_10s_1, y_CaO_1, y_CaO2_1 ]
+norm_ys_1 = []
+
+for i in np.arange( len(ys_1) ):
+    norm_ys_1.append( wf.normalize( ys_1[i], norm ) - ( 1.2 * i * norm ) )
+
 
 '''GENERATE FIGURES'''
 
 if len( file_anno ) == 0:
     
     pl.close( 'all' ) # close all open figures
-    pl.figure( figsize = ( 3.5, 3.5 ) ) # create a figure ( w, h )
-    ax0 = pl.gca() # store current axis
+    pl.figure( figsize = fig_size ) # create a figure ( w, h )
     mpl_customizations() # apply customizations to matplotlib
     # wf.slide_art_styles() # figure styling
     fontsize = mpl.rcParams[ 'font.size' ]
+
+    pl.subplot2grid( (1,2), (0,0) ) # ((rows,cols),(subplot_index))
     
     pl.plot( x_2p, norm_ys[0], color=cols[0], lw = width )
     pl.plot( x_2s, norm_ys[1], color=cols[0], dashes=dash, lw = width )
@@ -128,12 +143,32 @@ if len( file_anno ) == 0:
     pl.plot( x_CaO, norm_ys[6], color=cols[3], lw = width )
     pl.plot( x_CaO2, norm_ys[7], color=cols[3], dashes=dash, lw = width )
     
+    ax0 = pl.gca() # store current axis
     ax0.set_xlim( x_lims )
     ax0.set_ylim( y1_lims )
     ax0.set_xlabel( x_lab )
     ax0.set_ylabel( y1_lab )
     ax0.set_yticks([])
     ax0.minorticks_on()
+
+    pl.subplot2grid( (1,2), (0,1) ) # ((rows,cols),(subplot_index))
+    
+    # pl.plot( x_2p, norm_ys[0], color=cols[0], lw = width )
+    # pl.plot( x_2s, norm_ys[1], color=cols[0], dashes=dash, lw = width )
+    # pl.plot( x_5p, norm_ys[2], color=cols[1], lw = width )
+    # pl.plot( x_5s, norm_ys[3], color=cols[1], dashes=dash, lw = width )
+    pl.plot( x_10p_1, norm_ys_1[4], color=cols[2], lw = width )
+    pl.plot( x_10s_1, norm_ys_1[5], color=cols[2], dashes=dash, lw = width )
+    pl.plot( x_CaO_1, norm_ys_1[6], color=cols[3], lw = width )
+    pl.plot( x_CaO2_1, norm_ys_1[7], color=cols[3], dashes=dash, lw = width )
+    
+    ax1 = pl.gca() # store current axis
+    ax1.set_xlim( x_lims_1 )
+    ax1.set_ylim( y1_lims_1 )
+    ax1.set_xlabel( x_lab )
+    ax1.set_ylabel( y1_lab )
+    ax1.set_yticks([])
+    ax1.minorticks_on()
     
     # ax1_leg_hand = mpl.lines.Line2D( [], [], c=cols[0], marker=marks[0], ms=msize, ls='' )    
     # ax1.legend( [ax1_leg_hand], leg_ents, loc = 'upper right',
@@ -141,7 +176,8 @@ if len( file_anno ) == 0:
     #     handletextpad = .01 )
     #         
     pl.tight_layout() # can run once to apply to all subplots, i think
-    save_fig( output_file )
+    if save:
+        save_fig( output_file )
     
 
 elif len( file_anno ) > 0:

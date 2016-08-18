@@ -50,7 +50,7 @@ sp0_maj_loc = [ 0.5e5, 0.5e5 ] # [x,y] major tick locators
 sp0_leg_loc = 'upper right'
 
 # subplot1 (sp1): length fraction v concentration
-sp1_ax_labs = [ r'10$^{3}$/T (1/K)', r'$\sigma_{G.B.}$ (S $cm^{-1})$' ]
+sp1_ax_labs = [ r'10$^{3}$/T (1/K)', r'$\sigma$ (S $cm^{-1})$' ]
 sp1_entries = ( 'GdCeO$_2$', '(Pr,Gd)CeO$_2$' )
 sp1_c = [ 'maroon', wf.colors('dark_grey') ] # line colors
 sp1_m, sp1_m_width = [ '^', 'o' ], 1 # markers
@@ -74,7 +74,7 @@ def mpl_customizations():
       frameon=False, fontsize=10, labelspacing=.01 )
 
 def sp0_style( ax ):
-    wf.ax_limits( sp0_lims )
+    # wf.ax_limits( sp0_lims )
     pl.minorticks_on()
     wf.ax_labels( sp0_ax_labs )
     wf.major_ticks( ax, sp0_maj_loc, scientific=True )
@@ -103,6 +103,9 @@ a, gpdc_x, gpdc_gr_S, gpdc_gr_S_err, gpdc_gb_S, gpdc_gb_S_err = \
 b, gdc_x, gdc_gr_S, gdc_gr_S_err, gdc_gb_S, gdc_gb_S_err = \
     np.loadtxt( d_2, skiprows=d_2_skiprows ).T
 
+nyq_x_clip, nyq_y_clip, nyq_x_lims = wf.clip_xy( sp0_lims[0], sp0_x0, sp0_y0 )
+fit_x_clip, fit_y_clip, fit_x_lims = wf.clip_xy( sp0_lims[0], sp0_x1, sp0_y1 )
+
 gr_x = [ gdc_x, gpdc_x ]
 gr_y = [ gdc_gr_S, gpdc_gr_S ]
 gr_y_err = [ gdc_gr_S_err, gpdc_gr_S_err ]
@@ -116,7 +119,7 @@ pl.close( 'all' ) # close all open figures
 for h in range( 0, len( file_anno ) ):
 
     # pl.close( 'all' ) # close all open figures
-    pl.figure( figsize = fig_size ) # create a figure of size ( width", height" )
+    pl.figure( figsize=fig_size ) # create a figure of size ( width", height" )
     ax = pl.gca() # store current axis
     mpl_customizations() # apply customizations to matplotlib
 
@@ -125,9 +128,11 @@ for h in range( 0, len( file_anno ) ):
         # print( h, i )
         pl.subplot( 2, 1, 1 ) # suplot 0 ( sub_y, sub_x, sub_i )
         ax0 = pl.gca()
-        pl.plot( sp0_x0, sp0_y0, c=sp0_c[0], marker=sp0_m[0], ls=sp0_ls[0] )
-        pl.plot( sp0_x1, sp0_y1, c=sp0_c[1], marker=sp0_m[1], ls=sp0_ls[1] )
+        pl.plot( nyq_x_clip, nyq_y_clip, c=sp0_c[0], marker=sp0_m[0], ls=sp0_ls[0] )
+        pl.plot( fit_x_clip, fit_y_clip, c=sp0_c[1], marker=sp0_m[1], ls=sp0_ls[1] )
         sp0_style( ax0 )
+        ax0.set_xlim( nyq_x_lims )
+        ax0.set_ylim( sp0_lims[1] )
 
         col, mark = sp1_c[i], sp1_m[i]
 
@@ -135,7 +140,7 @@ for h in range( 0, len( file_anno ) ):
         ax1 = pl.gca()
         pl.errorbar( gr_x[i], gr_y[i], gr_y_err[i], c=col, marker=mark, 
             ls=sp1_ls[0] )
-        pl.errorbar( gr_x[i], gb_y[i], gb_y_err[i], c=col, marker=mark, 
+        pl.errorbar( gr_x[i], gb_y[i], gb_y_err[i], c=col, marker=mark,
             ls=sp1_ls[1] )
         sp1_style( ax1 )
 
@@ -177,9 +182,9 @@ for h in range( 0, len( file_anno ) ):
         # pass
         if not os.path.isdir( output_dir ):
             os.mkdir( output_dir )
-        output_name = wf.save_name( output_dir, output_file + file_anno[h], 
+        output_name = wf.save_name( output_dir, output_file+file_anno[h], 
             dot)
         pl.savefig( output_name+'.png', format='png', dpi=dot, transparent=True )
-        pl.savefig( output_name+'.svg', format='svg', transparent = True )
+        pl.savefig( output_name+'.svg', format='svg', transparent=True )
 
 ''' ########################### REFERENCES ########################### '''

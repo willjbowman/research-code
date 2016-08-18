@@ -224,18 +224,18 @@ def date_str():
 
 generate an output file name for saving figures.
 Usage:
->>> wf.save_name( dir, name, dpi )
+>>> wf.save_name( dir, name, dpi, file_type )
 
 '''
 
-def save_name( dir, name, dpi ):
+def save_name( dir, name, dpi, file_type ):
     basename = dir + name
     date = '-' + str( dt.date.today() ).replace( '-', '' )
     if dpi:
         dots = '-' + str( dpi ) + 'dpi'
     else:
         dots = ''
-    outname = basename + date + dots
+    outname = basename + date + dots + '.' + file_type
     print( 'file name: ' + outname )
     return outname
 

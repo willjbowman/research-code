@@ -35,7 +35,7 @@ output_dir = writing_dir +\
 fsize, dots, file_types = 10, [300], ['png','svg']
 
 saving = True
-# saving = False
+saving = False
 
 
 ''' ########################### FUNCTIONS ########################### '''
@@ -77,7 +77,8 @@ ax = pl.gca()
 pl.plot( ev_ceo2_pl, ceo2_pl, color='black', lw = 0.8, dashes = [ 2, 2 ] )
 pl.plot( ev, raw, color = wf.colors('dark_grey'), lw = 0.8, dashes = [ 2, 2 ] )
 pl.plot( ev, processed, color = 'maroon', lw = 0.5, ls = '-' )
-pl.legend( ( r'CeO$_{2}$', 'PCO', 'PCO Processed' ), loc = 'upper left', fontsize = fontsize, frameon = False )
+pl.legend( ( r'CeO$_{2}$', 'PCO', 'PCO Processed' ), loc='upper left',
+		fontsize=fontsize, frameon=False )
 pl.xlim( x_min, x_max )
 pl.ylim( y_min, y_max )
 pl.xlabel( x_label )
