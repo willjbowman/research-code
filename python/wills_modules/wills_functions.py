@@ -3,7 +3,7 @@ import add_modules_to_syspath # put ~/wills_modules in pyzo path variable
 import numpy as np
 import pylab as pl
 import matplotlib as mpl
-import csv
+import csv, imp, os
 import wills_functions as wf
 import datetime as dt
 
@@ -219,6 +219,33 @@ Usage:
 
 def date_str():
     return str( dt.date.today() ).replace( '-', '' )
+
+''' ########################## save_fig ########################## 
+
+save figure as .png or .svg.
+Usage:
+>>> wf.save_fig( output_file_name, subfolder_save=True )
+
+'''
+    
+def save_fig( data_dir, file_types, dots, output_file_name, subfolder_save=True ):
+    # create subfolder with date as name
+    if subfolder_save:
+        output_dir = data_dir + wf.date_str() + '/'
+        if not os.path.isdir( output_dir ):
+            os.mkdir( output_dir )
+
+    for file_type in file_types:
+        if file_type == 'png':
+            for dot in dots:
+                output_name = wf.save_name( output_dir, output_file_name, dot,
+                file_type )
+                pl.savefig( output_name, format=file_type, dpi=dot, 
+                    transparent=True )
+        elif file_type == 'svg':
+                output_name = wf.save_name( output_dir, output_file_name, False,
+                file_type )
+                pl.savefig( output_name, format=file_type, transparent=True )
 
 ''' ########################## save_name ########################## 
 

@@ -16,13 +16,15 @@ import csv, imp, os
 
 
 ''' ########################### USER-DEFINED ########################### '''
-# make gui to pick files?
-data_dir = 'C:/Users/Besitzer/Dropbox/WillB/Crozier_Lab/Writing/15_WJB_IS EBSD EELS Ca-Ceria gbs/figures/arrhenius-CCO-GCO10/CCO-GCO10/' # path to data file
+# absolute path to figure work directory
+data_dir = 'C:/Users/Besitzer/Dropbox/WillB/Crozier_Lab/Writing/'+\
+    '15_WJB_IS EBSD EELS Ca-Ceria gbs/figures/'+\
+    'CCO-arrhenius-GCO10/CCO-GCO10/'
 
 # electrical and sample data:s
 d_ele = [ data_dir + '140325_sdCaDC2_100-700c-PUB_ELECTRICAL.txt',
     data_dir + '140327_sdCaDC5_100-700c_pub_ELECTRICAL.txt',
-    data_dir + '140617_sdCa10DC-2_150-700c_PUB_ELECTRICAL.txt',
+    data_dir + '140617_sdCa10DC-2_150-700c_PUB_ELECTRICAL_v1.txt',
     data_dir + '140612_sdGDC10-2_150-700c_ELECTRICAL.txt'
     ]
     
@@ -34,11 +36,14 @@ d_sam = [ data_dir + '140325_sdCaDC2_100-700c-PUB_SAMPLE.txt',
 
 # path to output directory
 output_dir = data_dir + wf.date_str() + '/'
-output_file = 'arrhenius-CCO-GCO10'
+output_file = 'CCO-arrhenius-GCO10'
+subfolder_save = True
+save = True
+# save = False
 
 # font size, resolution (DPI), file type
-fsize, dots, file_type = 10, [300,1200], 'png'
-cols = [ 'maroon', 'grey', 'black', 'goldenrod' ] # wf.colors('dark_gold')  [ 255/255, 40/255, 40/255 ]
+fsize, dots, file_types = 10, [300], ['png','svg']
+cols = [ 'maroon', 'grey', 'black', 'goldenrod' ]
 marks, msize = [ 's', 'o', '^', 'x' ], 6
 leg_ents = [ '2Ca', '5Ca', '10Ca', '10Gd' ]
 x_lab, y_lab = '1000/T (1/K)', '$log\sigma$ (S/cm)'
@@ -47,7 +52,7 @@ x_lab, y_lab = '1000/T (1/K)', '$log\sigma$ (S/cm)'
 # del_gb_nm, del_gb_nm_Co5, del_gb_nm_Co1, del_gb_nm_Co2 = 2, 2, 2, 2 # gb width (nm)
 del_gb_nm = 2 # gb width (nm)
 
-x_lims, y_lims = [ 1, 2.4 ], [ -14, 0 ]
+x_lims, y_lims = [ 1, 2.4 ], [ -15, -1 ]
 file_anno = [ '-0of3', '-1of3', '-2of3', '-3of3' ]
 
 ''' ########################### FUNCTIONS ########################### '''
@@ -186,19 +191,17 @@ for h in range( 1, len( file_anno ) + 1 ):
     for i in range( 0, h ):
     # for i in range( 0, 1 ):
         col, mark = cols[i], marks[i]
-        pl.plot( TK_inv[i], np.log10(S_gr[i]), c=cols[i], marker=marks[i], markersize=msize )
+        pl.plot( TK_inv[i], np.log10(S_gr[i]), c=cols[i], 
+            marker=marks[i], markersize=msize )
         # pl.plot( TK_inv[i], np.log10( S_tot[i] ), marker=marks[i] )
-        pl.plot( TK_inv[i], np.log10( S_gb_sp_cc[i]), c=cols[i], marker=marks[i], ls='--', markersize=msize )
+        pl.plot( TK_inv[i], np.log10( S_gb_sp_cc[i]), c=cols[i], 
+            marker=marks[i], ls='--', markersize=msize )
         # pl.plot( TK_inv[i], np.log10( S_gb_sp_dD[i]), c=cols[i], marker=marks[i], ls='-.' )
     
-        # this applies legend to last figure, see gpdc-electrical.py if you
-        # want to apply legends to each figure
-        if h == len( file_anno ):
-            # legend handler for ith curve
-            leg_info = mpl.lines.Line2D( [], [], color = col, marker = mark, 
-                markersize = msize, linestyle = '-' )
-            legend_handles.append( leg_info ) # append ith legend handler to legend handles
-    
+    # apply legend to each figure
+    leg_info = mpl.lines.Line2D( [], [], color=cols[h-1], marker=marks[h-1], 
+        markersize=msize, linestyle='-' )
+    legend_handles.append( leg_info )
     
     # pl.legend( leg_ents )
     pl.ylabel( y_lab, labelpad=1.5 )
@@ -208,10 +211,13 @@ for h in range( 1, len( file_anno ) + 1 ):
     
     ax2 = ax.twiny() #create a second x-axis which shares ax1's y-axis
     Tc_axis_label = 'T ($^\circ$C)'
-    ax2_Tc_ticks = np.linspace( 700, 100, 13 ) # Celcius axis ticks and labels
-    ax2_Tc_ticklabels = np.array( [ 700, '', '', '', 500, '', 400, '', 300, '', 200, '', 100 ] )
-    ax2_tick_Tk_locations = 1000 / ( ax2_Tc_ticks + 273 ) #calculate 2nd axis tick locations
-    ax2_tick_Tc_locations = ( ax2_tick_Tk_locations - x_lims[0] ) / ( x_lims[1] - x_lims[0] )
+    ax2_Tc_ticks = np.linspace( 700, 150, 12 ) # Celcius axis ticks and labels
+    ax2_Tc_ticklabels = np.array( [ 700, '', '', '', 500, '', 400, '',
+        300, '', 200, '' ] )
+    #calculate 2nd axis tick locations
+    ax2_tick_Tk_locations = 1000 / ( ax2_Tc_ticks + 273 ) 
+    ax2_tick_Tc_locations = ( ax2_tick_Tk_locations - x_lims[0] ) / \
+        ( x_lims[1] - x_lims[0] )
     ax2.set_xticks( ax2_tick_Tc_locations ) #add ticks and labels to 2nd axis
     ax2.set_xticklabels( ax2_Tc_ticklabels )
     ax2.set_xlabel( Tc_axis_label )
@@ -223,16 +229,12 @@ for h in range( 1, len( file_anno ) + 1 ):
     # ax.legend( leg_ents )
     ax.legend( legend_handles, leg_ents, loc = 'lower left',
         numpoints = 1, frameon = False, fontsize = 10, labelspacing = .01,
-        handletextpad = .01 )
+        handletextpad = .2 )
     # pl.ylabel( y_lab, labelpad=1.5 )
     # pl.xlabel( x_lab, labelpad=1.5 )
     
-    for dot in dots:
-        # pass
-        if not os.path.isdir( output_dir ):
-            os.mkdir( output_dir )
-        output_name = wf.save_name( output_dir, output_file + file_anno[h-1], dot, file_type )
-        pl.savefig( output_name, format = file_type, dpi = dot, transparent = True )
+    if save:
+        wf.save_fig( data_dir, file_types, dots, output_file+file_anno[h-1] )
 
 
 ''' ########################### REFERENCES ########################### '''

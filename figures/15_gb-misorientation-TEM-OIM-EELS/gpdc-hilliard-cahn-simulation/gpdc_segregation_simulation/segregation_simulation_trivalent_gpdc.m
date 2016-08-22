@@ -20,7 +20,8 @@ par_file = 'segpar_ceria3_xiaorui.txt';
 
 % fyv = fyv * 4 % scaling dopant-vacancy association energy
 % cd = cd * 1.3 % scaling gradient energy coefficient
-nos = linspace( 0.5, 1.9, 8 ); % variable parameter
+% nos = linspace( 0.5, 1.9, 8 ); % variable parameter
+nos = linspace( 0.1, 1.9, 10 ); % variable parameter
 len_nos = length( nos );
 par_name = 'no';
 par_vales = nos;
