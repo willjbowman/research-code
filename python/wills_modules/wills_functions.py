@@ -58,7 +58,7 @@ below
 
 def colors( color_name ):
     custom_colors_RGB = {
-    'dark_gold': [230, 200, 0],
+    'pale_gold': [255, 240, 155],
     'eth_blue': [31, 64, 122],
     'eth_green': [130, 190, 30],
     'dark_grey': [100, 100, 100]
@@ -197,7 +197,7 @@ script so each figure can be customized futher.
 def wills_mpl( fontsize ):
     mpl.rc( 'lines', linewidth=1.0, mew=0.01, markersize=3 )
     # mpl.rc( 'pathces' )
-    mpl.rc( 'font', family='sans-serif', serif='Helvetica', weight='normal',
+    mpl.rc( 'font', family='sans-serif', serif='Arial', weight='normal',
         size=fontsize )
     # mpl.rc( 'text' )
     # mpl.rc( 'axes' )
@@ -213,12 +213,12 @@ def wills_mpl( fontsize ):
 generate a string with current date formatted 'XXXXYYZZ', where XXXX is year
 YY is month and ZZ is day
 Usage:
->>> today_date = wf.date_str( )
+>>> today_date = wf.date_str( mill='' )
 
 '''
 
-def date_str():
-    return str( dt.date.today() ).replace( '-', '' )
+def date_str( mill='' ):
+    return str( dt.date.today() ).replace('-','').replace('20',mill)
 
 ''' ########################## save_fig ########################## 
 
@@ -228,41 +228,42 @@ Usage:
 
 '''
     
-def save_fig( data_dir, file_types, dots, output_file_name, subfolder_save=True ):
+def save_fig( fig_dir, file_types, dots, output_file_name, anno,
+    subfolder_save=True ):
     # create subfolder with date as name
     if subfolder_save:
-        output_dir = data_dir + wf.date_str() + '/'
+        output_dir = fig_dir + wf.date_str() + '/'
         if not os.path.isdir( output_dir ):
             os.mkdir( output_dir )
 
     for file_type in file_types:
         if file_type == 'png':
             for dot in dots:
-                output_name = wf.save_name( output_dir, output_file_name, dot,
-                file_type )
+                output_name = wf.save_name( output_dir, output_file_name, anno,
+                dot, file_type )
                 pl.savefig( output_name, format=file_type, dpi=dot, 
                     transparent=True )
         elif file_type == 'svg':
-                output_name = wf.save_name( output_dir, output_file_name, False,
-                file_type )
+                output_name = wf.save_name( output_dir, output_file_name, anno,
+                False, file_type )
                 pl.savefig( output_name, format=file_type, transparent=True )
 
 ''' ########################## save_name ########################## 
 
 generate an output file name for saving figures.
 Usage:
->>> wf.save_name( dir, name, dpi, file_type )
+>>> wf.save_name( dir, name, anno, dpi, file_type )
 
 '''
 
-def save_name( dir, name, dpi, file_type ):
+def save_name( dir, name, anno, dpi, file_type ):
     basename = dir + name
-    date = '-' + str( dt.date.today() ).replace( '-', '' )
+    date = '-' + str( dt.date.today() ).replace('-','').replace('20','')
     if dpi:
         dots = '-' + str( dpi ) + 'dpi'
     else:
         dots = ''
-    outname = basename + date + dots + '.' + file_type
+    outname = basename + date + anno + dots + '.' + file_type
     print( 'file name: ' + outname )
     return outname
 
