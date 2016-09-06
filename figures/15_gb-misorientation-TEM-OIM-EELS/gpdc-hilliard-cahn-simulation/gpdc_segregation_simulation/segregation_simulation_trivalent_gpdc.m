@@ -88,21 +88,21 @@ for h = 1:len_nos
     legend_info{g} = [ 'n = ' num2str( no_h ) ' n*, ' ...
         num2str( fwhm*1e9*2, 3) ' nm' ];
 
-    % figure( fig_nv )
-    % plot( nodes, v/(na_b_i/4), 'Linewidth', line_w )
-    % ylims = [ -0.3, 4.4 ];
-    % % apply_limits();
-    % if limit_x % refactor to a function
-    %     xlim( xlims );
-    % end
-    % if limit_y
-    %     ylim( ylims );
-    % end
-    % ylabel( 'nv/nv_{bulk}' )
-    % xlabel( x_label )
-    % legend( legend_info )
-    % hold on
-    % drawnow
+    figure( fig_nv )
+    plot( nodes, v/(na_b_i/4), 'Linewidth', line_w )
+    ylims = [ -0.3, 4.4 ];
+    % apply_limits();
+    if limit_x % refactor to a function
+        xlim( xlims );
+    end
+    if limit_y
+        ylim( ylims );
+    end
+    ylabel( 'nv/nv_{bulk}' )
+    xlabel( x_label )
+    legend( legend_info )
+    hold on
+    drawnow
 
     figure( fig_nd )
     plot( gca, nodes, y/na_b_i, 'Linewidth', line_w )

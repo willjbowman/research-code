@@ -15,6 +15,27 @@ to reload a module:
 '''
     
 
+''' ########################## fill_windows ########################## 
+
+fills between curves y0 and y1 over range of x values defined by fill_xs.
+fill color is fill_c.
+
+Example [CeO2-EELS-standard.py]:
+'''
+
+def fill_windows( x, y0, y1, fill_xs, fill_c ):
+    for i, xx in enumerate( fill_xs ):
+        if i < 1: # fill
+            pl.fill_between( x, y0, y1, facecolor=fill_c, edgecolor=fill_c,
+                where= x > xx )
+        elif i % 2: # odd
+            pl.fill_between( x, y0, y1, facecolor='w', edgecolor=fill_c,
+                    where= x > xx )
+        else: # even
+            pl.fill_between( x, y0, y1, facecolor=fill_c, edgecolor=fill_c,
+                where= x > xx )
+    
+
 ''' ########################## normalize ########################## 
 
 return list, 'curve', normalized to specified max value, 'normalized_max'
@@ -34,9 +55,10 @@ ys[i] is the list to be normalized to the max value of norm.
 '''
 
 def normalize( curve, normalized_max ):
-    curve_max = np.nanmax( curve )
-    scalar = normalized_max / curve_max
-    return curve * scalar
+    return curve / np.nanmax( curve ) * normalized_max
+    # curve_max = np.nanmax( curve )
+    # scalar = normalized_max / curve_max
+    # return curve * scalar
     
 
 ''' ########################## colors ########################## 
@@ -207,6 +229,7 @@ def wills_mpl( fontsize ):
         fontsize=fontsize )
     # mpl.rc( 'figure' )
     mpl.rc( 'mathtext', default='regular' )
+    mpl.rc( 'image', interpolation='none' )
 
 ''' ########################## date_str ########################## 
 

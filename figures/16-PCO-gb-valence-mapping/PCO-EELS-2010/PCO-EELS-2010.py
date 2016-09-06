@@ -85,7 +85,6 @@ def mpl_customizations():
 d_0 = np.genfromtxt( d_in_0, delimiter='\t' )
 d_1 = np.genfromtxt( d_in_1, delimiter='\t' )
 d_2 = np.genfromtxt( d_in_2, delimiter='\t' )
-d_2 = np.genfromtxt( d_in_2, delimiter='\t' )
 d_3 = np.genfromtxt( d_in_3, delimiter='\t', skiprows=3 )
 # d_ref0 = np.genfromtxt( ref_d0, delimiter = ',' )
 
