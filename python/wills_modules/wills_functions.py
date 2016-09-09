@@ -15,6 +15,53 @@ to reload a module:
 '''
     
 
+''' ########################## cols, marks ########################## 
+
+returns list of colors and marks for plotting.
+
+Example [ prettify_digitized_publication_data.py ]:
+
+idx, stripped_d_y = strip_nan( col ) # strip nans
+'''
+
+def cols():
+    return [ 'maroon', 'grey', 'black', 'goldenrod', 'red', 'pink', 'orange' ]
+
+def marks():
+    return [ 'o', '^', 'v', 's', 'D', '*', 'x' ]
+    
+
+''' ########################## strip_nan ########################## 
+
+strips nan values from array. returns indicies of the finite values, and the 
+array with nans removed.
+
+Example [ prettify_digitized_publication_data.py ]:
+
+idx, stripped_d_y = strip_nan( col ) # strip nans
+'''
+
+def strip_nan( array ):
+    idx = np.isfinite( array )
+    return idx, array[ idx ] # return indicies, and nan-stripped array
+    
+
+''' ########################## degC2invK, invK2degC ########################## 
+
+converts degrees C to inverse K (numerator_K/K) and vice versa.
+
+Example []:
+invK_800C = wf.degC2invK( 800, 1e3 )
+degC = wf.invK2degC( 1.4, 1e3 )
+'''
+
+def degC2invK( degC, numerator_K ):
+    return numerator_K / (degC + 273)
+
+def invK2degC( invK, numerator_K ):
+    return numerator_K / invK - 273
+    
+
 ''' ########################## fill_windows ########################## 
 
 fills between curves y0 and y1 over range of x values defined by fill_xs.
@@ -225,8 +272,8 @@ def wills_mpl( fontsize ):
     # mpl.rc( 'axes' )
     # mpl.rc( 'ticks' )
     # mpl.rc( 'grids' )
-    mpl.rc( 'legend', fancybox=False, borderpad=0.1, labelspacing=0.1,
-        fontsize=fontsize )
+    mpl.rc( 'legend', loc='best', frameon=False, labelspacing=.1,
+    handletextpad=.1, fancybox=False, borderpad=.1, fontsize=fontsize )
     # mpl.rc( 'figure' )
     mpl.rc( 'mathtext', default='regular' )
     mpl.rc( 'image', interpolation='none' )
@@ -251,23 +298,24 @@ Usage:
 
 '''
     
-def save_fig( fig_dir, file_types, dots, output_file_name, anno,
-    subfolder_save=True ):
+def save_fig( output_dir, file_types, dots, output_file_name, anno, subfolder_save ):
     # create subfolder with date as name
     if subfolder_save:
-        output_dir = fig_dir + wf.date_str() + '/'
-        if not os.path.isdir( output_dir ):
-            os.mkdir( output_dir )
+        new_dir = output_dir + wf.date_str() + '/'
+        if not os.path.isdir( new_dir ):
+            os.mkdir( new_dir )
+    else:
+        new_dir = output_dir
 
     for file_type in file_types:
         if file_type == 'png':
             for dot in dots:
-                output_name = wf.save_name( output_dir, output_file_name, anno,
+                output_name = wf.save_name( new_dir, output_file_name, anno,
                 dot, file_type )
                 pl.savefig( output_name, format=file_type, dpi=dot, 
                     transparent=True )
         elif file_type == 'svg':
-                output_name = wf.save_name( output_dir, output_file_name, anno,
+                output_name = wf.save_name( new_dir, output_file_name, anno,
                 False, file_type )
                 pl.savefig( output_name, format=file_type, transparent=True )
 

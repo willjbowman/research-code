@@ -27,15 +27,19 @@ par_name = 'no';
 par_vales = nos;
 
 paper_dir = [ 'C:/Users/Besitzer/Dropbox/WillB/Crozier_Lab/Writing/' ...
-    '15_WJB_gb misorientation OIM EELS/' ];
+    '15_WJB_gb misorientation OIM EELS/' ];  
+
+saving = 0;
 
 save_dir = [ paper_dir 'figures/'...
     'gpdc-hilliard-cahn-simulation/gpdc_segregation_simulation/' ...
     datestr(now, 'yymmdd') '_' par_name ...
     '_na-' num2str(na_bulks(1)*100) '/' ];
 
-if ~exist( save_dir )
-    mkdir( save_dir )
+if saving
+    if ~exist( save_dir )
+        mkdir( save_dir )
+    end
 end
 
 ys = cell( len_nos, 1 );
@@ -45,9 +49,10 @@ lamvs = zeros( len_nos, 1 );
 lambds = lamvs;
 nodess = ys;
 flags = lamvs;
-y_maxs = lamvs;
+y_maxs = lamvs; % gb solute concentration
 phi_maxs = lamvs;
 fwhms = flags;
+v_mins = lamvs; % minimum vacancy concentration at gb
 
 % close all
 fig_nv = figure( 'position', [0, 0, fig_w, fig_h] ); % [ bot_l, bot_r, w, h ]
@@ -68,6 +73,7 @@ for h = 1:len_nos
             );
         ys{h} = y; % dopant site fraction
         vs{h} = v; % vacancy site fraction
+        v_mins(h) = min(v) / na_b_i / 4; % O vacancy site frac. for 3+ solute
         phis{h} = phi;
         lamv(h) = lamv;
         lambd(h) = lambd;
@@ -90,14 +96,10 @@ for h = 1:len_nos
 
     figure( fig_nv )
     plot( nodes, v/(na_b_i/4), 'Linewidth', line_w )
-    ylims = [ -0.3, 4.4 ];
-    % apply_limits();
-    if limit_x % refactor to a function
-        xlim( xlims );
-    end
-    if limit_y
-        ylim( ylims );
-    end
+    xlims = [ 0, 5e-9 ];
+    ylims = [ -.1, 4 ];
+    xlim( xlims );
+    ylim( ylims );
     ylabel( 'nv/nv_{bulk}' )
     xlabel( x_label )
     legend( legend_info )
@@ -106,13 +108,9 @@ for h = 1:len_nos
 
     figure( fig_nd )
     plot( gca, nodes, y/na_b_i, 'Linewidth', line_w )
-    ylims = [ 0, 22 ];
-    if limit_x
-        xlim( xlims );
-    end
-    if limit_y
-        ylim( ylims );
-    end
+    % ylims = [ 0, 2.5 ];
+    xlim( xlims );
+    % ylim( ylims );
     ylabel( 'na/na_{bulk}' )
     xlabel( x_label )
     % legend( legend_info_y )
@@ -123,12 +121,8 @@ for h = 1:len_nos
     figure( fig_phi )
     plot( gca, nodes(1:length(nodes)-1), phi, 'Linewidth', line_w )
     ylims = [ -0.1, 1.1 ];
-    if limit_x
-        xlim( xlims );
-    end
-    if limit_y
-        ylim( ylims );
-    end
+    xlim( xlims );
+    % ylim( ylims );
     ylabel( 'phi (V)' )
     xlabel( x_label )
     legend( legend_info )
@@ -280,12 +274,15 @@ set( findall( gcf , '-property', 'FontSize' ), 'FontSize', 10 )
 set( findall( gcf , '-property', 'FontName' ), 'FontName', 'Arial' )
 
 % create save directory if it doesn't exist
-if ~exist( save_dir )
-    mkdir( save_dir )
+if saving
+    if ~exist( save_dir )
+        mkdir( save_dir )
+    end
+    save_name = [ save_dir 'solute-concentration' ];
+    saveas( gcf, save_name, 'svg' )
+    saveas( gcf, save_name, 'png' )
 end
-save_name = [ save_dir 'solute-concentration' ];
-saveas( gcf, save_name, 'svg' )
-saveas( gcf, save_name, 'png' )
+
 
 % PHI VS. DISTANCE
 
@@ -333,10 +330,86 @@ set( findall( gcf , '-property', 'FontSize' ), 'FontSize', 10 )
 set( findall( gcf , '-property', 'FontName' ), 'FontName', 'Arial' )
 
 % save
-save_name = [ save_dir 'space-charge' ];
-saveas( gcf, save_name, 'svg' )
-saveas( gcf, save_name, 'png' )
+if saving
+    % save_fig( save_dir, save_name, file_types ) % I want this method!!!!
+    if ~exist( save_dir )
+        mkdir( save_dir )
+    end
+    save_name = [ save_dir 'space-charge' ];
+    saveas( gcf, save_name, 'svg' )
+    saveas( gcf, save_name, 'png' )
+end
 
-% saveas( gcf, sprintf([ ...
-%     save_dir par_name '_' num2str(h) '_' num2str(par_val) '.png' ...
-% ]) )
+
+% vacancy concentration VS. distance
+
+% % plot the simulation
+% figure( 'position', [4, 0, 3, 3] * 96) % 1 px = 1/96 in
+% grey = 170;
+% for j=1:len_nos
+%     % rgb = j / len_nos * [ grey, grey, grey ] / 256;
+%     nodes = nodess{j};
+%     plot( nodes(1:length(nodes)-1), phis{j}, 'color', rgbs{j}, ...
+%         'linewidth', line_w )
+%     hold on
+%     drawnow
+% end
+
+% xlim([ -1e-10, 5.1e-9 ])
+% ylim([ -.2, 1.6 ])
+% ylabel( 'Space charge pot. (V)' )
+% xlabel( 'Distance (m)' )
+% set(gca,'XMinorTick','on','YMinorTick','on')
+% set( findall( gcf , '-property', 'FontSize' ), 'FontSize', 10 )
+% set( findall( gcf , '-property', 'FontName' ), 'FontName', 'Arial' )
+
+
+% % create smaller axes in top right, and plot on it
+% % ax1 = axes( 'Position', [ .42 .45 .45 .45 ] ) % [L B W H]
+% ax1 = axes( 'Position', [ .4 .4 .45 .35 ] ) % [L B W H]
+% box on
+% for phi_i = 1:length( phi_maxs )
+%     plot( nos( phi_i ), phi_maxs( phi_i ), 'o', 'markersize', msize, ...
+%     'markerfacecolor', rgbs{ phi_i }, 'markeredgecolor', rgbs{ phi_i } )
+%     hold on
+%     drawnow
+% end
+% xlabel( 'n/n*' )
+% ylabel( 'Sp. chg. pot. (V)' )
+% set(gca,'XMinorTick','on','YMinorTick','on')
+
+% ax1_pos = ax1.Position;
+% ax2 = axes( 'position', ax1_pos, 'XAxisLocation', 'top', 'Color', 'none' );
+% plot( y_maxs*na_b_i, v_mins, '-o', 'markersize', 0 )
+% line( y_maxs*na_b_i, phi_maxs, 'Parent', ax2, 'Color', 'none' )
+% xlabel( '[3+ solute]_{GB} (Mole frac.)' )
+% set( findall( gcf , '-property', 'FontSize' ), 'FontSize', 10 )
+% set( findall( gcf , '-property', 'FontName' ), 'FontName', 'Arial' )
+
+% % save
+% if saving
+%     % save_fig( save_dir, save_name, file_types ) % I want this method!!!!
+%     if ~exist( save_dir )
+%         mkdir( save_dir )
+%     end
+%     save_name = [ save_dir 'space-charge' ];
+%     saveas( gcf, save_name, 'svg' )
+%     saveas( gcf, save_name, 'png' )
+% end
+
+%%
+% Ea vs. na from DC measurements [Mogensen]
+d_Mogensen_f30 = [ paper_dir ...
+    'data processing/gpdc-poisson-cahn-simulation/Mogensen_fig-30.txt' ];
+
+Mog_f30 = dlmread( Ea_na_Mogensen_f30,'\t','A2..B399' );
+na_Mog_f30 = .01 * Mog_f30( :, 1 );
+Ea_Mog_f30 = Mog_f30( :, 2 );
+
+
+fig_cond = figure();
+hold on
+plot( y_maxs * na_b_i, v_mins, '-o' )
+plot( na_Mog_f30, Ea_Mog_f30, 's-' )
+ylabel( 'n_a (Mole fraction)' )
+legend( 'n_v', 'Ea' )

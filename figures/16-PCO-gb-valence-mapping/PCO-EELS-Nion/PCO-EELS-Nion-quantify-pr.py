@@ -20,10 +20,11 @@ paper_dir = 'C:/Users/Besitzer/Dropbox/WillB/Crozier_Lab/Writing/' +\
     '16_PCO-gb-valence-mapping/'
 fig_name = 'PCO-EELS-Nion'
 fig_dir = paper_dir + 'figures/' + fig_name + '/'
-data_dir = paper_dir + 'data/' + fig_name + '/bkgd-sub/'
+data_dir = paper_dir + 'data/' + fig_name + '/'
+data_sub_dir = 'bkg-sub_CeM45-PrM5/'
 
 # path to output directory
-output_dir = data_dir
+output_dir = data_dir + data_sub_dir
 output_file_name = ''
 subfolder_save = True
 save = True
@@ -31,14 +32,6 @@ save = True
 
 d_in_0, skip_0 = data_dir +\
     '160627_PCO10-Si3N4-850C_EELS-SI_tags.txt', 1
-# d_in_1 = data_dir +\
-#     '160627_PCO10-Si3N4-850C_EELS-SI_00_Ref20i_100meV_3mm_200ms--Ce M Edge Map.txt'
-# d_in_2 = data_dir +\
-#     '160627_PCO10-Si3N4-850C_EELS-SI_00_Ref20i_100meV_3mm_200ms--Pr M Edge Map.txt'
-# d_in_3 = data_dir +\
-#     '160627_PCO10-Si3N4-850C_EELS-SI_01_Ref20i_100meV_3mm_200ms--Ce M Edge Map.txt'
-# d_in_4 = data_dir +\
-#     '160627_PCO10-Si3N4-850C_EELS-SI_01_Ref20i_100meV_3mm_200ms--Pr M Edge Map.txt'
 d_in = [ '160627_PCO10-Si3N4-850C_EELS-SI_00_Ref20i_100meV_3mm_200ms',
     '160627_PCO10-Si3N4-850C_EELS-SI_01_Ref20i_100meV_3mm_200ms',
     '160627_PCO10-Si3N4-850C_EELS-SI_02_Ref20i_100meV_3mm_200ms',
@@ -71,7 +64,8 @@ x_lab = [ 'Distance (nm)' ]
 y_lab = [ 'Distance (nm)' ]
 x_lims = [ [-0,1], [-10,100], [870,970] ]
 y_lims = [ [-.1,2.2], [-.1,11], [-.1,7.5] ]
-z_lims = [ [0,0], [-.1,11], [-.1,7.5] ]
+z_lims = [ [0,0], [.05,.2], [.8,.95] ]
+z_lims = [ [0,0], [0,.2], [.8,1] ]
 x_shift = [ '', 3, .5 ]
 y_shift = [ '', .75, .5 ]
 subplot_white_space = 0.1 # see pl.subplots_adjust()
@@ -83,9 +77,15 @@ c_map = mpl.cm.YlOrRd
 c_map = mpl.cm.coolwarm
 cbar_shrink = .5
 
-I_ce_scalar = .49 # from t/lambda of the film and CeO2 calibration curve
 C_pr_ce = .11 # nominal cation concentration ratio
-k_pr_ce = 0.43 # +/- 0.05
+
+k_Pr_Ce, k_Pr_Ce_std = [], []
+k_pr_ce = 4.48
+# for edge overlap correction, not needed if using Pr M5 directly
+# I_ce_scalar = .49 # from t/lambda of the film and CeO2 calibration curve
+# k_pr_ce = 0.43 # +/- 0.05
+# I_ce_scalar = .43 # assume t/lambda is between grain and gb
+# k_pr_ce = 0.35 # assume t/lambda in between grain and gb
 
 
 ''' ########################### FUNCTIONS ########################### '''
@@ -95,11 +95,6 @@ def mpl_customizations():
 
 def norm( col, norm_max ):
     return col / np.nanmax( col ) * norm_max
-
-def trendline( x, y, polyfit_degree ):
-        tl = np.polyfit( x, y, polyfit_degree )
-        tlp = pl.poly1d( tl )
-        return x, tlp(x)
     
 ''' ########################### MAIN SCRIPT ########################### '''
 
@@ -108,28 +103,51 @@ d_0 = np.genfromtxt( d_in_0, delimiter='\t', skiprows=skip_0 )
 
 pl.close('all')
 for i, file_name in enumerate(d_in):
-    d_ce = data_dir + file_name + '--Ce M Edge Map.txt'
-    d_pr = data_dir + file_name + '--Pr M Edge Map.txt'
+    d_ce = data_dir + data_sub_dir + file_name + '--Ce M Edge Map.txt'
+    d_pr = data_dir + data_sub_dir + file_name + '--Pr M Edge Map.txt'
     I_Ce = np.genfromtxt( d_ce, delimiter='\t' )
     I_Pr = np.genfromtxt( d_pr, delimiter='\t' )
 
+    # if i < 2:
+    ''' COMPUTE A K-FACTOR FOR PR M5 TECHNIQUE '''
+    I_Pr_Ce = I_Pr / I_Ce
+    k_Pr_Ce_i = C_pr_ce / I_Pr_Ce
+    k_Pr_Ce.append( np.nanmean( k_Pr_Ce_i ) )
+    k_Pr_Ce_std.append( np.nanstd( k_Pr_Ce_i ) )
+
+    # k_Pr_Ce[2] = np.nan
+    # k_pr_ce = np.nanmean( k_Pr_Ce )
+    # k_Pr_Ce_std[2] = np.nan
+    # k_pr_ce_std = np.nanmean( k_Pr_Ce_std )
+
+
     ''' ### COMPUTE CONCENTRATIONS FROM BKGD-SUB EELS INTENSITY ### '''
-    # apply overlap correction to remove Ce component from Pr signal
-    I_Pr_cor = I_Pr - I_ce_scalar * I_Ce
-    # compute intensity ratio for k-factor equation
-    I_Pr_cor_I_Ce = I_Pr_cor / I_Ce
-    # compute the Pr concentration from k-factor
-    alph = I_Pr_cor_I_Ce * k_pr_ce
+    # # apply overlap correction to remove Ce component from Pr signal
+    # I_Pr_cor = I_Pr - I_ce_scalar * I_Ce
+    # # compute intensity ratio for k-factor equation
+    # I_Pr_cor_I_Ce = I_Pr_cor / I_Ce
+    # # compute the Pr concentration from k-factor
+    # alph = I_Pr_cor_I_Ce * k_pr_ce
+
+    alph = I_Pr_Ce * k_pr_ce
+
+
     C_Pr = alph / ( 1 + alph )
     C_Ce = 1 - C_Pr
 
     ''' ### GENERATE FIGURES ### '''
     p_size = d_0[ i, 1 ]
-    lims = [ p_size*x for x in [ 0, np.shape(I_Ce)[1], 0, np.shape(I_Ce)[0] ]]
+    lims = [ p_size*x for x in [ 0, np.shape(I_Ce)[1], 0, np.shape(I_Ce)[0] ] ]
 
     pl.figure( figsize=fig_size[0] )
 
     '''( (rows,cols), (subplot_index), colspan=2, rowspan=1 )'''
+    # pl.subplot2grid( (2,4), (0,0) )
+    # inshow ADF before
+    
+    # pl.subplot2grid( (2,4), (1,0) )
+    # inshow ADF after
+
     pl.subplot2grid( (2,3), (0,0) )
     ax = pl.gca()
     # BKGD-SUB signal Ce
@@ -142,39 +160,36 @@ for i, file_name in enumerate(d_in):
     # BKGD-SUB signal Pr
     pl.subplot2grid( (2,3), (1,0) )
     pl.imshow( I_Pr, cmap=c_map, extent=lims, vmin=z_lims[0][0] )
-    pl.colorbar( shrink=.5 )
+    pl.colorbar( shrink=cbar_shrink )
     pl.gca().set_title( 'I_Pr BKGD-SUB' )
 
     pl.subplot2grid( (2,3), (0,1) )
-    I_Pr_cor = I_Pr - I_ce_scalar * I_Ce
     pl.imshow( I_Pr_cor, cmap=c_map, extent=lims, vmin=0 )
-    pl.colorbar( shrink=.5 )
+    pl.colorbar( shrink=cbar_shrink )
     pl.gca().set_title( 'I_Pr_corr' )
 
     pl.subplot2grid( (2,3), (1,1) )
-    I_Pr_cor_I_Ce = I_Pr_cor / I_Ce
     pl.imshow( I_Pr_cor_I_Ce, cmap=c_map, extent=lims, vmin=0, vmax=1 )
-    pl.colorbar( shrink=.5 )
+    pl.colorbar( shrink=cbar_shrink )
     pl.gca().set_title( 'I_Pr* / I_Ce' )
 
     pl.subplot2grid( (2,3), (1,2) )
-    alph = I_Pr_cor_I_Ce * k_pr_ce
-    C_Pr = alph / ( 1 + alph )
-    pl.imshow( C_Pr, cmap=c_map, extent=lims, vmin=0, vmax=.5 )
-    pl.colorbar( shrink=.5 )
+    pl.imshow( C_Pr, cmap=c_map, extent=lims, 
+        vmin=z_lims[1][0], vmax=z_lims[1][1] )
+    pl.colorbar( shrink=cbar_shrink )
     pl.gca().set_title( '[Pr]; areal ave. = ' + str(np.nanmean(C_Pr))[0:4] )
 
     pl.subplot2grid( (2,3), (0,2) )
-    C_Ce = 1 - C_Pr
-    pl.imshow( C_Ce, cmap=c_map, extent=lims, vmin=.5, vmax=1 )
-    pl.colorbar( shrink=.5 )
+    pl.imshow( C_Ce, cmap=c_map, extent=lims, 
+        vmin=z_lims[2][0], vmax=z_lims[2][1] )
+    pl.colorbar( shrink=cbar_shrink )
     pl.gca().set_title( '[Ce]; areal ave. = ' + str(np.nanmean(C_Ce))[0:4] )
 
     pl.tight_layout()
     pl.show()
     if save:
-        wf.save_fig( fig_dir, file_types, dots, output_file_name, file_name )
-
+        wf.save_fig( output_dir, file_types, dots, output_file_name, file_name )
+        pl.close('all')
 # # store columns in variables
 # # d_x_0, d_y_0 = d_0.T
 # d_d_0 = d_0.T

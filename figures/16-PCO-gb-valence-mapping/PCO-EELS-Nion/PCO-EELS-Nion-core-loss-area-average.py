@@ -60,7 +60,8 @@ subplot_white_space = 0.1 # see pl.subplots_adjust()
 # fill_x = [[[870,915],[930,960]],[[870,915],[930,960]]]
 fill_xs = [ [ 875, 915, 925, 965 ] ]
 fill_cs = [ 'lightgrey', wf.colors('pale_gold') ]
-I_ce_scalar = .49
+I_ce_scalar = .49 # this assumes a constant t/lam across gb
+I_ce_scalar = .43 # this assumes t/lam from gb and grain - will affect I_Pr*
 C_pr_ce = .11
 
 

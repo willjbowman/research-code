@@ -60,8 +60,10 @@ y_shift_on_vl, y_shift_off_vl = 1, 0
 # y1_ticks = False
 subplot_white_space = 0.05 # see pl.subplots_adjust()
 # fill_x = [[[870,915],[930,960]],[[870,915],[930,960]]]
-fill_xs = [ [ 870, 915, 930, 960 ], [ 870, 915, 930, 960 ] ]
+fill_xs = [ [ [875, 915], [926, 941] ], [ [875, 915], [925, 940] ] ]
+bkgd_xs = [ [ [920, 926], [941, 945] ], [ [920, 925], [940, 945] ] ]
 fill_c = wf.colors('pale_gold')
+bkgd_c = 'pink'
 
 
 ''' ########################### FUNCTIONS ########################### '''
@@ -69,17 +71,23 @@ fill_c = wf.colors('pale_gold')
 def mpl_customizations():
     wf.wills_mpl( fsize ) # pass the figure's fontsize
 
+# def fill_windows( x, y0, y1, fill_xs, fill_c ):
+#     for i, xx in enumerate( fill_xs ):
+#         if i < 1: # fill
+#             pl.fill_between( x, y0, y1, facecolor=fill_c, edgecolor=fill_c,
+#                 where= x > xx )
+#         elif i % 2: # odd
+#             pl.fill_between( x, y0, y1, facecolor='none', edgecolor=fill_c,
+#                     where= x > xx )
+#         else: # even
+#             pl.fill_between( x, y0, y1, facecolor=fill_c, edgecolor=fill_c,
+#                 where= x > xx )
+
 def fill_windows( x, y0, y1, fill_xs, fill_c ):
     for i, xx in enumerate( fill_xs ):
-        if i < 1: # fill
-            pl.fill_between( x, y0, y1, facecolor=fill_c, edgecolor=fill_c,
-                where= x > xx )
-        elif i % 2: # odd
-            pl.fill_between( x, y0, y1, facecolor='w', edgecolor=fill_c,
-                    where= x > xx )
-        else: # even
-            pl.fill_between( x, y0, y1, facecolor=fill_c, edgecolor=fill_c,
-                where= x > xx )
+        x_clipped, y_clipped, lims = wf.clip_xy( xx, x, y1 )
+        pl.fill_between( x_clipped, y0, y_clipped, facecolor=fill_c, 
+            edgecolor=fill_c )
     
 ''' ########################### MAIN SCRIPT ########################### '''
 
@@ -118,6 +126,7 @@ for i, anno in enumerate( file_anno ):
         pl.plot( d_ev_cl, y_on_cl_p, color=cols[0], lw=width )
         pl.plot( d_ev_cl, y_off_cl_p, color=cols[1], lw=width, dashes=dash )
         fill_windows( d_ev_cl, y_lims[0][0], y_on_cl_p, fill_xs[0], fill_c )
+        fill_windows( d_ev_cl, y_lims[0][0], y_on_cl_p, bkgd_xs[0], bkgd_c )
         
         ax0 = pl.gca() # store current axis
         ax0.set_xlim( x_lims[0] )

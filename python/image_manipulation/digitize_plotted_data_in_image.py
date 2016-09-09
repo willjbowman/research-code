@@ -2,6 +2,8 @@
 '''
  Created 2015-03-29 by Will Bowman. This script is used to digitize data plotted
  in images, like those printed in papers
+ 
+close all windows from the taskbar (right click, close windows) after saving
 '''
 
 ''' ########################### IMPORT MODULES ########################### '''
@@ -174,7 +176,7 @@ if __name__ == "__main__":
         Label( calibrate_root, text = "x-min (units) - " + str( calibration_list[ 'xmin-unit' ] ) ).grid( row = 0 )
         Label( calibrate_root, text = "x-max (units) - " + str( calibration_list[ 'xmax-unit' ] ) ).grid( row = 1 )
         Label( calibrate_root, text = "y-min (units) - " + str( calibration_list[ 'ymin-unit' ] ) ).grid( row = 2 )
-        Label( calibrate_root, text = "x-max (units) - " + str( calibration_list[ 'ymax-unit' ] ) ).grid( row = 3 )
+        Label( calibrate_root, text = "y-max (units) - " + str( calibration_list[ 'ymax-unit' ] ) ).grid( row = 3 )
         Label( calibrate_root, text = "x-min (coords) - " + str( calibration_list[ 'xmin-coord' ] ) ).grid( row = 4 )
         Label( calibrate_root, text = "y-max (coords) - " + str( calibration_list[ 'ymax-coord' ] ) ).grid( row = 5 )
         Label( calibrate_root, text = "x-max (coords) - " + str( calibration_list[ 'xmax-coord' ] ) ).grid( row = 6 )
