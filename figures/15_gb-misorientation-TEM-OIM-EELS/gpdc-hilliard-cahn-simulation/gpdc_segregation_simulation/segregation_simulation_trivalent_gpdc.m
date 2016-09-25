@@ -12,7 +12,7 @@ line_w = 1.5;
 x_label = 'Distance from interface (m)';
 legend_info = {}; % cell array for legend entries
 
-T = 800+273; % temperature; inversely prop to na_max, fwhm
+T = 800+273; % temperature; reduces na_max, fwhm
 na_bulks = [ .13 ];  % bulk dopant site fractions
 node_n = 100;
 r_gr = 1e-6;                             % grain radius

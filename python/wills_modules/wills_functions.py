@@ -127,6 +127,7 @@ below
 
 def colors( color_name ):
     custom_colors_RGB = {
+    'pinker': [255, 130, 130],
     'pale_gold': [255, 240, 155],
     'eth_blue': [31, 64, 122],
     'eth_green': [130, 190, 30],

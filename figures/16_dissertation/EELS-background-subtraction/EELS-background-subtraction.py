@@ -22,9 +22,10 @@ fig_name = 'EELS-background-subtraction'
 fig_dir = paper_dir + 'figures/' + fig_name + '/'
 data_dir = paper_dir + 'data/' + fig_name + '/'
 
-d_in = data_dir + '141007_2Ca_06.txt' # in data
+d_in = data_dir + fig_name + '.txt' # in data
 
-leg_ents = [ 'Raw data' ]
+leg_ents = [ 'Raw data', r'Background fit $(I=AE\/^{-r})$', 
+    'Bkgd.-subtracted signal', 'Bkgd. fitting window', 'Integrated signal' ]
 leg_loc = 'best'
 x_lab = [ 'Energy-loss (eV)' ]
 y_lab = [ 'Intensity (Arbitrary units)' ]
@@ -34,25 +35,29 @@ output_dir = fig_dir
 output_file_name = fig_name
 subfolder = True
 save = True
-# save = False
+save = False
 
 fig_size = ( 5, 3 ) # ( width, hight ) in inches
 
 # font size, resolution (DPI), file type
 fsize, dots, file_types = 10, [300], ['png','svg']
 cols = wf.cols()
-dash, l_wid = [ 6, 1 ], 1 # [ pix_on pix_off ], linewidth
+dash, l_wid = [ [], [3,3], [3,1] ], 1 # [ pix_on pix_off ], linewidth
 mark, msize, mwidth = wf.marks(), 7, 0.5
+line = [ '-', '--', ]
 
 # naming sequence of figs with successive curves on same axis
 file_anno = [ '-0of0' ] # for single fig with all curves
 x_lims = [ 300, 1e3 ]
 y_lims = [ 0, 10 ]
+y_tic_lab = [ np.arange(0,10,1) ]
 fill_xs = [
-    [ [300, 340], [450, 520], [770, 875] ],
+    [ [300, 340], [450, 520], [770, 875] ], 
     [ [340, 390], [520, 580], [875, 950] ]
 ]
-fill_cols =[ 'pink', wf.colors('pale_gold') ]
+norm_max = 10
+fill_col =[ ['pink', wf.colors('pinker') ], 
+    [ wf.colors('pale_gold'), 'goldenrod'] ] # [bkgd,border], [signal,border]
 
 
 ''' ########################### FUNCTIONS ########################### '''
@@ -60,11 +65,22 @@ fill_cols =[ 'pink', wf.colors('pale_gold') ]
 def mpl_customizations():
     wf.wills_mpl( fsize ) # pass the figure's fontsize
 
-def fill_windows( x, y0, y1, fill_xs, fill_c ):
+# y0 can be constant or function
+def fill_windows( x, y0, y1, fill_xs, fill_c, fill_lab ):
+
     for i, xx in enumerate( fill_xs ):
-        x_clipped, y_clipped, lims = wf.clip_xy( xx, x, y1 )
-        pl.fill_between( x_clipped, y0, y_clipped, facecolor=fill_c, 
-            edgecolor='grey' )
+        y0_clipped = y0
+        if type( y0 ) is np.ndarray: # if y_bot is a curve
+            x_clipped, y0_clipped, lims = wf.clip_xy( xx, x, y0 )
+        x_clipped, y1_clipped, lims = wf.clip_xy( xx, x, y1 )
+        pl.fill_between( x_clipped, y0_clipped, y1_clipped, facecolor=fill_c[0], 
+            edgecolor=fill_c[1], label=fill_lab )
+
+# from matplotlib.patches import Rectangle
+
+# p1 = Rectangle((0, 0), 1, 1, fc="green")
+# p2 = Rectangle((0, 0), 1, 1, fc="red")
+# legend([p1, p2], [a1_label, a2_label])
     
 ''' ########################### MAIN SCRIPT ########################### '''
 
@@ -72,13 +88,18 @@ def fill_windows( x, y0, y1, fill_xs, fill_c ):
 d = np.genfromtxt( d_in, delimiter='\t' )
 
 # store columns in variables
-eV_d, I_d = d.T
+eV_d, raw_d, bkgd_d, sig_d, xsec_d = d.T
 
-# # clip raw data to x_lims to avoid .svg rendering issues
-eV_p, I_p, x_lims_p = wf.clip_xy( x_lims, eV_d, I_d )
+# # clip data to x_lims to avoid .svg rendering issues
+# REFACTOR!
+eV_p, raw_p, x_lims_p = wf.clip_xy( x_lims, eV_d, raw_d )
+eV_p, bkgd_p, x_lims_p = wf.clip_xy( x_lims, eV_d, bkgd_d )
+eV_p, sig_p, x_lims_p = wf.clip_xy( x_lims, eV_d, sig_d )
 
-# # normalize, scale, shift curves for pretty plotting
-I_p = I_p / np.nanmax( I_p ) * 10
+# normalize, scale, shift curves for pretty plotting
+# raw_p = wf.normalize( raw_p, norm_max )
+# bkgd_p = wf.normalize( bkgd_p, norm_max )
+# sig_p = wf.normalize( sig_p, norm_max )
 
 ''' ### GENERATE FIGURES ### '''
 for i, anno in enumerate( file_anno ):
@@ -87,24 +108,34 @@ for i, anno in enumerate( file_anno ):
     pl.figure( figsize=fig_size ) # create a figure ( w, h )
     mpl_customizations() # apply customizations to matplotlib
 
-    pl.plot( eV_p, I_p, color=cols[0], lw=l_wid )
-    # ( x, y0, y1, fill_xs, fill_c )
-    fill_windows( eV_p, y_lims[0], I_p, fill_xs[0], bkgd_c )
-    fill_windows( eV_p, y_lims[0], I_p, fill_xs[1], fill_c )
+    p0, = pl.plot( eV_p, raw_p, color=cols[0], lw=l_wid, label=leg_ents[0] )
+    p1, = pl.plot( eV_p, bkgd_p, color=cols[1], lw=l_wid, label=leg_ents[1], 
+        dashes=dash[1] )
+    p2, = pl.plot( eV_p, sig_p, color=cols[2], lw=l_wid, label=leg_ents[2], 
+        dashes=dash[2] )
+
+    # ( x, y0, y1, fill_xs, fill_col )
+    # background
+    fill_windows( eV_p, y_lims[0], raw_p, fill_xs[0], fill_col[0], fill_lab[0] )
+    p3 = mpl.patches.Rectangle( (0,0), 1, 1, fc=fill_col[0][0], ec=fill_col[0][1] )
+    # signals
+    fill_windows( eV_p, bkgd_p, raw_p, fill_xs[1], fill_col[1], fill_lab[1] )
+    fill_windows( eV_p, y_lims[0], sig_p, fill_xs[1], fill_col[1], fill_lab[1] )
+    p4 = mpl.patches.Rectangle( (0,0), 1, 1, fc=fill_col[1][0], ec=fill_col[1][1] )
     
     ax0 = pl.gca() # store current axis
     ax0.set_xlim( x_lims_p )
-    # ax0.set_ylim( y_lims[0] )
+    ax0.set_ylim( y_lims[0] )
     ax0.set_xlabel( x_lab[0] )
     ax0.set_ylabel( y_lab[0] )
     # ax0.set_yticks([])
-    # ax0.set_yticklabels([])
+    ax0.set_yticklabels( y_tic_lab[0] )
     ax0.minorticks_on()
-    ax0.legend( leg_ents, loc=leg_loc, frameon=False, labelspacing=.1,
-        handletextpad=.3, fancybox=False, borderpad=.3, fontsize=fsize,
-        numpoints=1 )
+    ax0.legend( [p0,p1,p2,p3,p4],leg_ents, loc=leg_loc, frameon=False, 
+        labelspacing=.1, handletextpad=.3, fancybox=False, borderpad=.3, 
+        fontsize=fsize, numpoints=1 )
+    
     pl.tight_layout()
-
 
     pl.show()
     if save:
