@@ -29,12 +29,14 @@ par_vales = nos;
 paper_dir = [ 'C:/Users/Besitzer/Dropbox/WillB/Crozier_Lab/Writing/' ...
     '15_WJB_gb misorientation OIM EELS/' ];  
 
-saving = 0;
+saving = 1;
 
-save_dir = [ paper_dir 'figures/'...
-    'gpdc-hilliard-cahn-simulation/gpdc_segregation_simulation/' ...
+save_dir = [ paper_dir 'figures/gpdc-poisson-cahn-simulation/' ...
+    'conductivity-vs-length_fraction/' ...
     datestr(now, 'yymmdd') '_' par_name ...
     '_na-' num2str(na_bulks(1)*100) '/' ];
+
+fig_names = { 'Solute-conc', 'Space-charge', 'Vacancy-conc', 'Ea-cond };
 
 if saving
     if ~exist( save_dir )
@@ -73,7 +75,8 @@ for h = 1:len_nos
             );
         ys{h} = y; % dopant site fraction
         vs{h} = v; % vacancy site fraction
-        v_mins(h) = min(v) / na_b_i / 4; % O vacancy site frac. for 3+ solute
+        % v_mins(h) = min(v) / na_b_i / 4; % O vacancy site frac. for 3+ solute
+        v_mins(h) = min(v); % O vacancy site frac. for 3+ solute
         phis{h} = phi;
         lamv(h) = lamv;
         lambd(h) = lambd;
@@ -136,6 +139,8 @@ end
 P = polyfit( y_maxs, phi_maxs, 1 )
 
 %% PLOT THE DATA PRETTY
+
+solute_label = '[A^{3+}]_{GB} (Mole frac.)';
 
 msize = 4;
 rgbs = {};
@@ -308,24 +313,85 @@ set( findall( gcf , '-property', 'FontName' ), 'FontName', 'Arial' )
 
 
 % create smaller axes in top right, and plot on it
-% ax1 = axes( 'Position', [ .42 .45 .45 .45 ] ) % [L B W H]
-ax1 = axes( 'Position', [ .4 .4 .45 .35 ] ) % [L B W H]
+% ax1 = axes( 'Position', [ .4 .4 .45 .35 ] ) % [L B W H] w/ n/n*
+ax1 = axes( 'Position', [ .4 .53 .45 .35 ] ) % [L B W H] w/ n/n*
 box on
 for phi_i = 1:length( phi_maxs )
-    plot( nos( phi_i ), phi_maxs( phi_i ), 'o', 'markersize', msize, ...
+    % plot( nos( phi_i ), phi_maxs( phi_i ), 'o', 'markersize', msize, ...
+    plot( y_maxs(phi_i)*na_b_i, phi_maxs(phi_i), 'o', 'markersize', msize, ...
     'markerfacecolor', rgbs{ phi_i }, 'markeredgecolor', rgbs{ phi_i } )
     hold on
     drawnow
 end
-xlabel( 'n/n*' )
+% xlabel( 'n/n*' )
 ylabel( 'Sp. chg. pot. (V)' )
+xlim([ .1, .51 ])
+ylim([ -.01, 2 ])
 set(gca,'XMinorTick','on','YMinorTick','on')
 
-ax1_pos = ax1.Position;
-ax2 = axes( 'position', ax1_pos, 'XAxisLocation', 'top', 'Color', 'none' );
-% plot( y_maxs*na_b_i, phi_maxs, 'o', 'markersize', 0 )
-line( y_maxs*na_b_i, phi_maxs, 'Parent', ax2, 'Color', 'none' )
-xlabel( '[3+ solute]_{GB} (Mole frac.)' )
+% ax1_pos = ax1.Position;
+% ax2 = axes( 'position', ax1_pos, 'XAxisLocation', 'top', 'Color', 'none' );
+% line( y_maxs*na_b_i, phi_maxs, 'Parent', ax2, 'Color', 'none' )
+xlabel( solute_label )
+set( findall( gcf , '-property', 'FontSize' ), 'FontSize', 10 )
+set( findall( gcf , '-property', 'FontName' ), 'FontName', 'Arial' )
+
+% save
+if saving
+    % save_fig( save_dir, save_name, file_types ) % I want this method!!!!
+    if ~exist( save_dir ) % create save directory if it doesn't exist
+        mkdir( save_dir )
+    end
+    save_name = [ save_dir 'space-charge' ];
+    saveas( gcf, save_name, 'svg' )
+    saveas( gcf, save_name, 'png' )
+end
+
+
+% vacancy concentration VS. distance
+
+% % plot the simulation
+figure( 'position', [8, 0, 3, 3] * 96) % 1 px = 1/96 in
+grey = 170;
+for j=1:len_nos
+    % rgb = j / len_nos * [ grey, grey, grey ] / 256;
+    nodes = nodess{j};
+    % plot( nodes(1:length(nodes)-1), vs{j}, 'color', rgbs{j}, ...
+    plot( nodes, vs{j}, 'color', rgbs{j}, ...
+        'linewidth', line_w )
+    hold on
+    drawnow
+end
+
+xlim([ -1e-10, 5.1e-9 ])
+ylim([ -.01, .25 ])
+ylabel( 'O vacancy concentration (Mole frac.)' )
+xlabel( 'Distance (m)' )
+set( gca,'XMinorTick','on','YMinorTick','on' )
+set( findall( gcf , '-property', 'FontSize' ), 'FontSize', 10 )
+set( findall( gcf , '-property', 'FontName' ), 'FontName', 'Arial' )
+
+
+% create smaller axes in top right, and plot on it
+ax1 = axes( 'Position', [ .4 .53 .45 .35 ] ); % [L B W H]
+box on
+for v_min_i = 1:length( v_mins )
+    plot( y_maxs(v_min_i)*na_b_i, v_mins(v_min_i), 'o', 'markersize', msize, ...
+    'markerfacecolor', rgbs{ v_min_i }, 'markeredgecolor', rgbs{ v_min_i } )
+    hold on
+    drawnow
+end
+xlabel( solute_label )
+ylabel( '[O vac.]^{min.}' )
+xlim([ .1, .51 ])
+ylim([ -.01, .04 ])
+set(gca,'XMinorTick','on','YMinorTick','on')
+
+% ax1_pos = ax1.Position;
+% ax2 = axes( 'position', ax1_pos, 'XAxisLocation', 'top', 'Color', 'none' );
+% plot( y_maxs*na_b_i, v_mins, '-o', 'markersize', 0 )
+% line( y_maxs*na_b_i, phi_maxs, 'Parent', ax2, 'Color', 'none' )
+% xlabel( '[3+ solute]_{GB} (Mole frac.)' )
 set( findall( gcf , '-property', 'FontSize' ), 'FontSize', 10 )
 set( findall( gcf , '-property', 'FontName' ), 'FontName', 'Arial' )
 
@@ -340,76 +406,85 @@ if saving
     saveas( gcf, save_name, 'png' )
 end
 
-
-% vacancy concentration VS. distance
-
-% % plot the simulation
-% figure( 'position', [4, 0, 3, 3] * 96) % 1 px = 1/96 in
-% grey = 170;
-% for j=1:len_nos
-%     % rgb = j / len_nos * [ grey, grey, grey ] / 256;
-%     nodes = nodess{j};
-%     plot( nodes(1:length(nodes)-1), phis{j}, 'color', rgbs{j}, ...
-%         'linewidth', line_w )
-%     hold on
-%     drawnow
-% end
-
-% xlim([ -1e-10, 5.1e-9 ])
-% ylim([ -.2, 1.6 ])
-% ylabel( 'Space charge pot. (V)' )
-% xlabel( 'Distance (m)' )
-% set(gca,'XMinorTick','on','YMinorTick','on')
-% set( findall( gcf , '-property', 'FontSize' ), 'FontSize', 10 )
-% set( findall( gcf , '-property', 'FontName' ), 'FontName', 'Arial' )
-
-
-% % create smaller axes in top right, and plot on it
-% % ax1 = axes( 'Position', [ .42 .45 .45 .45 ] ) % [L B W H]
-% ax1 = axes( 'Position', [ .4 .4 .45 .35 ] ) % [L B W H]
-% box on
-% for phi_i = 1:length( phi_maxs )
-%     plot( nos( phi_i ), phi_maxs( phi_i ), 'o', 'markersize', msize, ...
-%     'markerfacecolor', rgbs{ phi_i }, 'markeredgecolor', rgbs{ phi_i } )
-%     hold on
-%     drawnow
-% end
-% xlabel( 'n/n*' )
-% ylabel( 'Sp. chg. pot. (V)' )
-% set(gca,'XMinorTick','on','YMinorTick','on')
-
-% ax1_pos = ax1.Position;
-% ax2 = axes( 'position', ax1_pos, 'XAxisLocation', 'top', 'Color', 'none' );
-% plot( y_maxs*na_b_i, v_mins, '-o', 'markersize', 0 )
-% line( y_maxs*na_b_i, phi_maxs, 'Parent', ax2, 'Color', 'none' )
-% xlabel( '[3+ solute]_{GB} (Mole frac.)' )
-% set( findall( gcf , '-property', 'FontSize' ), 'FontSize', 10 )
-% set( findall( gcf , '-property', 'FontName' ), 'FontName', 'Arial' )
-
-% % save
-% if saving
-%     % save_fig( save_dir, save_name, file_types ) % I want this method!!!!
-%     if ~exist( save_dir )
-%         mkdir( save_dir )
-%     end
-%     save_name = [ save_dir 'space-charge' ];
-%     saveas( gcf, save_name, 'svg' )
-%     saveas( gcf, save_name, 'png' )
-% end
-
 %%
-% Ea vs. na from DC measurements [Mogensen]
-d_Mogensen_f30 = [ paper_dir ...
-    'data processing/gpdc-poisson-cahn-simulation/Mogensen_fig-30.txt' ];
+% Ea vs. na
+% fit from Zhan ('01)
+kb = 8.612e-5; % eV/K
+T = 300 + 273; % K
+Ea_gr_PGCO = 0.78; % eV
 
-Mog_f30 = dlmread( Ea_na_Mogensen_f30,'\t','A2..B399' );
-na_Mog_f30 = .01 * Mog_f30( :, 1 );
-Ea_Mog_f30 = Mog_f30( :, 2 );
+na = y_maxs * na_b_i;
+nv_gr = na_b_i / 2 / 2;
+Ea_n = -10*na.^3 + 7.7143*na.^2 + 0.1714*na + 0.634;
+nv_gbs = v_mins;
 
+% compute Sig_grain assuming .13 3+ solutes and Ea_grain from PGCO
+S_gr = nv_gr * exp( -Ea_gr_PGCO/(kb*T) );
+S_gb = nv_gbs .* exp( -Ea_n/(kb*T) );
+S_gb_gr = S_gb / S_gr;
 
-fig_cond = figure();
+% plot the simulation
+name_Ea_cond = 'Ea-cond';
+if ~isempty(findall(0,'Type','Figure','Name',name_Ea_cond));
+    close( name_Ea_cond ); % close previous version of fig if it exists
+end
+figure( 'name', name_Ea_cond, 'position', [8, 4, 3, 3] * 96) % 1 px = 1/96 in
+left_color = [0 0 0];
+right_color = left_color;
+set(gcf,'defaultAxesColorOrder',[left_color; right_color]);
+
+yyaxis left
+plot( na, Ea_n, '--k' ) % eyeguide for Ea
+
+yyaxis right
+% semilogy( na, S_gb_gr, '--r' ) % eyeguide
+% polynomial fitting log( conductivity ratio ) vs [A3+]
+polyfit_log10_S_gb_gr = polyfit( na, log10(S_gb_gr), 3 ) % print to console
+log10_S_gb_gr_polyfit = polyval( polyfit_log10_S_gb_gr, na );
+semilogy( na, 10.^log10_S_gb_gr_polyfit, '-k' ) % underlay polyfit
 hold on
-plot( y_maxs * na_b_i, v_mins, '-o' )
-plot( na_Mog_f30, Ea_Mog_f30, 's-' )
-ylabel( 'n_a (Mole fraction)' )
-legend( 'n_v', 'Ea' )
+drawnow
+
+legend( {'E_a^{GB}, eye guide', '\sigma_{GB}/\sigma_{Grain}, fit'}, ...
+    'Position', [.33 .77 .5 .1] ); % [left bottom width height] relat to fig
+legend boxoff
+
+grey = 170;
+for j=1:length(na)
+    yyaxis left
+    plot( na(j), Ea_n(j), 'o', 'markersize', msize, ...
+    'markerfacecolor', rgbs{j}, 'markeredgecolor', rgbs{j} )
+    yyaxis right
+    semilogy( na(j), S_gb_gr(j), 's', 'markersize', msize, ...
+    'markerfacecolor', rgbs{j}, 'markeredgecolor', rgbs{j} )
+    hold on
+    drawnow
+end
+
+yyaxis left
+% xlim([ -1e-10, 5.1e-9 ])
+ylim([ .6, 1.7 ])
+ylabel( 'E_a^{GB} (eV)' )
+xlabel( solute_label )
+set( gca,'XMinorTick','on','YMinorTick','on' )
+
+yyaxis right
+% xlim([ -1e-10, 5.1e-9 ])
+ylim([ 1e-8, 1e2 ])
+ylabel( '\sigma_{GB}/\sigma_{Grain}' )
+set( gca,'XMinorTick','on','YMinorTick','on' )
+
+set( findall( gcf , '-property', 'FontSize' ), 'FontSize', 10 )
+set( findall( gcf , '-property', 'FontName' ), 'FontName', 'Arial' )
+
+% save
+if saving
+    'saving now'
+    % save_fig( save_dir, save_name, file_types ) % I want this method!!!!
+    if ~exist( save_dir )
+        mkdir( save_dir )
+    end
+    save_name = [ save_dir 'Ea_conductivity-ratio' ];
+    saveas( gcf, save_name, 'svg' )
+    saveas( gcf, save_name, 'png' )
+end

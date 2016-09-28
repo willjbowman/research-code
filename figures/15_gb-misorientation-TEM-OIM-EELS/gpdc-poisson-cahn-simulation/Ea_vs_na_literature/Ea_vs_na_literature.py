@@ -27,37 +27,41 @@ data_dir = paper_dir + 'data processing/' + fig_name + '/' + sub_name + '/'
 d_in = [ 'Kudo T Obayashi H_J Electrochem Soc (1976) Fig 1',
     'Stefinak TS_MIT Dissertation (2004) Fig 1-5',
     'Avila-Paredes HJ Kim S etal_J mat chem (2009) Fig 6',
-    'Zhang TS etal_Mat res bull (2006) Fig 4' ]
+    'Zhang TS etal_Mat res bull (2006) Fig 4',
+    'Zhan Z etal_AC impendance of SDC (2001) jECS Tab 1' ]
 
 # the order is f-ed up bc i need to plot both graphs no matter how many in_file
 tits = [ 'Kudo (76)', r'$E_a vs. [Solute]$', 'Stefinak (06)', 
-	'Avila-Par. (09)', 'Zhang (06)' ]
+	'Avila-Par. (09)', 'Zhang (06)', 'Zhan (01)' ]
 leg_ents = [ 
 	[ '10GCO', '20GCO', '30GCO', '40GCO', '50GCO' ],
     [ 
-    	r'Gd$^{3+} \sigma_{Total}^{DC}$ [1]', 
-    	r'Sm$^{3+} \sigma_{Total}^{DC}$ [2]', 
-    	r'Gd$^{3+} \sigma_{Grain}^{AC}$ [3]', 
-    	r'Gd$^{3+} \sigma_{Total}^{AC}$ [4]' 
+    	r'Gd$^{3+} \sigma_{Total}^{DC}$ [Kudo]', 
+    	r'Sm$^{3+} \sigma_{Total}^{DC}$ [Stef.]', 
+    	r'Gd$^{3+} \sigma_{Grain}^{AC}$ [A.P.]', 
+    	r'Gd$^{3+} \sigma_{Total}^{AC}$ [Zhang]', 
+    	r'Sm$^{3+} \sigma_{Grain\ low\ T}^{AC}$ [Zhan]' 
     ],
 	[ 'CeO2', '10SCO', '20SCO', '30SCO', '40SCO', '50SCO', '60SCO' ],
 	[ 'Grain', 'Grain boundary' ],
-	[ 'Total' ]
+	[ 'Total' ],
+	[ 'Grain low T' ]
 ]
 Xs = [
 	[ .1, .2, .3, .4, .5 ],
 	[ 0, .1, .2, .3, .4, .5, .6 ],
-	[], []
+	[], [],
+	[ .1, .2, .3, .4 ]
 ]
 Ts = [ [], [],
 	np.array([ 500, 600, 700, 800, 900 ])
 ]
 
-locs = [ 'upper right', 'upper left', 'lower left', 'best', 'best' ]
+locs = [ 'upper right', 'upper left', 'lower left', 'best', 'best', 'best' ]
 x_lab = [ '1000/T (1/K)', '[Solute] (Mole frac.)', '1000/T (1/K)', 
-	'[Gd] (Mole frac.)', '[Gd] (Mole frac.)' ]
+	'[Gd] (Mole frac.)', '[Gd] (Mole frac.)', '[Sm] (Mole frac.)' ]
 y_lab = [ r'$\sigma$T (S/cm K)', r'$E_a$ (eV)', r'$\sigma$T (S/cm K)', 
-	r'$E_a$ (eV)', r'$E_a$ (eV)' ]
+	r'$E_a$ (eV)', r'$E_a$ (eV)', r'$E_a$ (eV)' ]
 x_lims = [ [-0,1], [-.1,.7], [0,.7] ]
 y_lims = [ [-.1,2.2], [.6,1.8], [-.1,3] ]
 
@@ -117,8 +121,10 @@ d_0 = np.genfromtxt( d_in[0], delimiter='\t' ) # update when headers happen
 d_2 = np.genfromtxt( d_in[1], delimiter='\t' )
 d_3 = np.genfromtxt( d_in[2], delimiter='\t' )
 d_4 = np.genfromtxt( d_in[3], delimiter='\t' )
+d_5 = np.genfromtxt( d_in[4], delimiter='\t' )
 
 pl.close('all')
+mpl_customizations() # apply customizations to matplotlib
 
 '''SECTION FOR EACH INPUT FILE (THEY'RE ALL DIFFERENT)'''
 '''Kudo T Obayashi H_J Electrochem Soc (1976) -- fig 1'''
@@ -197,8 +203,25 @@ Xs[ fidx-1 ] = xs_gr_gb
 Eas_gr_gb = d_4.T[ 1,: ]
 Eas.append( d_4.T[ 1,: ] ) # grain Ea
 
-# for i, Ea in enumerate( Eas_gr_gb ):
+# for i, Ea in enumerate( Eas_gr_lowT ):
 pl.plot( xs_gr_gb, Eas_gr_gb, marker=mark[0], c=cols[0] )
+
+ax = pl.gca()
+add_labels( ax, fidx )
+add_legend( ax, leg_ents[fidx], loc=locs[fidx] )
+
+
+'''Zhan Z etal_AC impendance of SDC (2001) jECS Tab 1'''
+fidx = 5 # fig index
+pl.figure( figsize=fig_size[0] )
+
+xs_gr_lowT = d_5[ :,0 ] # grain Ea at lowT
+Xs[ fidx-1 ] = xs_gr_lowT
+Eas_gr_lowT = d_5[ :,4 ]
+Eas.append( d_5[ :,4 ] )
+
+# for i, Ea in enumerate( Eas_gr_lowT ):
+pl.plot( xs_gr_lowT, Eas_gr_lowT, marker=mark[0], c=cols[0] )
 
 ax = pl.gca()
 add_labels( ax, fidx )
