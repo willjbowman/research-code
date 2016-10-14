@@ -1,94 +1,158 @@
-# plot the composition profiles of 10CCO gb2 map3 and 2CCO gb5 map9
+''' ########################### OVERVIEW ########################### '''
+'''
+ Updated 2016-09-28 by Will Bowman.
+ This script creates a figure for plotting composition line profiles for 2CCO
+ and 10CCOO derived from EELS
+'''
 
-input_file_dir = 'C:/Users/willb/Dropbox/WillB/Crozier_Lab/Writing/2015_IS EBSD EELS of CaCeria grain boundaries/figures/FIGURE-PANELS/composition-profiles/'
-
-input_file_name = 'comp-profiles-10-2-CCO.txt'
-
-output_file_dir = input_file_dir
-output_file_name = 'fig4b-comp-profiles-10-2-CCO'
-dots = 400
-
+''' ########################### IMPORT MODULES ########################### '''
+import add_modules_to_syspath # put ~/wills_modules in pyzo path variable
 import numpy as np
 import pylab as pl
 import matplotlib as mpl
+import wills_functions as wf
+import csv, imp, os
+imp.reload(wf) # reload wf
 
-## store data
-# import data
-d = np.genfromtxt( input_file_dir + input_file_name, skiprows = 5, delimiter = '\t' )
+##
 
-dist_10, Ca_10, Ce_10, O_10, dist_2, Ca_2, Ce_2, O_2 = d.T[ 0 ], d.T[ 1 ], d.T[ 2 ], d.T[ 3 ], d.T[ 5 ], d.T[ 6 ], d.T[ 7 ], d.T[ 8 ]
+''' ########################### USER-DEFINED ########################### '''
+# path to data file
+paper_dir ='C:/Users/Besitzer/Dropbox/WillB/Crozier_Lab/Writing/'+\
+    '15_WJB_IS EBSD EELS Ca-Ceria gbs/'
+sub_dir = ''
+# sub_dir = 'CCO-STEM-EELS/' # comment if no subdir
+fig_name = 'CCO-EELS-composition-profiles'
+fig_dir = paper_dir + 'figures/' + fig_name + '/'
+data_dir = paper_dir + 'data/' + fig_name + '/'
+
+d_in_0, d_in_0_ski = data_dir + 'CCO-EELS-composition-profiles_2_and_10.txt', 4
+# d_in_1, d_in_1_ski = data_dir + 'CCO-gb-conductivity-300C.txt', 1
+
+# naming sequence of figs with successive curves on same axis
+file_anno = [ '-0of1', '-1of1' ] # for single fig with all curves
+fig_size = [ (6,3), ( 3, 3 ) ] # ( width, hight ) in inches
+
+# path to output directory
+output_dir = fig_dir
+output_file_name = fig_name
+subfolder = True
+save = True
+# save = False
+
+# font size, resolution (DPI), file type
+leg_ents = [ [ ['[Ce]', '[Ca]'], ['[Ce]', '[Ca]'] ],
+	['10%, [Ce]', r'$[Ca]_2$', r'$[Ce]_{10}$', r'$[Ca]_{10}$'] ]
+leg_loc = 'best'
+x_labs = [ 'Distance (nm)' ]
+y_labs = [ r'Concentration (Mole frac.)' ]
+x_lims = [ [-6,6] ]
+y_lims = [ [ 0, 1 ] ]
+
+fsize, dots, file_types = 10, [300], ['png','svg']
+cols = wf.cols()
+marks, msize, mwidth = wf.marks(), 5, 0.5
+
+shif_x_10, shif_x_2 = -3.5, -9.2 # distance position of gb
+
+
+''' ########################### FUNCTIONS ########################### '''
+
+def mpl_customizations():
+    wf.wills_mpl( fsize ) # pass the figure's fontsize
+        
+''' ########################### MAIN SCRIPT ########################### '''
+
+# READ AND STORE DATA IN VARIABLES
+d0 = np.genfromtxt( d_in_0, skiprows=d_in_0_ski )
+x_10, ca_10, ce_10, o_10, x_2, ca_2, ce_2, o_2 = d0.T
+
+
+'''GENERATE FIGURES'''
+
+# subplot fig for slide
+pl.close( 'all' ) # close all open figures
+pl.figure( figsize=fig_size[0] ) # create a figure ( w, h )
+mpl_customizations() # apply customizations to matplotlib
+
+pl.subplot2grid( (1,2), (0,0) ) # ((rows,cols),(subplot_index))
+ax0 = pl.gca() # store current axis
+
+ax0.plot( x_2+shif_x_2, ce_2, color=cols[0], marker=marks[0], ms=msize,
+	ls='--' )
+ax0.plot( x_2+shif_x_2, ca_2, color=cols[1], marker=marks[1], ms=msize )
+
+# label_lim( ax0, [0] ) # this could be a nice method
+ax0.set_xlim( x_lims[0] )
+ax0.set_ylim( y_lims[0] )
+ax0.set_xlabel( x_labs[0] )
+ax0.set_ylabel( y_labs[0] )
+ax0.minorticks_on()
+
+ax0.legend( leg_ents[0][0], loc=leg_loc,
+    numpoints=1, frameon=False, fontsize=fsize, labelspacing=.6,
+    handletextpad=.6 )
+
+pl.subplot2grid( (1,2), (0,1) ) # ((rows,cols),(subplot_index))
+ax1 = pl.gca() # store current axis
+
+ax1.plot( x_10+shif_x_10, ce_10, color=cols[0], marker=marks[0], ms=msize,
+	ls='--' )
+ax1.plot( x_10+shif_x_10, ca_10, color=cols[1], marker=marks[1], ms=msize )
+
+# label_lim( ax1, [0] ) # this could be a nice method
+ax1.set_xlim( x_lims[0] )
+ax1.set_ylim( y_lims[0] )   
+ax1.set_xlabel( x_labs[0] )
+ax1.set_ylabel( y_labs[0] )
+ax1.minorticks_on()
+
+ax1.legend( leg_ents[0][1], loc=leg_loc,
+    numpoints=1, frameon=False, fontsize=fsize, labelspacing=.6,
+    handletextpad=.6 )
+        
+pl.tight_layout() # can run once to apply to all subplots, i think
+if save:
+    wf.save_fig( fig_dir, file_types, dots, output_file_name, anno,
+        subfolder_save=subfolder )
+
+
+
+# # overlaid compact figure for manuscript
+# for i, anno in enumerate( file_anno ):
     
-## plot stuff
-pl.close( 'all' )
-pl.figure( figsize = ( 2.3, 2.3 ) ) # ( width, height )
-
-mpl.rcParams[ 'font.family' ] = 'sans-serif' # modify matplotlib parameters
-mpl.rcParams[ 'font.weight' ] = 'normal'
-mpl.rcParams[ 'font.size' ] = 10
-mpl.rcParams[ 'mathtext.default' ] = 'regular'
-
-col_10, col_2 = 'maroon', 'slategray'
-fill_10, fill_2 = 'full', 'none'
-O_mark, Ce_mark, Ca_mark = 'o', '^', 'v'
-marker_size, mark_width = 4, 0.5
-shift_2, shift_10, shift_both = 0, 4.0, -7.5
-
-# plot 10CCO
-pl.plot( dist_10 + shift_10 + shift_both, O_10, color = col_10, marker = O_mark, linestyle = 'none',
-    fillstyle = fill_10, mew = mark_width, mec = col_10, markersize = marker_size )
-pl.plot( dist_10 + shift_10 + shift_both, Ce_10, color = col_10, marker = Ce_mark, linestyle = '-',
-    fillstyle = fill_10, mew = mark_width, mec = col_10, markersize = 3 )
-pl.plot( dist_10 + shift_10 + shift_both, Ca_10, color = col_10, marker = Ca_mark, linestyle = '-',
-    fillstyle = fill_10, mew = mark_width, mec = col_10, markersize = 3 )
+#     pl.close( 'all' ) # close all open figures
+#     pl.figure( figsize=fig_size ) # create a figure ( w, h )
+#     mpl_customizations() # apply customizations to matplotlib
     
-# plot 10CCO
-pl.plot( dist_2 + shift_both, O_2, color = col_2, marker = O_mark, linestyle = 'none',
-    fillstyle = fill_2, mew = mark_width, mec = col_2, markersize = marker_size )
-pl.plot( dist_2 + shift_both, Ce_2, color = col_2, marker = Ce_mark, linestyle = 'none',
-    fillstyle = fill_2, mew = mark_width, mec = col_2, markersize = marker_size )
-pl.plot( dist_2 + shift_both, Ca_2, color = col_2, marker = Ca_mark, linestyle = 'none',
-    fillstyle = fill_2, mew = mark_width, mec = col_2, markersize = marker_size )
+#     # pl.subplot2grid( (1,2), (0,0) ) # ((rows,cols),(subplot_index))
+#     ax0 = pl.gca() # store current axis
 
-ax = pl.gca()
-ax.set_xlabel( 'Distance (nm)', labelpad = 0 )
-ax.set_ylabel( 'Composition (mol/mol)', labelpad = 0 )  
-ax.set_xlim( -6, 6 )
-ax.set_ylim( 0, 2.1 )
+#     ax0.plot( x_2+shif_x_2, ce_2, color=cols[1], marker=marks[2], ms=msize,
+#     	ls='--' )
+#     ax0.plot( x_2+shif_x_2, ca_2, color=cols[1], marker='x', ms=msize )
+#     ax0.plot( x_10+shif_x_10, ce_10, color=cols[0], marker=marks[0], ms=msize,
+#     	ls='--' )
+#     ax0.plot( x_10+shif_x_10, ca_10, color=cols[0], marker=marks[1], ms=msize )
 
-# ax.set_xticklabels( [] )
-# ax.set_yticks( np.linspace( 0, 4e-2, 9 ) )
-# ax.yaxis.set_major_locator( mpl.ticker.MultipleLocator( 2e-2 ) )
-ax.minorticks_on()
-# ax.set_yticklabels( np.linspace( 0, 4e-2, 3 ) )
-# ax.set_yticks( [ 0.1, 0.2, 0.3, 0.4 ] )
+#     # label_lim( ax0, [0] ) # this could be a nice method
+#     ax0.set_xlim( x_lims[0] )
+#     ax0.set_ylim( y_lims[0] )
+#     ax0.set_xlabel( x_labs[0] )
+#     ax0.set_ylabel( y_labs[0] )
+#     ax0.minorticks_on()
+    
+#     ax0.legend( leg_ents, loc=leg_loc,
+#         numpoints=1, frameon=False, fontsize=fsize, labelspacing=.1,
+#         handletextpad=.1 )
+            
+#     pl.tight_layout() # can run once to apply to all subplots, i think
+#     if save:
+#         wf.save_fig( fig_dir, file_types, dots, output_file_name, anno,
+#             subfolder_save=subfolder )
 
-# legend_labels = [ 'Exp.', 'Theor.' ]
-# legend_loc = 'best' # ( 4.5 / 11, 0 )
-# ax.legend( legend_labels, loc = legend_loc,
-#     numpoints = 1, frameon = False, fontsize = 10, labelspacing = .01,
-#     handletextpad = 0.2 )
 
-
-# plot 5CCO
-# pl.subplot( 2, 1, 2 )
-# pl.plot( deg_5, num_5, color = mark_col, marker = mark, linestyle = 'none',
-#     fillstyle = 'full', mew = 1, mec = mark_col, markersize = marker_size )
-# pl.plot( deg_5, ran_len_5, color = rand_col, linestyle = '-' )
-# 
-# ax = pl.gca()
-# ax.set_yticks( np.linspace( 0, 4e-2, 9 ) )
-# ax.yaxis.set_major_locator( mpl.ticker.MultipleLocator( 2e-2 ) )
-# ax.minorticks_on()
-# ax.set_xlabel( r'Misorientation angle ($^\circ$)', labelpad = 0 )
-# ax.set_ylabel( 'Number fraction', labelpad = 0 )
-
- 
-
-# ax1.set_xticks( np.linspace( 100, 500, 5 ) )
-# ax1.set_xticklabels( np.linspace( 100, 500, 5 ) )
-# ax1.set_yticks( [ 0.1, 0.2, 0.3, 0.4 ] )
-# ax.minorticks_on()
-
-pl.tight_layout()
-pl.show()
-pl.savefig( output_file_dir + output_file_name + '-' + str( dots ) + 'dpi.png', format = 'png', dpi = dots, transparent = True )
+''' ########################### REFERENCES ########################### '''
+'''
+1. 
+'''

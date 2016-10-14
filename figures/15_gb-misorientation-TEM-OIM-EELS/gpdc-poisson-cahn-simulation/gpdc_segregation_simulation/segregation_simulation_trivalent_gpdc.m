@@ -20,8 +20,8 @@ par_file = 'segpar_ceria3_xiaorui.txt';
 
 % fyv = fyv * 4 % scaling dopant-vacancy association energy
 % cd = cd * 1.3 % scaling gradient energy coefficient
-% nos = linspace( 0.5, 1.9, 8 ); % variable parameter
-nos = linspace( 0.1, 1.9, 10 ); % variable parameter
+% nos = linspace( 0.1, 1.9, 10 ); % variable parameter (in dissertation)
+nos = linspace( .3, 1, 8 ); % variable parameter
 len_nos = length( nos );
 par_name = 'no';
 par_vales = nos;
@@ -35,11 +35,11 @@ save_dir = [ paper_dir 'figures/gpdc-poisson-cahn-simulation/' ...
     '_na-' num2str(na_bulks(1)*100) '/' ];
 
 
-if saving
-    if ~exist( save_dir )
-        mkdir( save_dir )
-    end
-end
+% if saving
+%     if ~exist( save_dir )
+%         mkdir( save_dir )
+%     end
+% end
 
 ys = cell( len_nos, 1 );
 vs = ys;
@@ -91,7 +91,7 @@ for h = 1:len_nos
     % legend_info{g} = [ strcat( 'no = ', num2str( no_h ) ), ...
     %         '; fwhm =', num2str( fwhm*1e9*2, 3), ' nm' ];
 
-    legend_info{g} = [ 'n = ' num2str( no_h ) ' n*, ' ...
+    legend_info{g} = [ 'S = ' num2str( no_h ) ' ; ' ...
         num2str( fwhm*1e9*2, 3) ' nm' ];
 
     figure( fig_nv )
@@ -132,14 +132,15 @@ for h = 1:len_nos
     g = g + 1;
 end
 
-%% GET THE LINEAR FIT OF NA_MAX VS PHI_MAX (NEED FOR RELATING PHI TO MIS ANG)
-P = polyfit( y_maxs, phi_maxs, 1 )
+% GET THE LINEAR FIT OF NA_MAX VS PHI_MAX (NEED FOR RELATING PHI TO MIS ANG)
+P_phi_vs_na_gb = polyfit( y_maxs*na_b_i, phi_maxs, 3 )
 
 %% PLOT THE DATA PRETTY
 
 fig_names = { 'Solute-concentration', 'Space-charge', ...
     'Vacancy-concentration', 'Ea_conductivitiy-ratio' };
 saving = 1;
+saving = 0;
 
 solute_label = '[A^{3+}]_{GB} (Mole frac.)';
 
@@ -317,7 +318,7 @@ for j=1:len_nos
 end
 
 xlim([ -1e-10, 5.1e-9 ])
-ylim([ -.2, 1.6 ])
+ylim([ -.1, 1.3 ])
 ylabel( 'Space charge pot. (V)' )
 xlabel( 'Distance (m)' )
 set(gca,'XMinorTick','on','YMinorTick','on')
@@ -338,9 +339,9 @@ for phi_i = 1:length( phi_maxs )
 end
 % xlabel( 'n/n*' )
 ylabel( 'Sp. chg. pot. (V)' )
-xlim([ .1, .51 ])
-ylim([ -.01, 2 ])
-set(gca,'XMinorTick','on','YMinorTick','on')
+xlim([ .2, .55 ])
+ylim([ .1, 1.2 ])
+set( gca, 'XMinorTick', 'on', 'YMinorTick', 'on', 'TickLength', [.02,.02] )
 
 % ax1_pos = ax1.Position;
 % ax2 = axes( 'position', ax1_pos, 'XAxisLocation', 'top', 'Color', 'none' );
@@ -382,7 +383,7 @@ for j=1:len_nos
 end
 
 xlim([ -1e-10, 5.1e-9 ])
-ylim([ -.01, .25 ])
+ylim([ -.0, .25 ])
 ylabel( 'O vacancy concentration (Mole frac.)' )
 xlabel( 'Distance (m)' )
 set( gca,'XMinorTick','on','YMinorTick','on' )
@@ -401,9 +402,9 @@ for v_min_i = 1:length( v_mins )
 end
 xlabel( solute_label )
 ylabel( '[O vac.]^{min.}' )
-xlim([ .1, .51 ])
-ylim([ -.01, .04 ])
-set(gca,'XMinorTick','on','YMinorTick','on')
+xlim([ .2, .55 ])
+ylim([ .01, .03 ])
+set( gca, 'XMinorTick', 'on', 'YMinorTick', 'on', 'TickLength', [.02,.02] )
 
 % ax1_pos = ax1.Position;
 % ax2 = axes( 'position', ax1_pos, 'XAxisLocation', 'top', 'Color', 'none' );
@@ -435,6 +436,7 @@ Ea_gr_PGCO = 0.78; % eV
 
 na = y_maxs * na_b_i;
 nv_gr = na_b_i / 2 / 2;
+% make array (size na) with Ea
 Ea_n = -10*na.^3 + 7.7143*na.^2 + 0.1714*na + 0.634;
 nv_gbs = v_mins;
 

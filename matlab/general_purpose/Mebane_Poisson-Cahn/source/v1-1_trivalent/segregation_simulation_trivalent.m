@@ -1,8 +1,8 @@
 % This script replicates the results in Mebane EES paper.
 
 T = 440+273;                             % temperature
-% na_bulks = [ 1e-3, .01, .1, .2 ];  % bulk dopant site fractions
-na_bulks = [ .15 ];  % bulk dopant site fractions
+na_bulks = [ 1e-4, 1e-3, .01, .1, .2 ];  % bulk dopant site fractions
+% na_bulks = [ .13 ];  % bulk dopant site fractions
 node_n = 100;
 r_gr = 1e-6;                             % grain radius
 par_file = 'segpar_ceria3_xiaorui.txt';
@@ -31,7 +31,7 @@ for i=1:length( na_bulks )
     lambds(i) = lambd;
     nodess{i} = nodes;
     flags(i) = flag;
-    [ fwhm_ds, fwhm_ind ] = least_squares( y );
+    [ fwhm_ds, fwhm_ind ] = least_squares( y ); % compute the profile width
     fwhm_i = nodes( fwhm_ind );
     fwhms( i ) = fwhm_i;
     disp( strcat( '@', datestr(now,'HH:MM:SS') ) );

@@ -52,7 +52,7 @@ save = True
 fsize, dots, file_types = 10, [300], ['png','svg']
 cols = [ 'maroon', 'grey', 'black', 'goldenrod' ]
 marks, msize = [ 's', 'o', '^', 'x' ], 6
-leg_ents = [ '2 Ca', '5 Ca', '10 Ca', '10 Gd' ]
+leg_ents = [ '2% Ca', '5% Ca', '10% Ca', '10% Gd' ]
 x_lab, y_lab = '1000/T (1/K)', '$log\sigma$ (S/cm)'
 
 # grain boundary thickness (nm)
