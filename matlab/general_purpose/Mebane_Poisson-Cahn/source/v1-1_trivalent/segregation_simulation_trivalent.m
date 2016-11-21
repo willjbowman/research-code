@@ -3,7 +3,7 @@
 T = 440+273;                             % temperature
 na_bulks = [ 1e-4, 1e-3, .01, .1, .2 ];  % bulk dopant site fractions
 % na_bulks = [ .13 ];  % bulk dopant site fractions
-node_n = 100;
+node_n = 200;
 r_gr = 1e-6;                             % grain radius
 par_file = 'segpar_ceria3_xiaorui.txt';
 
@@ -48,7 +48,54 @@ figure()
 
 subplot( 3, 1, 1 )
 for i=1:length( na_bulks )
-    plot( nodess{i}, vs{i}/(na_bulks(i)/2), 'Linewidth', line_w ) % v_bulk is half na_bulk for divalent
+    % v_bulk is half na_bulk for divalent
+    % plot( nodess{i}, vs{i}/(na_bulks(i)/2/2), 'Linewidth', line_w ) 
+    plot( nodess{i}, vs{i}, 'Linewidth', line_w )
+    hold on;
+    legend_info{i} = [ strcat( ...
+         'na=', num2str( na_bulks(i) ), ...
+         '; fwhm=', num2str( fwhms(i)*1e9*2, 2 ), ' nm' ...
+    ) ];
+end
+title( 'Segregation Simulation Trivalent' )
+
+ylabel( 'nv' )
+xlabel( x_label )
+% ylims = [ -0.3, 4.4 ];
+ylim( ylims );
+xlim( xlims );
+legend( legend_info )
+
+subplot( 3, 1, 2 )
+for i=1:length( na_bulks )
+    % plot( nodess{i}, ys{i}/na_bulks(i), 'Linewidth', line_w )
+    plot( nodess{i}, ys{i}, 'Linewidth', line_w )
+    hold on;
+end
+ylabel( 'na' )
+xlabel( x_label )
+% ylims = [ 0, 22 ];
+ylim( ylims );
+xlim( xlims );
+
+subplot( 3, 1, 3 )
+for i=1:length( na_bulks )
+    plot( nodess{i}(1:length(nodess{i})-1), phis{i}, 'Linewidth', line_w )
+    hold on;
+end
+ylabel( 'phi (V)' )
+xlabel( x_label )
+ylims = [ -0.1, 1.1 ];
+ylim( ylims );
+xlim( xlims );
+
+figure()
+
+subplot( 3, 1, 1 )
+for i=1:length( na_bulks )
+    % v_bulk is half na_bulk for divalent
+    plot( nodess{i}, vs{i}/(na_bulks(i)/2/2), 'Linewidth', line_w ) 
+    % plot( nodess{i}, vs{i}, 'Linewidth', line_w )
     hold on;
     legend_info{i} = [ strcat( ...
          'na=', num2str( na_bulks(i) ), ...
@@ -67,6 +114,7 @@ legend( legend_info )
 subplot( 3, 1, 2 )
 for i=1:length( na_bulks )
     plot( nodess{i}, ys{i}/na_bulks(i), 'Linewidth', line_w )
+    % plot( nodess{i}, ys{i}, 'Linewidth', line_w )
     hold on;
 end
 ylabel( 'na/na_{bulk}' )

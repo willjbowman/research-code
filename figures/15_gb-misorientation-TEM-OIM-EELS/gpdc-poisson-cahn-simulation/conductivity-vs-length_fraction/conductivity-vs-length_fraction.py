@@ -70,24 +70,42 @@ lims = [ # [x,y]
     ],
     [ [], [] ],
     [ [], [] ],
-    [ [], [] ]
+    [ 
+        [ [0,.3],[] ], 
+        [ [.9,1.15],[0,.2] ] # inset
+    ],
+    [ 
+        [ [0,.3],[] ],
+        [ [-4,-1.5],[0,.2] ] # inset
+    ]
 ]
 
 x_lims = [ [-.8,1], [1155,1240] ]
 y_lims = [ [0,.3], [0,1] ]
 
 # fit of Ea vs. [solute]
-P_ea = [ -10, 7.7143, 0.1714, 0.634 ]
+# P_ea = [ -10, 7.7143, 0.1714, 0.634 ] # from Ea_grain lit
+P_ea = [ -78.456, 103.9, -43.82, 6.8439 ] # from Ea_GBs Gd-only
+P_ea = [ -47.831, 64.583, -28.225, 5.0159 ] # from Ea_GBs all
+
 # outputs of MatLab simulation script
 # P_phi = [ 1.4599, -2.5358, 3.9246, -0.4624 ] # 'P_phi_vs_na_gb' in .m; 0 Pr3+
 P_phi = [ 1.4599, -2.5358, 3.9246, -0.4624 ] # 'P_phi_vs_na_gb' in .m; 0.5 Pr3+
 # P_phi = [ 1.4599, -2.5358, 3.9246, -0.4624 ] # 'P_phi_vs_na_gb' in .m; 1 Pr3+
 P_cond = [ 87.1720, -65.6588, -3.5286, 1.5086 ]
+P_cond = [ 689.6156, -912.1475, 383.6245, -53.1429 ] # Ea_Gr = 0.78 eV
+# P_cond = [ 689.6156, -912.1475, 383.6245, -53.8470 ] # Ea_Gr = 0.7 eV
+P_cond = [ 420.0889, -566.1236, 246.3749, -37.0549 ] # Ea_Gr=0.78, Ea_GB all data
 
 # # font size, resolution (DPI), file type
 fsize, dots, file_types = 10, [300], ['png','svg']
 cols = wf.cols()
 marks, msize, mwidth = wf.marks(), 5, 0.5
+cmaps = [
+    mpl.cm.spectral_r, mpl.cm.spectral_r, mpl.cm.spectral_r, mpl.cm.cool_r,
+    mpl.cm.cool
+]
+perco_idx = [127,200]
 
 ''' ########################### FUNCTIONS ########################### '''
 
@@ -172,7 +190,7 @@ pl.tight_layout()
 ax = pl.axes([ .35, .55, .3, .3 ]) # [ L, B, W, H ] relative to figure
 t = phi_gb_exp
 s = [ 7**2 for n in range( len( t ) ) ] # [2]
-pl.scatter( ema, t, s=s, c=phi_gb_exp, cmap=mpl.cm.spectral_r )
+pl.scatter( ema, t, s=s, c=phi_gb_exp, cmap=cmaps[fidx] )
 # pl.colorbar()
 ax.set_xlabel( labs[fidx][1][0], labelpad=0.5 )
 ax.set_ylabel( labs[fidx][1][1], labelpad=0.5 )
@@ -194,7 +212,7 @@ pl.figure( figsize=fig_size ) # ( w, h ) inches
 # pl.plot( mack_ang, phi_gb, ls='-' )
 t = phi_gb_exp
 s = [ 7**2 for n in range( len( t ) ) ] # [2]
-pl.scatter( ema, t, s=s, c=phi_gb_exp, cmap=mpl.cm.spectral_r )
+pl.scatter( ema, t, s=s, c=phi_gb_exp, cmap=cmaps[fidx] )
 pl.colorbar()     
 
 ax = pl.gca()
@@ -214,7 +232,7 @@ pl.figure( figsize=(3.5,3) ) # ( w, h ) inches
 # pl.plot( log10_sig_gb_gr, mack, ls='-', c='maroon' )
 t = na_3_gb * 100
 s = [ 7**1.5 for n in range( len( t ) ) ] # [2]
-pl.scatter( t, mack, s=s, c=t, cmap=mpl.cm.spectral_r, edgecolors='none' )
+pl.scatter( t, mack, s=s, c=t, cmap=cmaps[fidx], edgecolors='none' )
 pl.colorbar()
 
 ax = pl.gca()
@@ -230,14 +248,14 @@ if save:
     save_anno_fig( anno )
 
 
-# length fraction vs. ea_gb ##
+# 4. length fraction vs. ea_gb ##
 fidx += 1
 pl.figure( figsize=(3.5,3) ) # ( w, h ) inches
 
 # pl.plot( log10_sig_gb_gr, mack, ls='-', c='maroon' )
 t = ea_gb
 s = [ 7**1.5 for n in range( len( t ) ) ] # [2]
-pl.scatter( t, mack, s=s, c=t, cmap=mpl.cm.spectral_r, edgecolors='none' )
+pl.scatter( t, mack, s=s, c=t, cmap=cmaps[fidx], edgecolors='none' )
 pl.colorbar()
 
 ax = pl.gca()
@@ -247,20 +265,37 @@ ax.set_ylabel( labs[fidx][1], labelpad=0.5 )
 ax.set_ylim( y_lims[0] )
 ax.minorticks_on()
 pl.tight_layout()
+
+# inset axes
+ax = pl.axes([ .44, .57, .3, .3 ]) # [ L, B, W, H ] relative to figure
+# t = phi_gb_exp
+# s = [ 7**2 for n in range( len( t ) ) ] # [2]
+pl.scatter( t, mack, s=s, c=t, cmap=cmaps[fidx], edgecolors='none' )
+pl.plot( t[ perco_idx[0]:perco_idx[1] ], mack[ perco_idx[0]:perco_idx[1] ], 'o',
+    c='w', markersize=1.5 )
+print( np.sum( mack[ perco_idx[0]:perco_idx[1] ] ) / np.sum( mack ) )
+# pl.colorbar()
+ax.set_xlabel( labs[fidx][0], labelpad=0.5 )
+ax.set_ylabel( labs[fidx][1], labelpad=0.5 )
+ax.xaxis.set_major_locator( mpl.ticker.MultipleLocator( .1 ) )
+ax.set_xlim( lims[fidx][1][0] )
+ax.set_ylim( lims[fidx][1][1] )
+ax.minorticks_on()
+pl.tight_layout() # can run once to apply to all subplots, i think
 
 anno = name_ext[fidx]
 if save:
     save_anno_fig( anno )
 
 
-# length fraction vs. sig_gb/sig_gr ##
+# 5. length fraction vs. sig_gb/sig_gr ##
 fidx += 1
 pl.figure( figsize=(3.5,3) ) # ( w, h ) inches
 
 # pl.plot( log10_sig_gb_gr, mack, ls='-', c='maroon' )
 t = log10_sig_gb_gr
 s = [ 7**1.5 for n in range( len( t ) ) ] # [2]
-pl.scatter( t, mack, s=s, c=t, cmap=mpl.cm.spectral, edgecolors='none' )
+pl.scatter( t, mack, s=s, c=t, cmap=cmaps[fidx], edgecolors='none' )
 pl.colorbar()
 
 ax = pl.gca()
@@ -270,6 +305,22 @@ ax.set_ylabel( labs[fidx][1], labelpad=0.5 )
 ax.set_ylim( y_lims[0] )
 ax.minorticks_on()
 pl.tight_layout()
+
+# inset axes
+ax = pl.axes([ .34, .57, .3, .3 ]) # [ L, B, W, H ] relative to figure
+# t = phi_gb_exp
+# s = [ 7**2 for n in range( len( t ) ) ] # [2]
+pl.scatter( t, mack, s=s, c=t, cmap=cmaps[fidx], edgecolors='none' )
+pl.plot( t[ perco_idx[0]:perco_idx[1] ], mack[ perco_idx[0]:perco_idx[1] ], 'o',
+    c='w', markersize=1.5 )
+# pl.colorbar()
+ax.set_xlabel( labs[fidx][0], labelpad=0.5 )
+ax.set_ylabel( labs[fidx][1], labelpad=0.5 )
+ax.xaxis.set_major_locator( mpl.ticker.MultipleLocator( 1 ) )
+ax.set_xlim( lims[fidx][1][0] )
+ax.set_ylim( lims[fidx][1][1] )
+ax.minorticks_on()
+pl.tight_layout() # can run once to apply to all subplots, i think
             
 anno = name_ext[fidx]
 if save:

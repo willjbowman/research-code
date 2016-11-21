@@ -34,13 +34,6 @@ save_dir = [ paper_dir 'figures/gpdc-poisson-cahn-simulation/' ...
     datestr(now, 'yymmdd') '_' par_name ...
     '_na-' num2str(na_bulks(1)*100) '/' ];
 
-
-% if saving
-%     if ~exist( save_dir )
-%         mkdir( save_dir )
-%     end
-% end
-
 ys = cell( len_nos, 1 );
 vs = ys;
 phis = ys;
@@ -135,12 +128,19 @@ end
 % GET THE LINEAR FIT OF NA_MAX VS PHI_MAX (NEED FOR RELATING PHI TO MIS ANG)
 P_phi_vs_na_gb = polyfit( y_maxs*na_b_i, phi_maxs, 3 )
 
+
+
+
 %% PLOT THE DATA PRETTY
 
-fig_names = { 'Solute-concentration', 'Space-charge', ...
-    'Vacancy-concentration', 'Ea_conductivitiy-ratio' };
+fig_names = { 'Solute-concentration-sup', 'Solute-concentration-main', ...
+    'Space-charge-sup', 'Vacancy-concentration-sup', ...
+    'Vacancy-concentration-main', 'Ea_conductivitiy-ratio' };
+
+c_maroon = [ 128, 0, 0 ] / 256;
+c_gold = [ 218, 165, 32 ] / 256;
 saving = 1;
-saving = 0;
+% saving = 0;
 
 solute_label = '[A^{3+}]_{GB} (Mole frac.)';
 
@@ -149,7 +149,7 @@ rgbs = {};
 
 fig_idx = 1;
 % plot the simulation
-fig_name_1 = fig_names{ 1 };
+fig_name_1 = fig_names{ fig_idx };
 if ~isempty(findall(0,'Type','Figure','Name',fig_name_1 ));
     close( fig_name_1 ); % close previous version of fig if it exists
 end
@@ -220,8 +220,8 @@ tri_pr_frac = .5;
 exp_h_sol_ave = exp_h_gd_ave + tri_pr_frac * exp_h_pr_ave;
 
 plot( (exp_h_nm_slice-9.4)*10^-9, exp_h_sol_ave, 'o', 'markersize', msize, ...
-    'markerfacecolor', [ 128, 0, 0 ] / 256, ...
-    'markeredgecolor', [ 128, 0, 0 ] / 256 )
+    'markerfacecolor', c_maroon, ...
+    'markeredgecolor', c_maroon )
 
 %# read the whole file to a temporary cell array
 fid = fopen(exp_l_file,'rt');
@@ -271,11 +271,9 @@ exp_l_pr_ave = ( exp_l_pr_slice + exp_l_pr_flip ) / 2;
 exp_l_sol_ave = exp_l_gd_ave + tri_pr_frac * exp_l_pr_ave;
 
 plot( (exp_l_nm_slice-7)*10^-9, exp_l_sol_ave, 's', 'markersize', msize, ...
-    'markerfacecolor', [ 218, 165, 32 ] / 256, ...
-    'markeredgecolor', [ 218, 165, 32 ] / 256 )
+    'markerfacecolor', c_gold, ...
+    'markeredgecolor', c_gold )
 
-%# delete temporary array (if you want)
-% clear tmp
 
 legend( legend_info )
 legend( 'boxoff' )
@@ -299,8 +297,49 @@ if saving
 end
 
 
+% [3+ SOLUTE] VS. DISTANCE - main text
+fig_idx = fig_idx + 1;
+fig_name = fig_names{ fig_idx };
+if ~isempty(findall(0,'Type','Figure','Name', fig_name ));
+    close( fig_name ); % close previous version of fig if it exists
+end
+figure( 'position', [0, 0, 3, 3]*96, 'name', fig_name ) % 1 px = 1/96 in
+
+plot( (exp_h_nm_slice-9.4)*10^-9, exp_h_sol_ave, 'o', 'markersize', msize, ...
+    'markerfacecolor', c_maroon, ...
+    'markeredgecolor', c_maroon )
+hold on
+plot( nodess{6}, ys{6}, 'color', c_maroon, 'linewidth', line_w )
+
+plot( (exp_l_nm_slice-7)*10^-9, exp_l_sol_ave, 's', 'markersize', msize, ...
+    'markerfacecolor', c_gold, ...
+    'markeredgecolor', c_gold )
+plot( nodess{2}, ys{2}, 'color', c_gold, 'linewidth', line_w )
+
+legend({ 'High-angle GB EELS', 'Simulation', 'Low-angle GB EELS', 'Simulation' })
+legend( 'boxoff' )
+xlim([ -1e-10, 7e-9 ])
+ylim([ .1, .5 ])
+ylabel( '3+ solute conc. (Mole frac.)' )
+xlabel( 'Distance (m)' )
+set( gca, 'XMinorTick', 'on', 'YMinorTick', 'on' )
+set( findall( gcf , '-property', 'FontSize' ), 'FontSize', 10 )
+set( findall( gcf , '-property', 'FontName' ), 'FontName', 'Arial' )
+
+% create save directory if it doesn't exist
+if saving
+    [ 'saving now: ' fig_name ]
+    if ~exist( save_dir )
+        mkdir( save_dir )
+    end
+    save_name = [ save_dir fig_name ];
+    saveas( gcf, save_name, 'svg' )
+    saveas( gcf, save_name, 'png' )
+end
+
+
 % PHI VS. DISTANCE
-fig_idx = 2;
+fig_idx = fig_idx+1;
 % plot the simulation
 fig_name_2 = fig_names{ fig_idx };
 if ~isempty(findall(0,'Type','Figure','Name',fig_name_2 ));
@@ -363,8 +402,10 @@ if saving
 end
 
 
+
+
 % vacancy concentration VS. distance
-fig_idx = 3;
+fig_idx = fig_idx+1;
 % % plot the simulation
 fig_name_3 = fig_names{ fig_idx };
 if ~isempty(findall(0,'Type','Figure','Name',fig_name_3));
@@ -426,10 +467,53 @@ if saving
     saveas( gcf, save_name, 'png' )
 end
 
+
+
+
+% vacancy concentration VS. distance - main text
+fig_idx = fig_idx+1;
+% % plot the simulation
+fig_name = fig_names{ fig_idx };
+if ~isempty(findall(0,'Type','Figure','Name',fig_name));
+    close( fig_name ); % close previous version of fig if it exists
+end
+figure( 'position', [8, 0, 3, 3]*96, 'name', fig_name ) % 1 px = 1/96 in
+plot( nodess{6}, vs{6}, 'color', c_maroon, 'linewidth', line_w )
+hold on
+plot( nodess{2}, vs{2}, 'color', c_gold, 'linewidth', line_w )
+
+% legend({ 'High-ang. GB Simulation','Low-ang. GB Simulation' })
+legend( char({'High-angle', 'GB Simulation'}), ...
+    char({'Low-angle', 'GB Simulation'}) )
+legend( 'boxoff' )
+xlim([ -1e-10, 5.1e-9 ])
+ylim([ 0, .10 ])
+ylabel( 'O vacancy concentration (Mole frac.)' )
+xlabel( 'Distance (m)' )
+set( gca,'XMinorTick','on','YMinorTick','on' )
+set( findall( gcf , '-property', 'FontSize' ), 'FontSize', 10 )
+set( findall( gcf , '-property', 'FontName' ), 'FontName', 'Arial' )
+
+
+
+% save
+if saving
+    [ 'saving now: ' fig_name ]
+    % save_fig( save_dir, save_name, file_types ) % I want this method!!!!
+    if ~exist( save_dir )
+        mkdir( save_dir )
+    end
+    save_name = [ save_dir fig_name ];
+    saveas( gcf, save_name, 'svg' )
+    saveas( gcf, save_name, 'png' )
+end
+
+
+
+
 %%
 % Ea vs. na
-% fit from Zhan ('01)
-fig_idx = 4;
+fig_idx = fig_idx+1;
 kb = 8.612e-5; % eV/K
 T = 300 + 273; % K
 Ea_gr_PGCO = 0.78; % eV
@@ -437,7 +521,11 @@ Ea_gr_PGCO = 0.78; % eV
 na = y_maxs * na_b_i;
 nv_gr = na_b_i / 2 / 2;
 % make array (size na) with Ea
-Ea_n = -10*na.^3 + 7.7143*na.^2 + 0.1714*na + 0.634;
+% Ea_n = -10*na.^3 + 7.7143*na.^2 + 0.1714*na + 0.634; % est from grain; wrong
+Ea_n = -109.66*na.^3 + 143.55*na.^2 - 59.666*na + 8.8666; % Ea_GB Gd-only
+Ea_n = -47.831*na.^3 + 64.583*na.^2 - 28.225*na + 5.0159; % Ea_GB all
+
+
 nv_gbs = v_mins;
 
 % compute Sig_grain assuming .13 3+ solutes and Ea_grain from PGCO

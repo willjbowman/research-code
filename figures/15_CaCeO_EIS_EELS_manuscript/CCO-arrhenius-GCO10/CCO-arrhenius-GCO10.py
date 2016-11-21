@@ -194,6 +194,7 @@ for i in range( 0, len( R_gr ) ):
 '''GENERATE FIGURES'''
 S_gb_sp_dD_1 = S_gb_sp_dD[1] # w/ outliers
 S_gb_sp_dD[1][5:-1]=np.nan # nan outliers
+
 '''GRAIN, TOTAL AND SPECIFIC BOUNDARY CONDUCTIVITY'''
 pl.close( 'all' ) # close all open figures
 pl.figure( figsize = ( 3.4, 3 ) ) # create a figure
@@ -276,6 +277,81 @@ for h in range( 1, len( file_anno ) + 1 ):
         # wf.save_fig( data_dir, file_types, dots, output_file+file_anno[h-1] )
         wf.save_fig( output_dir, file_types, dots, fig_name, anno=file_anno[h-1],
             subfolder_save=subfolder )
+
+'''Total conductivity'''
+
+S_tot_1 = S_tot[1] # w/ outliers
+S_tot[1][5:-1] = np.nan # nan outliers
+
+legend_handles = [] # container for legend handles (filled in loop)
+pl.figure( figsize = ( 3.4, 3 ) ) # create a figure
+ax = pl.gca() # store current axis
+
+mpl_customizations() # apply customizations to matplotlib
+fontsize = mpl.rcParams[ 'font.size' ]
+
+for i in range( 0, 3 ):
+# for i in range( 0, 1 ):
+    col, mark = cols[i], marks[i]
+    # pl.plot( TK_inv[i], np.log10( S_gr[i] ), c=cols[i], 
+    #     marker=marks[i], markersize=msize )
+
+    pl.plot( TK_inv[i], np.log10( S_tot[i] ), marker=marks[i], c=cols[i], 
+        markersize=msize )
+
+    # pl.plot( TK_inv[i], np.log10( S_gb_sp_cc[i]), c=cols[i], 
+    #     marker=marks[i], ls='--', markersize=msize )
+    # pl.plot( TK_inv[i], np.log10( S_gb_sp_dD[i] ),
+    #     c=cols[i], marker=marks[i], ls='--', markersize=msize )
+
+    # pl.errorbar( TK_inv[i], np.log10( S_gr[i] ), 
+    #     yerr = [ S_gr_er[i]*0, np.log10( S_gr_er[i] )/10 ], capthick=1,
+    #     c=cols[i], marker=marks[i], markersize=msize )
+
+    # pl.errorbar( TK_inv[i], np.log10( S_gb_sp_dD[i] ), 
+    #     yerr = np.log10( S_gb_sp_dD_er[i] )/10, capthick=1,
+    #     c=cols[i], marker=marks[i], ls='--', markersize=msize )
+
+    # apply legend to each figure
+    leg_info = mpl.lines.Line2D( [], [], color=col, marker=mark, 
+        markersize=msize, linestyle='-' )
+    legend_handles.append( leg_info )
+
+# pl.legend( leg_ents )
+pl.ylabel( y_lab, labelpad=1.5 )
+pl.xlabel( x_lab, labelpad=1.5 )
+ax.set_xlim( x_lims )
+ax.set_ylim( y_lims )
+
+ax2 = ax.twiny() #create a second x-axis which shares ax1's y-axis
+Tc_axis_label = 'T ($^\circ$C)'
+ax2_Tc_ticks = np.linspace( 700, 150, 12 ) # Celcius axis ticks and labels
+ax2_Tc_ticklabels = np.array( [ 700, '', '', '', 500, '', 400, '',
+    300, '', 200, '' ] )
+#calculate 2nd axis tick locations
+ax2_tick_Tk_locations = 1000 / ( ax2_Tc_ticks + 273 ) 
+ax2_tick_Tc_locations = ( ax2_tick_Tk_locations - x_lims[0] ) / \
+    ( x_lims[1] - x_lims[0] )
+ax2.set_xticks( ax2_tick_Tc_locations ) #add ticks and labels to 2nd axis
+ax2.set_xticklabels( ax2_Tc_ticklabels )
+ax2.set_xlabel( Tc_axis_label )
+
+pl.tight_layout() # can run once to apply to all subplots, i think
+
+
+# # pl.tight_layout() # can run once to apply to all subplots, i think
+# ax.legend( leg_ents )
+ax.legend( legend_handles, leg_ents, loc = 'lower left',
+    numpoints = 1, frameon = False, fontsize = 10, labelspacing = .01,
+    handletextpad = .2 )
+# pl.ylabel( y_lab, labelpad=1.5 )
+# pl.xlabel( x_lab, labelpad=1.5 )
+
+if save:
+    # wf.save_fig( data_dir, file_types, dots, output_file+file_anno[h-1] )
+    file_anno = '-Total'
+    wf.save_fig( output_dir, file_types, dots, fig_name, anno=file_anno,
+        subfolder_save=subfolder )
 
 
 ''' ########################### REFERENCES ########################### '''

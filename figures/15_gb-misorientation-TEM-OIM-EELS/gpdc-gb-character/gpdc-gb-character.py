@@ -18,7 +18,12 @@ import math as math
 
 ''' ########################### USER-DEFINED ########################### '''
 # path to data file (make gui to pick files?)
-fig_dir = 'C:/Users/Besitzer/Dropbox/WillB/Crozier_Lab/Writing/15_WJB_gb misorientation OIM EELS/figures/gpdc-gb-character/'
+paper_dir = 'C:/Users/Besitzer/Dropbox/WillB/Crozier_Lab/Writing/'+\
+    '15_WJB_gb misorientation OIM EELS/'
+fig_name = 'gpdc-gb-character'
+data_dir = paper_dir + 'data/' + fig_name + '/'
+fig_dir = paper_dir + 'figures/' + fig_name + '/'
+# fig_dir = 'C:/Users/Besitzer/Dropbox/WillB/Crozier_Lab/Writing/15_WJB_gb misorientation OIM EELS/figures/gpdc-gb-character/'
 
 # misorientation angle distribution (MAD)
 d_mad = fig_dir + 'misorientation-distribution/GPDCfib_gbLengthFraction.txt'
@@ -30,12 +35,17 @@ d_csl_skiprows = 0
 d_mack = fig_dir + 'misorientation-distribution/mackenzie_200_bins-tdl.txt'
 d_mack_skiprows = 7
 
-# output file info
+# path to output directory
 output_dir = fig_dir
-output_file = 'gpdc-gb-character'
+output_file = fig_name
+subfolder = True
+save = True
+# save = False
 
 # font size, resolution (DPI), file type
-fsize, dots, file_type = 10, [ 300, 1200 ], 'png'
+fsize, dots, file_types = 10, [300], ['png','svg']
+cols = wf.cols()
+marks, msize, mwidth = wf.marks(), 5, 0.5
 
 # subplot 0 (sp0): length fraction v misorientation angle
 sp0_ax_labs = [ 'Misorientation angle (Deg.)', 'Length fraction' ]
@@ -94,7 +104,7 @@ mack_ang, mack_cor, mack_rand = np.loadtxt( d_mack, skiprows=d_mack_skiprows ).T
 mack = mack_rand * mack_scalar + mack_shift
 
 pl.close( 'all' ) # close all open figures
-pl.figure( figsize = ( 3.33, 4 ) ) # create a figure of size ( width", height" )
+pl.figure( figsize = ( 3, 4 ) ) # create a figure of size ( width", height" )
 ax = pl.gca() # store current axis
 
 mpl_customizations() # apply customizations to matplotlib
@@ -113,8 +123,9 @@ sp1_style( ax1 )
 # applies to all subplots, h_pad defined vertical spacing
 pl.tight_layout( pad=0.3, h_pad=0.6 )
 
-# for dot in dots:
-#     output_name = wf.save_name( fig_dir, output_file, dot, file_type )
-#     pl.savefig( output_name, format = file_type, dpi = dot, transparent = True )
-    
+if save:
+    file_anno = ''
+    wf.save_fig( output_dir, file_types, dots, fig_name, anno=file_anno,
+        subfolder_save=subfolder )
+  
 ''' ########################### REFERENCES ########################### '''
