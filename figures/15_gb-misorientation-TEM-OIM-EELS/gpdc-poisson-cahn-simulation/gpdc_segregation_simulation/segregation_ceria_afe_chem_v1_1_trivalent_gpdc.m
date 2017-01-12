@@ -84,23 +84,40 @@ avnum = 6.022e23;
 % material parameters
 paramfile = varargin{5};
 par = importdata(paramfile,' ',2);
-no = par.data(1);       % surface site density for vacancies, mol/m^2 (NvGB)
-% no = no * 1.4; % interface site density (proportional to phi)
-no = no * varargin{6}; % interface site density (proportional to phi)
-fv = par.data(2);       % vacancy self-interaction, J/mol
-fo = par.data(3);          % vacancy segregation energy, J/mol
-fo = fo * 1.1;          % lowers vacancy profile minimum
-fy = par.data(4);       % dopant self-interaction, J/mol
-% fy = fy * 1.3;
-fyv = par.data(5);      % dopant-vacancy interaction, J/mol
-% fyv = fyv * 3; % proportional to na_max (diss)
-fyv = fyv * 5.8; % proportional to na_max
-cv = par.data(6);       % vacancy gradient energy coefficient, J/mol-m
-% cv = cv * 1.5; % inv prop to phi (diss)
-cv = cv * .5; % inv prop to phi
-cd = par.data(7);       % dopant gradient energy coefficient, J/mol-m
-% cd = cd * 0.85; % proportional to fwhm (diss)
-cd = cd * .6; % proportional to fwhm
+
+% surface site density for vacancies, mol/m^2 (NvGB)
+% proportional to phi
+no = par.data(1);
+no = no * varargin{6};
+
+% vacancy self-interaction, J/mol
+fv = par.data(2);
+% fv = fv * .5;
+
+% vacancy segregation energy, fvGB, J/mol
+% lowers vacancy profile minimum
+fo = par.data(3);
+% fo = fo * 1.75; % 161215
+
+% dopant self-interaction, 'faa', J/mol
+fy = par.data(4);
+% fy = fy * .75; % 161215
+
+% dopant-vacancy interaction, 'fav', J/mol
+% proportional to na_max
+fyv = par.data(5);
+% fyv = fyv * 1.5; %*
+
+% vacancy gradient energy coefficient, J/mol-m
+% inv prop to phi
+cv = par.data(6);
+% cv = cv * .10; % (changed 161201)
+
+% dopant gradient energy coefficient, J/mol-m
+% proportional to fwhm
+cd = par.data(7);
+% cd = cd * .8;
+
 epsr = par.data(8);     % relative permittivity
 latpar = par.data(9);   % lattice parameter, m
 

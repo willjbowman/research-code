@@ -17,9 +17,9 @@ import csv, imp, os
 
 ''' ########################### USER-DEFINED ########################### '''
 # path to data file
-paper_dir = 'C:/Users/Besitzer/Dropbox/WillB/Crozier_Lab/Writing/'+\
+paper_dir ='C:/Users/Besitzer/Dropbox/WillB/Crozier_Lab/Writing/'+\
     '16_WJB_Heterolayer strain mapping/'
-fig_name = 'EELS-maps-ERO'
+fig_name = 'EELS-maps-BNO-BiNb'
 fig_dir = paper_dir + 'figures/' + fig_name + '/'
 data_dir = paper_dir + 'data/' + fig_name + '/'
 
@@ -39,21 +39,21 @@ save = True
 
 # font size, resolution (DPI), file type
 leg_ents = [
-    [ 'O K', 'F', 'Ce M5', 'Ce M4', 'Ce M45', 'Gd M45', 'Er M5' ], 
-    [ 'I Gd/Ce', 'I Ce_M4/M5' ]
+    [ 'Nb L23', 'Bi M5' ], 
+    [ 'I Bi/Nb' ]
     ]
 leg_loc = 'best'
 x_labs = [ 'distance (nm)', 'Distance (nm)' ]
 y_labs = [ 'Counts (Arb. units)', 'Counts (Arb. units)' ]
 x_lims = [ [.01, .11] ]
-y_lims = [ [.0, .7], [ -.5, 2.5 ] ]
+y_lims = [ [.0, .7], [ 0, 1.5 ] ]
 
-fsize, dots, file_types = 10, [300], ['png','svg']
+fsize, dots, file_types = 10, [300], ['png']
 cols = wf.cols()
 marks, msize, mwidth = wf.marks(), 5, 0.5
 
 anno = ''
-percent_er = 0.19 # propagated error from k-factor (determined in grain)
+# percent_er = 0.19 # propagated error from k-factor (determined in grain)
 
 ''' ########################### FUNCTIONS ########################### '''
 
@@ -70,7 +70,7 @@ pl.close( 'all' ) # close all open figures
 for i, fname in enumerate( os.listdir( data_dir ) ):
 
     d = np.genfromtxt( data_dir+fname, delimiter='\t' )
-    nm, iOK, iF, iCeM5, iCeM4, iCeM, iGdM, iErM5 = d
+    nm, iNb, iBi = d
     
     pl.figure( figsize=fig_size ) # create a figure ( w, h )
     mpl_customizations() # apply customizations to matplotlib
@@ -115,9 +115,7 @@ for i, fname in enumerate( os.listdir( data_dir ) ):
     pl.subplot2grid( (2,2), (1,1) ) # ((rows,cols),(subplot_index))
     ax1 = pl.gca() # store current axis
 
-    ax1.plot( d[0], iGdM/iCeM, marker=marks[0] )
-    ax1.plot( d[0], iCeM4/iCeM5, marker=marks[0] )
-    ax1.plot( d[0], iErM5/iCeM, marker=marks[0] )
+    ax1.plot( d[0], iBi/iNb, marker=marks[0] )
 
     # label_lim( ax1, [1] )
     # ax1.set_xlim( x_lims[1] )

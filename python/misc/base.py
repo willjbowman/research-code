@@ -7,6 +7,9 @@
 """
 The base code editor class.
 
+USE THIS FILE FOR DARK THEME:
+http://blogs.univ-poitiers.fr/laurentsignac/2013/09/01/sublime-dark-iep/
+
 
 """
 

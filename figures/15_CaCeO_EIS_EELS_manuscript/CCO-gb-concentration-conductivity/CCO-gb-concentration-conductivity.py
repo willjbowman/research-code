@@ -73,7 +73,7 @@ x_10 = [ .1 for x in gb_id_10 ] # arrays with nominal [Ca]
 x_5 = [ .05 for x in gb_id_5 ]
 x_2 = [ .02 for x in gb_id_2 ]
 
-x, x_gb, x_gb_er, S_gb, S_gb_er = d1.T
+x, x_gb, x_gb_stdev, x_gb_er, S_gb, S_gb_er = d1.T
 
 
 '''GENERATE FIGURES'''
@@ -86,6 +86,7 @@ for i, anno in enumerate( file_anno ):
     pl.subplot2grid( (1,2), (0,0) ) # ((rows,cols),(subplot_index))
     ax0 = pl.gca() # store current axis
 
+    # plot the errorbars
     ax0.errorbar( x_2, Ca_2, yerr=percent_er*Ca_2, color=cols[1],
         fmt=marks[0], ms=msize-2, capthick=1 )
     ax0.errorbar( x_5, Ca_5, yerr=percent_er*Ca_5, color=cols[1],
@@ -93,6 +94,7 @@ for i, anno in enumerate( file_anno ):
     ax0.errorbar( x_10, Ca_10, yerr=percent_er*Ca_10, color=cols[1],
         fmt=marks[0], ms=msize-2, capthick=1 )
 
+    # plot the data points on top
     ax0.plot( x_2, Ca_2, color=cols[0], marker=marks[0], ms=msize, 
         ls='' )
     ax0.plot( x_5, Ca_5, color=cols[0], marker=marks[0], ms=msize, 
@@ -120,18 +122,7 @@ for i, anno in enumerate( file_anno ):
     ax1_leg_hand = mpl.lines.Line2D( [], [], c=cols[0], marker=marks[0],
         ms=msize, ls='' )
 
-    # if h == 1:
-    
-    # ax1.legend( [ax1_leg_hand], leg_ents, loc='upper right',
-    #     numpoints=1, frameon=False, fontsize=fsize, labelspacing=.01,
-    #     handletextpad=.01 )
-                
-        # pl.tight_layout() # can run once to apply to all subplots, i think
-        
-        # save_fig( output_file + file_anno[h-1] )
-        
-    # if h == 2:
-
+    # plot the mean and std dev of [Ca]_GB
     ax2 = ax1.twinx() #create a second x-axis which shares ax1's y-axis
     ax2.errorbar( x, x_gb, yerr=x_gb_er, color=cols[1], fmt=marks[1],
         capthick=1, ms=msize, ls='-' )

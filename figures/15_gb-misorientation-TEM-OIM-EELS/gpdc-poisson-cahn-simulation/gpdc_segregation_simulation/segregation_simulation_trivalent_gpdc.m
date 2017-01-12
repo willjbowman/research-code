@@ -31,7 +31,7 @@ paper_dir = [ 'C:/Users/Besitzer/Dropbox/WillB/Crozier_Lab/Writing/' ...
 
 save_dir = [ paper_dir 'figures/gpdc-poisson-cahn-simulation/' ...
     'conductivity-vs-length_fraction/' ...
-    datestr(now, 'yymmdd') '_' par_name ...
+    datestr(now, 'yymmdd') '_' datestr(now, 'hhMM') '_' par_name ...
     '_na-' num2str(na_bulks(1)*100) '/' ];
 
 ys = cell( len_nos, 1 );
@@ -46,7 +46,12 @@ phi_maxs = lamvs;
 fwhms = flags;
 v_mins = lamvs; % minimum vacancy concentration at gb
 
-% close all
+
+saving = 1;
+saving = 0;
+
+close all
+
 fig_nv = figure( 'position', [0, 0, fig_w, fig_h] ); % [ bot_l, bot_r, w, h ]
 fig_nd = figure( 'position', [fig_w, 0, fig_w, fig_h] );
 fig_phi = figure( 'position', [2*fig_w, 0, fig_w, fig_h] );
@@ -128,6 +133,35 @@ end
 % GET THE LINEAR FIT OF NA_MAX VS PHI_MAX (NEED FOR RELATING PHI TO MIS ANG)
 P_phi_vs_na_gb = polyfit( y_maxs*na_b_i, phi_maxs, 3 )
 
+% save
+if saving
+    [ 'saving now: ' 'fig_nv' ]
+    % save_fig( save_dir, save_name, file_types ) % I want this method!!!!
+    if ~exist( save_dir ) % create save directory if it doesn't exist
+        mkdir( save_dir )
+    end
+    save_name = [ save_dir 'fig_nv' ];
+    saveas( fig_nv, save_name, 'svg' )
+    saveas( fig_nv, save_name, 'png' )
+    
+    [ 'saving now: ' 'fig_nd' ]
+    % save_fig( save_dir, save_name, file_types ) % I want this method!!!!
+    if ~exist( save_dir ) % create save directory if it doesn't exist
+        mkdir( save_dir )
+    end
+    save_name = [ save_dir 'fig_nd' ];
+    saveas( fig_nd, save_name, 'svg' )
+    saveas( fig_nd, save_name, 'png' )
+
+    [ 'saving now: ' 'fig_phi' ]
+    % save_fig( save_dir, save_name, file_types ) % I want this method!!!!
+    if ~exist( save_dir ) % create save directory if it doesn't exist
+        mkdir( save_dir )
+    end
+    save_name = [ save_dir 'fig_phi' ];
+    saveas( fig_phi, save_name, 'svg' )
+    saveas( fig_phi, save_name, 'png' )
+end
 
 
 
@@ -139,8 +173,6 @@ fig_names = { 'Solute-concentration-sup', 'Solute-concentration-main', ...
 
 c_maroon = [ 128, 0, 0 ] / 256;
 c_gold = [ 218, 165, 32 ] / 256;
-saving = 1;
-% saving = 0;
 
 solute_label = '[A^{3+}]_{GB} (Mole frac.)';
 
@@ -357,7 +389,7 @@ for j=1:len_nos
 end
 
 xlim([ -1e-10, 5.1e-9 ])
-ylim([ -.1, 1.3 ])
+% ylim([ -.1, 1.3 ])
 ylabel( 'Space charge pot. (V)' )
 xlabel( 'Distance (m)' )
 set(gca,'XMinorTick','on','YMinorTick','on')
@@ -378,8 +410,8 @@ for phi_i = 1:length( phi_maxs )
 end
 % xlabel( 'n/n*' )
 ylabel( 'Sp. chg. pot. (V)' )
-xlim([ .2, .55 ])
-ylim([ .1, 1.2 ])
+xlim([ .1, .5 ])
+% ylim([ .1, 1.2 ])
 set( gca, 'XMinorTick', 'on', 'YMinorTick', 'on', 'TickLength', [.02,.02] )
 
 % ax1_pos = ax1.Position;
@@ -443,8 +475,8 @@ for v_min_i = 1:length( v_mins )
 end
 xlabel( solute_label )
 ylabel( '[O vac.]^{min.}' )
-xlim([ .2, .55 ])
-ylim([ .01, .03 ])
+xlim([ .1, .5 ])
+% ylim([ .01, .03 ])
 set( gca, 'XMinorTick', 'on', 'YMinorTick', 'on', 'TickLength', [.02,.02] )
 
 % ax1_pos = ax1.Position;
@@ -515,7 +547,7 @@ end
 % Ea vs. na
 fig_idx = fig_idx+1;
 kb = 8.612e-5; % eV/K
-T = 300 + 273; % K
+T = 800 + 273; % K
 Ea_gr_PGCO = 0.78; % eV
 
 na = y_maxs * na_b_i;
@@ -524,6 +556,7 @@ nv_gr = na_b_i / 2 / 2;
 % Ea_n = -10*na.^3 + 7.7143*na.^2 + 0.1714*na + 0.634; % est from grain; wrong
 Ea_n = -109.66*na.^3 + 143.55*na.^2 - 59.666*na + 8.8666; % Ea_GB Gd-only
 Ea_n = -47.831*na.^3 + 64.583*na.^2 - 28.225*na + 5.0159; % Ea_GB all
+Ea_n = 2e-4 * na .^ -5 + .92; % Ea_GB all ax^r+c
 
 
 nv_gbs = v_mins;
@@ -572,15 +605,15 @@ for j=1:length(na)
 end
 
 yyaxis left
-% xlim([ -1e-10, 5.1e-9 ])
-ylim([ .6, 1.7 ])
+xlim([ .1, .5 ])
+% ylim([ .6, 1.7 ])
 ylabel( 'E_a^{GB} (eV)' )
 xlabel( solute_label )
 set( gca,'XMinorTick','on','YMinorTick','on' )
 
 yyaxis right
-% xlim([ -1e-10, 5.1e-9 ])
-ylim([ 1e-8, 1e2 ])
+xlim([ .1, .5 ])
+ylim([ 1e-8, 1e-1 ])
 ylabel( '\sigma_{GB}/\sigma_{Grain}' )
 set( gca,'XMinorTick','on','YMinorTick','on' )
 

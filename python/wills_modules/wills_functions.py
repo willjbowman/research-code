@@ -289,7 +289,7 @@ Usage:
 '''
 
 def date_str( mill='' ):
-    return str( dt.date.today() ).replace('-','').replace('20',mill)
+    return str( dt.date.today() ).replace('-','').replace('20',mill,1)
 
 ''' ########################## save_fig ########################## 
 
