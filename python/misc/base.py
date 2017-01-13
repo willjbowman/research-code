@@ -254,6 +254,8 @@ class CodeEditorBase(QtGui.QPlainTextEdit):
             S["Editor.text"] = "back:%s, fore:%s" % (lsdarkgrey, lslightblue)
             S['Syntax.identifier'] = "fore:%s, bold:no, italic:no, underline:no" % lswhite
             S["Syntax.nonidentifier"] = "fore:%s, bold:no, italic:no, underline:no" % lslightpink
+            S["Syntax.openparen"] = "fore:%s, bold:no, italic:no, underline:no" % lslightpink
+            S["Syntax.closeparen"] = "fore:%s, bold:no, italic:no, underline:no" % lslightpink
             S["Syntax.keyword"] = "fore:%s, bold:no, italic:no, underline:no" % lspink
  
             S["Syntax.functionname"] = "fore:%s, bold:yes, italic:no, underline:no" % lsgreen
