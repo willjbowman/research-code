@@ -169,7 +169,7 @@ end
 
 fig_names = { 'Solute-concentration-sup', 'Solute-concentration-main', ...
     'Space-charge-sup', 'Vacancy-concentration-sup', ...
-    'Vacancy-concentration-main', 'Ea_conductivitiy-ratio' };
+    'Vacancy-concentration-main', 'Ea_conductivitiy-ratio', 'nv-vs-na' };
 
 c_maroon = [ 128, 0, 0 ] / 256;
 c_gold = [ 218, 165, 32 ] / 256;
@@ -615,6 +615,79 @@ yyaxis right
 xlim([ .1, .5 ])
 ylim([ 1e-8, 1e-1 ])
 ylabel( '\sigma_{GB}/\sigma_{Grain}' )
+set( gca,'XMinorTick','on','YMinorTick','on' )
+
+set( findall( gcf , '-property', 'FontSize' ), 'FontSize', 10 )
+set( findall( gcf , '-property', 'FontName' ), 'FontName', 'Arial' )
+
+% save
+if saving
+    [ 'saving now: ' fig_name ]
+    % save_fig( save_dir, save_name, file_types ) % I want this method!!!!
+    if ~exist( save_dir )
+        mkdir( save_dir )
+    end
+    save_name = [ save_dir fig_name ];
+    saveas( gcf, save_name, 'svg' )
+    saveas( gcf, save_name, 'png' )
+end
+
+
+
+
+%%
+% nv vs. na and fit
+fig_idx = fig_idx+1;
+
+% plot the simulation
+fig_name = fig_names{ fig_idx };
+if ~isempty(findall(0,'Type','Figure','Name',fig_name));
+    close( fig_name ); % close previous version of fig if it exists
+end
+figure( 'name', fig_name, 'position', [8, 4, 3, 3]*96) % 1 px = 1/96 in
+% left_color = [0 0 0];
+% right_color = left_color;
+% set( gcf, 'defaultAxesColorOrder', [left_color; right_color] );
+
+% yyaxis left
+% plot( na, Ea_n, '--k' ) % eyeguide for Ea
+
+% yyaxis right
+% semilogy( na, S_gb_gr, '--r' ) % eyeguide
+% polynomial fitting log( conductivity ratio ) vs [A3+]
+polyfit_log10_nv_na = polyfit( na, log10(v_mins), 3 ) % console
+log10_nv_na_polyval = polyval( polyfit_log10_nv_na, na );
+semilogy( na, 10.^log10_nv_na_polyval, '-k' ) % underlay polyfit
+hold on
+drawnow
+
+legend( { 'nv_{GB}, fit' } )%, ...
+    % 'Position', [.33 .77 .5 .1] ); % [left bottom width height] relat to fig
+legend boxoff
+
+grey = 170;
+for j=1:length(na)
+    % yyaxis left
+    % plot( na(j), Ea_n(j), 'o', 'markersize', msize, ...
+    % 'markerfacecolor', rgbs{j}, 'markeredgecolor', rgbs{j} )
+    % yyaxis right
+    semilogy( na(j), v_mins(j), 's', 'markersize', msize, ...
+    'markerfacecolor', rgbs{j}, 'markeredgecolor', rgbs{j} )
+    hold on
+    drawnow
+end
+
+% yyaxis left
+% xlim([ .1, .5 ])
+% % ylim([ .6, 1.7 ])
+% ylabel( 'E_a^{GB} (eV)' )
+% set( gca,'XMinorTick','on','YMinorTick','on' )
+
+% yyaxis right
+xlim([ .1, .5 ])
+ylim([ 1e-8, 1e-1 ])
+xlabel( solute_label )
+ylabel( '[nv_{GB}]' )
 set( gca,'XMinorTick','on','YMinorTick','on' )
 
 set( findall( gcf , '-property', 'FontSize' ), 'FontSize', 10 )

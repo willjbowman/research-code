@@ -97,11 +97,11 @@ fv = par.data(2);
 % vacancy segregation energy, fvGB, J/mol
 % lowers vacancy profile minimum
 fo = par.data(3);
-% fo = fo * 1.75; % 161215
+fo = fo * 1.75; % 161215
 
 % dopant self-interaction, 'faa', J/mol
 fy = par.data(4);
-% fy = fy * .75; % 161215
+fy = fy * .75; % 161215
 
 % dopant-vacancy interaction, 'fav', J/mol
 % proportional to na_max

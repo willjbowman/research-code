@@ -26,9 +26,10 @@ sub_dir = 'gpdc-poisson-cahn-simulation/' # comment if no subdir
 fig_name = 'conductivity-vs-length_fraction'
 name_ext = [ '_Space-charge-dist', 
              '_Space-charge-dist_cmap', 
-             '_Trival-conc-gb-dist', 
-             '_Ea-gb-dist',
-             '_Conductiv-dist' ]
+             '_Trival-conc-gb-dist', # fig. 3
+             '_Ea-gb-dist', # fig. 4
+             '_Conductiv-dist', # fig. 5
+             '_Conductiv-dist-binned' ] # fig. 6
 
 fig_dir = paper_dir + 'figures/' + sub_dir + fig_name + '/'
 data_dir = paper_dir + 'data/' + sub_dir + fig_name + '/'
@@ -59,7 +60,10 @@ labs = [ # [x,y]
     ],
     [ 'Misorientation angle (Deg.)', 'Space charge potential (V)' ],
     [ r'$[A^{3+}]_{GB}$ (Mole%)', 'Length fraction' ],
-    [ r'$E_a^{GB}$ (eV)', 'Length fraction' ],
+    [
+        [ r'$E_a^{GB}$ (eV)', 'Length fraction' ],
+        [ r'$log([nv]_{GB})$', 'Length fraction' ]
+    ],
     [ r'log($\sigma_{GB}/\sigma_{Grain}$)', 'Length fraction' ],
     [ r'log($\sigma_{GB}/\sigma_{Grain}$)', 'Length fraction' ] # 6
 ]
@@ -72,8 +76,8 @@ lims = [ # [x,y]
     [ [], [] ],
     [ [], [] ],
     [ 
-        [ [0,.3],[] ], 
-        [ [.9,1.15],[0,.2] ] # inset
+        [ [.5,3.5], [] ], 
+        [ [.9,1.15], [0,.2] ] # inset
     ],
     [ 
         [ [0,.3],[] ],
@@ -103,6 +107,9 @@ P_phi = [ 1.4599, -2.5358, 3.9246, -0.4624 ] # 'P_phi_vs_na_gb' in .m; 0.5 Pr3+
 # Ea_Gr=0.78, Ea_GB from peter fitting (Ea_GB all ax^r+c)
 P_cond = [ 1344.7, -1399.7, 454.4, -49.6 ] # fvgb=1.75; faa=0.5
 P_cond = [ 1830.9, -1806.1, 559.6, -58.3 ] # fvgb=1.75; faa=0.75
+
+# nv vs na 
+P_nv = [ 830.6307, -792.1165, 216.5590, -20.1802 ] # fvgb=1.75; faa=0.75
 
 # # font size, resolution (DPI), file type
 fsize, dots, file_types = 10, [300], ['png','svg']
@@ -173,6 +180,10 @@ log10_sig_gb_gr = np.polyval( P_cond, na_3_gb )
 # evaluate Ea at each [solute]_gb
 # ea_gb = np.polyval( P_ea, na_3_gb )
 ea_gb = F_ea[0] * ( na_3_gb ** F_ea[1] ) + F_ea[2]; # Ea_GB all ax^r+c
+
+# evaluate nv at each [solute]_gb
+nv_gb = np.polyval( P_nv, na_3_gb )
+# ea_gb = F_ea[0] * ( na_3_gb ** F_ea[1] ) + F_ea[2]; # Ea_GB all ax^r+c
 
 
 # GENERATE FIGURES #####
@@ -258,7 +269,11 @@ if save:
 
 # 4. length fraction vs. ea_gb ##
 fidx += 1
-pl.figure( figsize=(3.5,3) ) # ( w, h ) inches
+# pl.figure( figsize=(3.5,3) ) # ( w, h ) inches
+
+pl.figure( figsize=(7,3) ) # ( w, h ) inches
+# un-binned distribution
+pl.subplot2grid( (1,2), (0,0) ) # ((rows,cols),(subplot_index))
 
 # pl.plot( log10_sig_gb_gr, mack, ls='-', c='maroon' )
 t = ea_gb
@@ -267,36 +282,77 @@ pl.scatter( t, mack, s=s, c=t, cmap=cmaps[fidx], edgecolors='none' )
 pl.colorbar()
 
 ax = pl.gca()
-ax.set_xlabel( labs[fidx][0], labelpad=0.5 )
-ax.set_ylabel( labs[fidx][1], labelpad=0.5 )
-# ax.set_xlim( x_lims[0] )
+ax.set_xlabel( labs[fidx][0][0], labelpad=0.5 )
+ax.set_ylabel( labs[fidx][0][1], labelpad=0.5 )
+ax.set_xlim( lims[fidx][0][0] )
 ax.set_ylim( y_lims[0] )
 ax.minorticks_on()
 pl.tight_layout()
 
-# inset axes
-ax = pl.axes([ .44, .57, .3, .3 ]) # [ L, B, W, H ] relative to figure
-# t = phi_gb_exp
-# s = [ 7**2 for n in range( len( t ) ) ] # [2]
-pl.scatter( t, mack, s=s, c=t, cmap=cmaps[fidx], edgecolors='none' )
-pl.plot( t[ perco_idx[0]:perco_idx[1] ], mack[ perco_idx[0]:perco_idx[1] ], 'o',
-    c='w', markersize=1.5 )
-print( np.sum( mack[ perco_idx[0]:perco_idx[1] ] ) / np.sum( mack ) )
-# pl.colorbar()
-ax.set_xlabel( labs[fidx][0], labelpad=0.5 )
-ax.set_ylabel( labs[fidx][1], labelpad=0.5 )
-ax.xaxis.set_major_locator( mpl.ticker.MultipleLocator( .1 ) )
-ax.set_xlim( lims[fidx][1][0] )
-ax.set_ylim( lims[fidx][1][1] )
+# binned distribution
+pl.subplot2grid( (1,2), (0,1) ) # ((rows,cols),(subplot_index))
+# THIS SHOULD BE THE BINNED NV VS NA
+
+# pl.plot( log10_sig_gb_gr, mack, ls='-', c='maroon' )
+# t = nv_gb
+t = 10**nv_gb[150:200] * np.exp( -ea_gb[150:200] / (kb*T) )
+s = [ 7**1.5 for n in range( len( t ) ) ] # [2]
+# pl.scatter( t, mack, s=s, c=t, cmap=cmaps[fidx], edgecolors='none' )
+pl.scatter( t, mack[150:200], s=s, c=t, cmap=cmaps[fidx], edgecolors='none' )
+pl.colorbar()
+
+ax = pl.gca()
+ax.set_xlabel( labs[fidx][1][0], labelpad=0.5 )
+ax.set_ylabel( labs[fidx][1][1], labelpad=0.5 )
+# ax.set_xlim( lims[fidx][1][0] )
+# ax.set_ylim( y_lims[0] )
 ax.minorticks_on()
-pl.tight_layout() # can run once to apply to all subplots, i think
+pl.tight_layout()
+
+# # inset axes
+# ax = pl.axes([ .44, .57, .3, .3 ]) # [ L, B, W, H ] relative to figure
+# # t = phi_gb_exp
+# # s = [ 7**2 for n in range( len( t ) ) ] # [2]
+# pl.scatter( t, mack, s=s, c=t, cmap=cmaps[fidx], edgecolors='none' )
+# pl.plot( t[ perco_idx[0]:perco_idx[1] ], mack[ perco_idx[0]:perco_idx[1] ], 'o',
+#     c='w', markersize=1.5 )
+# print( np.sum( mack[ perco_idx[0]:perco_idx[1] ] ) / np.sum( mack ) )
+# # pl.colorbar()
+# ax.set_xlabel( labs[fidx][0], labelpad=0.5 )
+# ax.set_ylabel( labs[fidx][1], labelpad=0.5 )
+# ax.xaxis.set_major_locator( mpl.ticker.MultipleLocator( .1 ) )
+# ax.set_xlim( lims[fidx][1][0] )
+# ax.set_ylim( lims[fidx][1][1] )
+# ax.minorticks_on()
+# pl.tight_layout() # can run once to apply to all subplots, i think
+
+
+# length fraction vs. ea_gb_sub_threshold ##
+ea_max = 0.95 # eV
+mack_sub_thresh = []
+ea_gb_sub_thresh = []
+
+for idx, ea_gb_i in enumerate( ea_gb ):
+    if ea_gb_i < ea_max:
+        mack_sub_thresh.append( mack[idx] )
+        ea_gb_sub_thresh.append( ea_gb_i )
+
+# normalize length fraction to 1
+mack_sub_thresh_norm = mack_sub_thresh / np.sum( mack_sub_thresh )
+# ea_gb below threshold, weighted by length fraction
+ea_gb_weighted_sub_thresh = np.sum( mack_sub_thresh_norm * ea_gb_sub_thresh )
+ea_gb_weighted_sub_thresh
+
 
 anno = name_ext[fidx]
 if save:
     save_anno_fig( anno )
 
+# 5 REPEAT 4 FOR LENGTH FRACTION VS NV
 
-# 5. length fraction vs. sig_gb/sig_gr ##
+
+
+# 6. length fraction vs. sig_gb/sig_gr ## DO THE SUBPLOT FOR BINNED
 fidx += 1
 pl.figure( figsize=(3.5,3) ) # ( w, h ) inches
 
@@ -479,6 +535,9 @@ pl.tight_layout()
 # anno = name_ext[fidx]
 # if save:
 #     save_anno_fig( anno )
+
+# 7 (1) ARRHENIUS PLOTS FOR WEIGHTED EA'S, WEIGHTED AVERAGE EA, NO NVS
+# 7 (2) ARRHENIUS PLOTS FOR WEIGHTED CONDUCTIVITY, WEIGHTED AVERAGE SIG (W/ NVS)
 
 '''
 REFS
